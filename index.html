@@ -673,8 +673,7 @@
             <span class="cat">CAT</span><span class="alyst">alyst</span>
         </h1>
         <p class="hero-sub">
-            Automated CAT market making on Dexie. Run a live bid/ask ladder,
-            auto-requote on price moves, and let the spread work for you — from a native desktop app.
+            Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book and requotes when price moves. Runs as a proper Windows desktop app.
         </p>
         <div class="hero-actions">
             <a href="#download" class="btn btn-primary btn-lg">
@@ -718,53 +717,53 @@
     <div class="container">
         <p class="section-label">What it does</p>
         <h2 class="section-title">Everything a market maker needs</h2>
-        <p class="section-subtitle">CATalyst handles the mechanics so you can focus on the strategy.</p>
+        <p class="section-subtitle">Set it up once and it takes care of the rest.</p>
 
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">📊</div>
                 <div class="feature-title">Live Bid/Ask Ladder</div>
-                <div class="feature-body">Deploys a multi-tier ladder of buy and sell offers around the current mid-price, sized proportionally by distance. Inner offers are largest, outer offers are smallest.</div>
+                <div class="feature-body">Places buy and sell offers in tiers around the mid price. Closer offers are bigger, wider ones are smaller. You set the spread and the bot handles the rest.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
                 <div class="feature-title">Auto-Requote</div>
-                <div class="feature-body">Monitors the market continuously. When price moves beyond your threshold, stale offers are cancelled and replaced — keeping you always on the right side of the spread.</div>
+                <div class="feature-body">When price moves past your threshold the bot cancels old offers and puts fresh ones up at the new prices. You don't have to watch it.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🧠</div>
                 <div class="feature-title">Smart Settings</div>
-                <div class="feature-body">One click generates a complete capital plan. Smart Settings reads your wallet balance, live market data, and volatility, then calculates the optimal offer sizes, tier counts, and spread width.</div>
+                <div class="feature-body">Point it at your wallet and it works out a sensible starting config. Reads your balance, checks the current market, and suggests offer sizes and spread width. Useful if you're not sure where to begin.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔭</div>
                 <div class="feature-title">Mempool Fill Detection</div>
-                <div class="feature-body">Fills are detected the moment they appear in the mempool — not after block confirmation. This means faster requotes and tighter spread capture.</div>
+                <div class="feature-body">Fills show up in the mempool before they're confirmed on chain. CATalyst catches them there so requotes go out faster.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🪙</div>
                 <div class="feature-title">Coin Prep</div>
-                <div class="feature-body">Chia offers each lock a specific coin. CATalyst pre-splits coins to exact sizes ahead of time so new offers are always ready to go without waiting for wallet operations.</div>
+                <div class="feature-body">Chia offers need coins pre-split to specific sizes. CATalyst does this in the background so there's no delay when it needs to place a new offer.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🛡️</div>
                 <div class="feature-title">Risk Controls</div>
-                <div class="feature-body">Hard price bounds, position limits, inventory skew, circuit breakers, and configurable reserve amounts keep your capital protected at every market condition.</div>
+                <div class="feature-body">Price bounds, position limits, a circuit breaker, and reserve amounts you set yourself. Guardrails to stop it doing something dumb if the market goes sideways.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📈</div>
                 <div class="feature-title">Market Intelligence</div>
-                <div class="feature-body">Pulls live data from TibetSwap, Dexie, and Spacescan — AMM price, order book depth, pool size, and competitor spread — to inform pricing decisions in real time.</div>
+                <div class="feature-body">Grabs live prices from TibetSwap and checks what's already sitting on the Dexie order book before deciding where to put your offers.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🖥️</div>
                 <div class="feature-title">Native Desktop App</div>
-                <div class="feature-body">Runs as a proper Windows desktop application with a system tray icon, native notifications, and a persistent window — no browser tab to close by accident.</div>
+                <div class="feature-body">Runs in your system tray. There's a proper window you can open and close but the bot keeps going in the background. No browser tab to lose.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔗</div>
                 <div class="feature-title">Sage Wallet Integration</div>
-                <div class="feature-body">Connects directly to your local Sage wallet via RPC. Your keys never leave your machine — CATalyst talks to Sage, Sage talks to the blockchain.</div>
+                <div class="feature-body">Talks to Sage over local RPC. Your keys stay in Sage, CATalyst just tells it what to do. Nothing leaves your machine.</div>
             </div>
         </div>
     </div>
@@ -777,28 +776,28 @@
     <div class="container">
         <p class="section-label">The loop</p>
         <h2 class="section-title">How it works</h2>
-        <p class="section-subtitle">CATalyst runs a continuous loop. Here's what happens every cycle.</p>
+        <p class="section-subtitle">Every few seconds it runs through the same steps.</p>
 
         <div class="how-grid">
             <div class="how-step">
                 <div class="how-step-num">Step 01</div>
                 <div class="how-step-title">Price Check</div>
-                <div class="how-step-body">CATalyst reads the current mid-price from TibetSwap's AMM and cross-references it with the Dexie order book. Competitor spreads are factored in to keep your pricing competitive.</div>
+                <div class="how-step-body">Grabs the current price from TibetSwap and checks what's on the Dexie order book. Has a look at where other people are sitting before deciding where to put your offers.</div>
             </div>
             <div class="how-step">
                 <div class="how-step-num">Step 02</div>
                 <div class="how-step-title">Ladder Management</div>
-                <div class="how-step-body">Active offers are compared against the new price. Any that have drifted outside your requote threshold are cancelled and replaced with fresh offers at the correct prices and sizes.</div>
+                <div class="how-step-body">Checks whether your open offers are still in the right place. If price has moved enough that they're stale, it cancels them and puts new ones up.</div>
             </div>
             <div class="how-step">
                 <div class="how-step-num">Step 03</div>
                 <div class="how-step-title">Fill Handling</div>
-                <div class="how-step-body">Filled offers are detected via the mempool. The bot logs each fill, updates PnL, adjusts inventory skew if needed, and queues a replacement offer immediately.</div>
+                <div class="how-step-body">Spots fills in the mempool as soon as they happen. Logs the trade, updates the position, and gets a replacement offer out.</div>
             </div>
             <div class="how-step">
                 <div class="how-step-num">Step 04</div>
                 <div class="how-step-title">Coin Replenishment</div>
-                <div class="how-step-body">Spare pre-split coins are consumed as offers are placed. When stock runs low, the topup worker automatically splits new coins in the background — the ladder keeps running uninterrupted.</div>
+                <div class="how-step-body">Offers use up pre-split coins. When it's running low it splits more in the background. The ladder keeps going while this happens.</div>
             </div>
         </div>
     </div>
@@ -811,7 +810,7 @@
     <div class="container">
         <p class="section-label">Before you start</p>
         <h2 class="section-title">Requirements</h2>
-        <p class="section-subtitle">You'll need a couple of things set up before running CATalyst.</p>
+        <p class="section-subtitle">Nothing complicated, just make sure you have these before you start.</p>
 
         <div class="req-grid">
             <div class="req-item">
@@ -858,7 +857,7 @@
         <div class="download-box">
             <img src="assets/icon.png" alt="CATalyst">
             <div class="download-title"><span class="cat">CAT</span><span class="alyst">alyst</span></div>
-            <p class="download-sub">The latest release is always available on GitHub. Download the installer, run it, and you're ready to connect your wallet.</p>
+            <p class="download-sub">Grab the latest release from GitHub, run the installer, and connect your Sage wallet.</p>
             <div class="download-platforms">
                 <a href="https://github.com/Lowestofttim/catalystxch/releases/latest" target="_blank" rel="noopener" class="platform-btn">
                     <span class="platform-icon">🪟</span>
@@ -879,7 +878,7 @@
     <div class="container">
         <p class="section-label">Installation</p>
         <h2 class="section-title">Setup Guide</h2>
-        <p class="section-subtitle">From a fresh machine to a running market maker in under ten minutes.</p>
+        <p class="section-subtitle">Shouldn't take more than ten minutes if you've already got Sage installed.</p>
 
         <div class="setup-steps">
             <div class="setup-step">
@@ -887,9 +886,7 @@
                 <div class="setup-step-content">
                     <div class="setup-step-title">Install Sage Wallet</div>
                     <div class="setup-step-body">
-                        Download and install <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> (v0.12.10 or later).
-                        Once installed, open Sage and let it sync. Then go to <strong>Settings → Advanced</strong> and enable <strong>RPC</strong>.
-                        This is what allows CATalyst to communicate with your wallet.
+                        Download and install <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> (v0.12.10 or later). Let it sync, then go to <strong>Settings &gt; Advanced</strong> and turn on <strong>RPC</strong>. CATalyst uses this to talk to Sage.
                     </div>
                 </div>
             </div>
@@ -898,9 +895,7 @@
                 <div class="setup-step-content">
                     <div class="setup-step-title">Add your CAT token to Sage</div>
                     <div class="setup-step-body">
-                        In Sage, use the token manager to add the CAT token you want to market-make.
-                        Make sure your wallet holds a balance of both that token and some XCH — you'll need both
-                        to place offers on both sides of the spread.
+                        Add the CAT you want to trade in the Sage token manager. You'll need a balance of that token and some XCH — one for sell offers, the other for buys.
                     </div>
                 </div>
             </div>
@@ -909,9 +904,7 @@
                 <div class="setup-step-content">
                     <div class="setup-step-title">Download and run CATalyst</div>
                     <div class="setup-step-body">
-                        Download the Windows installer from the <a href="#download">Download section</a> above and run it.
-                        CATalyst will install and open automatically. The first time it launches it will check
-                        that Sage is running and walk you through connecting your wallet.
+                        Download the installer from the <a href="#download">Download section</a> above and run it. When it opens for the first time it'll check Sage is running and help you connect.
                     </div>
                 </div>
             </div>
@@ -920,9 +913,7 @@
                 <div class="setup-step-content">
                     <div class="setup-step-title">Select your trading pair</div>
                     <div class="setup-step-body">
-                        Once connected, choose the CAT token you want to trade from the pair selector at the top of the dashboard.
-                        CATalyst will load the current market price from TibetSwap and show you a snapshot of the token's
-                        recent volume and price range.
+                        Pick the CAT you want to trade from the selector at the top. It'll pull the current price from TibetSwap and show you what the market looks like.
                     </div>
                 </div>
             </div>
@@ -931,9 +922,7 @@
                 <div class="setup-step-content">
                     <div class="setup-step-title">Run Smart Settings</div>
                     <div class="setup-step-body">
-                        Click <strong>Smart Settings</strong> in the configuration panel. CATalyst will analyse your wallet balance,
-                        the current market conditions, and token volatility, then generate a complete set of recommended settings
-                        — offer sizes, tier counts, spread width, reserves, and coin prep targets. Review them and click Apply.
+                        Click <strong>Smart Settings</strong>. It looks at your balance and the current market and suggests a config. Have a look over the numbers and click Apply if they look sensible.
                     </div>
                 </div>
             </div>
@@ -942,10 +931,8 @@
                 <div class="setup-step-content">
                     <div class="setup-step-title">Run Coin Prep, then Start</div>
                     <div class="setup-step-body">
-                        Before the bot can place offers it needs coins pre-split to the right sizes. Click <strong>Run Coin Prep</strong>
-                        and wait for it to complete — this takes a few minutes the first time. Once done, hit <strong>Start Bot</strong>.
-                        The ladder goes live immediately.
-                        <div class="code-block">💡 Tip: leave CATalyst running in the background. It sits in the system tray and keeps the ladder active while you work.</div>
+                        The bot needs coins pre-split before it can place offers. Hit <strong>Run Coin Prep</strong> and wait for it to finish — usually a few minutes the first time. Then click <strong>Start Bot</strong> and it'll go.
+                        <div class="code-block">💡 Tip: you don't need to keep the window open. Close it and CATalyst keeps running from the system tray.</div>
                     </div>
                 </div>
             </div>
@@ -970,7 +957,7 @@
                 <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a></li>
             </ul>
             <p class="footer-copy">
-                Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a> &middot; Use at your own risk
+                Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>. Use at your own risk.
             </p>
         </div>
     </div>
