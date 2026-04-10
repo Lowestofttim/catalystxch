@@ -494,6 +494,12 @@
         .platform-btn .platform-info { text-align: left; }
         .platform-btn .platform-name { display: block; font-weight: 700; }
         .platform-btn .platform-note { display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+        .platform-btn.coming-soon {
+            opacity: 0.45;
+            pointer-events: none;
+            cursor: default;
+        }
+        .platform-btn.coming-soon .platform-note { color: var(--accent); }
 
         /* ── Setup guide ── */
         .setup-steps {
@@ -667,23 +673,23 @@
         <img src="assets/icon.png" alt="CATalyst" class="hero-icon">
         <div class="hero-badge">
             <span class="dot"></span>
-            Now available for Windows, macOS & Linux
+            Now available for Windows · macOS &amp; Linux coming soon
         </div>
         <h1 class="hero-title">
             <span class="cat">CAT</span><span class="alyst">alyst</span>
         </h1>
         <p class="hero-sub">
-            Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book and requotes when price moves. Runs as a proper Windows desktop app.
+            Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book and requotes when price moves. Runs as a native desktop app.
         </p>
         <div class="hero-actions">
             <a href="#download" class="btn btn-primary btn-lg">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Download for Windows
+                Download Now
             </a>
             <a href="#setup" class="btn btn-ghost btn-lg">Setup Guide</a>
         </div>
         <p class="hero-note">
-            Requires <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> · Windows 10/11 · Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>
+            Requires <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> · Windows, macOS &amp; Linux · Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>
         </p>
     </div>
 </section>
@@ -866,6 +872,20 @@
                         <span class="platform-note">.exe · Windows 10/11 · 64-bit</span>
                     </span>
                 </a>
+                <span class="platform-btn coming-soon">
+                    <span class="platform-icon">🍎</span>
+                    <span class="platform-info">
+                        <span class="platform-name">macOS</span>
+                        <span class="platform-note">Coming Soon</span>
+                    </span>
+                </span>
+                <span class="platform-btn coming-soon">
+                    <span class="platform-icon">🐧</span>
+                    <span class="platform-info">
+                        <span class="platform-name">Linux</span>
+                        <span class="platform-note">Coming Soon</span>
+                    </span>
+                </span>
             </div>
         </div>
     </div>
@@ -952,7 +972,7 @@
                 <li><a href="#features">Features</a></li>
                 <li><a href="#setup">Setup Guide</a></li>
                 <li><a href="#download">Download</a></li>
-                <li><a href="https://github.com/Lowestofttim/catalyst-bot/releases" target="_blank" rel="noopener">Releases</a></li>
+                <li><a href="https://github.com/Lowestofttim/catalystxch/releases" target="_blank" rel="noopener">Releases</a></li>
                 <li><a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a></li>
                 <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a></li>
             </ul>
