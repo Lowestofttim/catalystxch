@@ -663,7 +663,7 @@
             <li><a href="#setup">Setup</a></li>
             <li><a href="#download">Download</a></li>
         </ul>
-        <a href="#download" class="btn btn-primary">Download</a>
+        <a href="#features" class="btn btn-primary">Features</a>
     </div>
 </nav>
 
@@ -673,7 +673,7 @@
         <img src="assets/icon.png" alt="CATalyst" class="hero-icon">
         <div class="hero-badge">
             <span class="dot"></span>
-            Now available for Windows · macOS &amp; Linux coming soon
+            Coming Soon · Windows, macOS &amp; Linux
         </div>
         <h1 class="hero-title">
             <span class="cat">CAT</span><span class="alyst">alyst</span>
@@ -682,14 +682,11 @@
             Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book and requotes when price moves. Runs as a native desktop app.
         </p>
         <div class="hero-actions">
-            <a href="#download" class="btn btn-primary btn-lg">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Download Now
-            </a>
+            <a href="#features" class="btn btn-primary btn-lg">View Features</a>
             <a href="#setup" class="btn btn-ghost btn-lg">Setup Guide</a>
         </div>
         <p class="hero-note">
-            Requires <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> · Windows, macOS &amp; Linux · Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>
+            Requires <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> · Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>
         </p>
     </div>
 </section>
@@ -700,7 +697,7 @@
         <div class="stats-inner">
             <div class="stat">
                 <div class="stat-value"><span class="cat">4</span> tiers</div>
-                <div class="stat-label">Inner / Mid / Outer / Extreme</div>
+                <div class="stat-label">Tiered bid/ask ladder</div>
             </div>
             <div class="stat">
                 <div class="stat-value"><span class="alyst">Live</span></div>
@@ -712,7 +709,7 @@
             </div>
             <div class="stat">
                 <div class="stat-value"><span class="alyst">Smart</span></div>
-                <div class="stat-label">One-click capital planning</div>
+                <div class="stat-label">One-click config &amp; capital planning</div>
             </div>
         </div>
     </div>
@@ -753,18 +750,33 @@
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🛡️</div>
-                <div class="feature-title">Risk Controls</div>
-                <div class="feature-body">Price bounds, position limits, a circuit breaker, and reserve amounts you set yourself. Guardrails to stop it doing something dumb if the market goes sideways.</div>
+                <div class="feature-title">Circuit Breakers</div>
+                <div class="feature-body">Automatic safety halts when price drifts outside your range or position gets too large. Price breakers stop both sides; position breakers only block the accumulating side so the correcting side keeps running.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📈</div>
                 <div class="feature-title">Market Intelligence</div>
-                <div class="feature-body">Grabs live prices from TibetSwap and checks what's already sitting on the Dexie order book before deciding where to put your offers.</div>
+                <div class="feature-body">Competitor spread monitoring, order book depth, slippage analysis, and live reserve data from TibetSwap. Knows where other market makers are sitting before placing your offers.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Close the Gap</div>
+                <div class="feature-body">Adaptive spread-tightening probe that starts wide and gradually narrows. Uses the TibetSwap arb gap as a floor so it never probes tighter than profitable. Cascades success back to the main ladder.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Arb Sniper</div>
+                <div class="feature-body">Detects TibetSwap swaps in real time and fires immediate offers at the new best price. Size-aware, inventory-aware, and fast — catches moves in seconds rather than waiting for the next loop cycle.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">PnL Tracking</div>
+                <div class="feature-body">Automatic round-trip fill matching with per-trade spread capture. Tracks every fill by category — normal, sniper, boost — with verified confirmation from on-chain data.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🖥️</div>
                 <div class="feature-title">Native Desktop App</div>
-                <div class="feature-body">Runs in your system tray. There's a proper window you can open and close but the bot keeps going in the background. No browser tab to lose.</div>
+                <div class="feature-body">Runs in your system tray with a live status icon. Open and close the dashboard whenever you like — the bot keeps going in the background. No browser tab to lose.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔗</div>
@@ -788,22 +800,27 @@
             <div class="how-step">
                 <div class="how-step-num">Step 01</div>
                 <div class="how-step-title">Price Check</div>
-                <div class="how-step-body">Grabs the current price from TibetSwap and checks what's on the Dexie order book. Has a look at where other people are sitting before deciding where to put your offers.</div>
+                <div class="how-step-body">Grabs the current price from TibetSwap, polls AMM reserves, and checks the Dexie order book. Knows where competitors are sitting before deciding where to place your offers.</div>
             </div>
             <div class="how-step">
                 <div class="how-step-num">Step 02</div>
                 <div class="how-step-title">Ladder Management</div>
-                <div class="how-step-body">Checks whether your open offers are still in the right place. If price has moved enough that they're stale, it cancels them and puts new ones up.</div>
+                <div class="how-step-body">Checks whether your open offers are still in the right place. If price has moved enough that they're stale, it cancels them and puts fresh ones up at the new levels.</div>
             </div>
             <div class="how-step">
                 <div class="how-step-num">Step 03</div>
-                <div class="how-step-title">Fill Handling</div>
-                <div class="how-step-body">Spots fills in the mempool as soon as they happen. Logs the trade, updates the position, and gets a replacement offer out.</div>
+                <div class="how-step-title">Fill Detection &amp; Sniping</div>
+                <div class="how-step-body">Spots fills in the mempool as soon as they happen. Logs the trade, updates the position, and fires a replacement. The Arb Sniper watches for TibetSwap swaps and catches price moves in seconds.</div>
             </div>
             <div class="how-step">
                 <div class="how-step-num">Step 04</div>
-                <div class="how-step-title">Coin Replenishment</div>
-                <div class="how-step-body">Offers use up pre-split coins. When it's running low it splits more in the background. The ladder keeps going while this happens.</div>
+                <div class="how-step-title">Spread Tightening</div>
+                <div class="how-step-body">Close the Gap probes the spread with adaptive offers that start wide and gradually tighten. Uses the arb floor as a safety net and feeds success back to the main ladder.</div>
+            </div>
+            <div class="how-step">
+                <div class="how-step-num">Step 05</div>
+                <div class="how-step-title">Risk &amp; Coin Management</div>
+                <div class="how-step-body">Circuit breakers monitor price and position. Coin prep keeps pre-split coins topped up in the background with dedicated fee coins for concurrent operations.</div>
             </div>
         </div>
     </div>
@@ -820,9 +837,9 @@
 
         <div class="req-grid">
             <div class="req-item">
-                <div class="req-icon">🪟</div>
+                <div class="req-icon">🖥️</div>
                 <div>
-                    <div class="req-name">Windows 10 or 11</div>
+                    <div class="req-name">Windows, macOS or Linux</div>
                     <div class="req-detail">64-bit required</div>
                 </div>
             </div>
@@ -863,15 +880,15 @@
         <div class="download-box">
             <img src="assets/icon.png" alt="CATalyst">
             <div class="download-title"><span class="cat">CAT</span><span class="alyst">alyst</span></div>
-            <p class="download-sub">Grab the latest release from GitHub, run the installer, and connect your Sage wallet.</p>
+            <p class="download-sub">We're currently in closed beta testing. Downloads will be available here once testing is complete.</p>
             <div class="download-platforms">
-                <a href="https://github.com/Lowestofttim/catalyst-bot/releases/latest" target="_blank" rel="noopener" class="platform-btn">
+                <span class="platform-btn coming-soon">
                     <span class="platform-icon">🪟</span>
                     <span class="platform-info">
-                        <span class="platform-name">Windows Installer</span>
-                        <span class="platform-note">.exe · Windows 10/11 · 64-bit</span>
+                        <span class="platform-name">Windows</span>
+                        <span class="platform-note">Coming Soon</span>
                     </span>
-                </a>
+                </span>
                 <span class="platform-btn coming-soon">
                     <span class="platform-icon">🍎</span>
                     <span class="platform-info">
@@ -972,9 +989,12 @@
                 <li><a href="#features">Features</a></li>
                 <li><a href="#setup">Setup Guide</a></li>
                 <li><a href="#download">Download</a></li>
-                <li><a href="https://github.com/Lowestofttim/catalystxch/releases" target="_blank" rel="noopener">Releases</a></li>
-                <li><a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a></li>
+            </ul>
+            <ul class="footer-links">
                 <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a></li>
+                <li><a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a></li>
+                <li><a href="https://v2.tibetswap.io" target="_blank" rel="noopener">TibetSwap</a></li>
+                <li><a href="https://coinset.org" target="_blank" rel="noopener">Coinset</a></li>
             </ul>
             <p class="footer-copy">
                 Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>. Use at your own risk.
