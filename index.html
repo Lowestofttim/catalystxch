@@ -635,6 +635,94 @@
             margin: 0;
         }
 
+        /* ── Recommendation Box ── */
+        .rec-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-mid);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rec-box::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            background: radial-gradient(ellipse, rgba(62,201,163,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .rec-box-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .rec-box-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rec-box-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--cat-teal);
+            margin-bottom: 6px;
+        }
+
+        .rec-box-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .rec-box-body {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .rec-box-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .rec-box-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .rec-box-tag .check {
+            color: var(--cat-teal);
+            font-size: 13px;
+        }
+
+        .rec-box .btn {
+            font-size: 13px;
+            padding: 8px 18px;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 640px) {
             .nav-links { display: none; }
@@ -643,6 +731,8 @@
             .stats-inner { gap: 32px; }
             .how-grid { grid-template-columns: 1fr; }
             .download-box { padding: 32px 24px; }
+            .rec-box { flex-direction: column; align-items: center; text-align: center; padding: 24px; }
+            .rec-box-features { justify-content: center; }
             .setup-step { flex-direction: column; gap: 12px; }
             .footer-inner { flex-direction: column; align-items: flex-start; }
         }
@@ -974,8 +1064,22 @@
             </div>
         </div>
 
-        <div class="code-block" style="margin-top: 32px;">
-            💡 <strong>Top tip:</strong> Sign up for a free <a href="https://spacescan.io" target="_blank" rel="noopener" style="color: var(--cat-gold); text-decoration: underline;">Spacescan API key</a> to unlock on-chain fill verification, live balance checks against the blockchain, token holder and activity data for smarter trading decisions, and faster API rate limits. CATalyst works without one, but a key makes everything more reliable.
+        <div class="rec-box">
+            <img src="assets/spacescan-logo.webp" alt="Spacescan" class="rec-box-logo">
+            <div class="rec-box-content">
+                <div class="rec-box-label">Recommended</div>
+                <div class="rec-box-title">Spacescan API — Builder Tier</div>
+                <p class="rec-box-body">
+                    CATalyst uses the Spacescan API to verify trades on-chain and pull live market data. It works without a key, but you'll hit tight rate limits on the free tier. We recommend the <strong>Builder</strong> plan for the best experience.
+                </p>
+                <div class="rec-box-features">
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> On-chain fill verification</span>
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> Live balance checks</span>
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> Token holder &amp; activity data</span>
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> 40,000 requests/month</span>
+                </div>
+                <a href="https://spacescan.io" target="_blank" rel="noopener" class="btn btn-primary">Get an API Key</a>
+            </div>
         </div>
     </div>
 </section>
