@@ -7,6 +7,8 @@
     <meta name="description" content="A native desktop market-making bot for Chia CAT tokens. Tiered bid/ask ladder, auto-requote, mempool fill detection, arb sniper, and gap-closing probes, all from a Sage wallet, all local.">
     <link rel="canonical" href="https://catalystxch.com/">
     <meta name="theme-color" content="#080C12">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'none'; frame-src 'none'; form-action 'none'; upgrade-insecure-requests">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://catalystxch.com/">
@@ -22,9 +24,6 @@
     <meta name="twitter:image" content="https://catalystxch.com/assets/screenshots/01_dashboard.png">
 
     <link rel="icon" type="image/png" href="assets/icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -58,12 +57,14 @@
             --radius-lg: 18px;
             --radius-xl: 24px;
             --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 30px 80px -20px rgba(0,0,0,0.6);
+            --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
         }
 
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-sans);
             background:
                 radial-gradient(1200px 600px at 50% -100px, rgba(62,201,163,0.08) 0%, transparent 60%),
                 radial-gradient(800px 400px at 90% 600px, rgba(212,168,75,0.05) 0%, transparent 60%),
@@ -78,8 +79,8 @@
         /* ── Type ── */
         .cat   { color: var(--cat-teal); }
         .alyst { color: var(--cat-gold); }
-        .mono  { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; }
-        .num   { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; letter-spacing: -0.02em; }
+        .mono  { font-family: var(--font-mono); font-feature-settings: "tnum"; }
+        .num   { font-family: var(--font-mono); font-feature-settings: "tnum"; letter-spacing: -0.02em; }
 
         a { color: inherit; }
         .text-link {
@@ -407,7 +408,7 @@
 
         .hero-shot-chrome .label {
             margin-left: 12px;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 0.04em;
@@ -434,7 +435,7 @@
         }
 
         .stat-value {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 24px;
             font-weight: 700;
             letter-spacing: -0.02em;
@@ -471,7 +472,7 @@
         .pillar:hover { border-color: var(--border-mid); transform: translateY(-2px); }
 
         .pillar-num {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 11px;
             color: var(--cat-teal);
             letter-spacing: 0.18em;
@@ -524,7 +525,7 @@
         }
 
         .showcase-card-kicker {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 11px;
             color: var(--cat-teal);
             letter-spacing: 0.16em;
@@ -629,7 +630,7 @@
         }
 
         .loop-step-num {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 13px;
             font-weight: 600;
             color: var(--cat-teal);
@@ -703,7 +704,7 @@
             background: rgba(0,0,0,0.25);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 12.5px;
         }
 
@@ -885,6 +886,33 @@
             line-height: 1.6;
         }
 
+        .download-security {
+            max-width: 860px;
+            margin: 18px auto 0;
+            border: 1px solid rgba(62,201,163,0.18);
+            border-radius: var(--radius);
+            background: rgba(62,201,163,0.04);
+            padding: 18px 20px;
+            text-align: left;
+        }
+
+        .download-security-title {
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .download-security-list {
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.7;
+            margin: 0;
+            padding-left: 18px;
+        }
+
         .release-status {
             max-width: 860px;
             margin: 28px auto 0;
@@ -911,7 +939,7 @@
         }
 
         .release-version {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 28px;
             color: var(--text-primary);
             font-weight: 700;
@@ -959,7 +987,7 @@
             background: rgba(62,201,163,0.10);
             border: 1px solid rgba(62,201,163,0.25);
             color: var(--cat-teal);
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 14px;
             font-weight: 700;
             display: flex;
@@ -1663,6 +1691,15 @@
             <p class="download-note">
                 Early tester downloads are being kept private until the main CATalyst app repository is public. This section is already structured for the switch: when public releases are enabled, the Windows installer, portable archives, checksums, and release notes can be linked here directly.
             </p>
+            <div class="download-security">
+                <div class="download-security-title">Safe download rules</div>
+                <ul class="download-security-list">
+                    <li>Public installers will link only to official GitHub Releases over HTTPS.</li>
+                    <li>Each download will show its version, release notes, file size, and SHA-256 checksum.</li>
+                    <li>There will be no mirror links, shortened URLs, or installer links posted only in chat.</li>
+                    <li>CATalyst never asks for your seed phrase or private keys; Sage signs locally on your machine.</li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>
