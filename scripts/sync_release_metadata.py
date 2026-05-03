@@ -124,6 +124,16 @@ def sort_asset_key(asset: dict) -> tuple[int, int, str]:
     )
 
 
+def extract_sha256(asset: dict) -> str | None:
+    digest = asset.get("digest")
+    if not isinstance(digest, str):
+        return None
+    match = re.fullmatch(r"sha256:([0-9a-fA-F]{64})", digest.strip())
+    if not match:
+        return None
+    return match.group(1).lower()
+
+
 def build_metadata(release: dict, repo: str, include_download_urls: bool) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
@@ -142,6 +152,9 @@ def build_metadata(release: dict, repo: str, include_download_urls: bool) -> dic
         name = item.get("name")
         if not name:
             continue
+        sha256 = extract_sha256(item)
+        if include_download_urls and not sha256:
+            raise SystemExit(f"release asset {name!r} is missing a SHA-256 digest")
         assets.append(
             {
                 "name": name,
@@ -149,17 +162,19 @@ def build_metadata(release: dict, repo: str, include_download_urls: bool) -> dic
                 "kind": classify_kind(name),
                 "size_bytes": item.get("size") or 0,
                 "download_url": item.get("url") if include_download_urls else None,
-                "sha256": None,
+                "sha256": sha256 if include_download_urls else None,
             }
         )
     assets.sort(key=sort_asset_key)
+
+    downloads_enabled = bool(include_download_urls)
 
     return {
         "schema_version": 1,
         "source_repo": repo,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        "downloads_enabled": False,
-        "download_status": "coming_soon",
+        "downloads_enabled": downloads_enabled,
+        "download_status": "available" if downloads_enabled else "coming_soon",
         "latest": {
             "version": version,
             "name": release.get("name") or version,
@@ -195,7 +210,11 @@ def main() -> None:
     output = args.output if args.output.is_absolute() else ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(metadata, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
-    print(f"wrote {output.relative_to(ROOT)} for {metadata['latest']['version']}")
+    try:
+        display_output = output.relative_to(ROOT)
+    except ValueError:
+        display_output = output
+    print(f"wrote {display_output} for {metadata['latest']['version']}")
 
 
 if __name__ == "__main__":
