@@ -1097,6 +1097,94 @@
 
         .divider { height: 1px; background: var(--border); margin: 0; }
 
+        /* ── Recommendation Box ── */
+        .rec-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-mid);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rec-box::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            background: radial-gradient(ellipse, rgba(62,201,163,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .rec-box-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .rec-box-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rec-box-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--cat-teal);
+            margin-bottom: 6px;
+        }
+
+        .rec-box-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .rec-box-body {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .rec-box-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .rec-box-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .rec-box-tag .check {
+            color: var(--cat-teal);
+            font-size: 13px;
+        }
+
+        .rec-box .btn {
+            font-size: 13px;
+            padding: 8px 18px;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 960px) {
             .hero-grid {
@@ -1120,6 +1208,8 @@
             .tier-section { padding: 32px 24px; }
             .download-wrap { padding: 36px 24px; }
             .setup-step { padding: 22px 20px; grid-template-columns: 40px 1fr; gap: 16px; }
+            .rec-box { flex-direction: column; align-items: center; text-align: center; padding: 24px; }
+            .rec-box-features { justify-content: center; }
             .footer-inner { flex-direction: column; align-items: flex-start; gap: 18px; }
             .stats-inner { grid-template-columns: 1fr 1fr; }
             .stat-value { font-size: 20px; }
@@ -1342,7 +1432,7 @@
             <div class="feature-card">
                 <div class="feature-icon">🛡️</div>
                 <div class="feature-title">Risk Controls</div>
-                <div class="feature-body">Position circuit breakers, reserve floors, mass-disappearance guard, price-shock detection, and per-side limits.</div>
+                <div class="feature-body">Position circuit breakers, reserve floors, mass-disappearance guard, price-shock detection, and per-side controls that keep the correcting side running.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📡</div>
@@ -1357,7 +1447,7 @@
             <div class="feature-card">
                 <div class="feature-icon">🖥️</div>
                 <div class="feature-title">Native Desktop App</div>
-                <div class="feature-body">System-tray persistence, light/dark themes, in-app crash report viewer, auto-update notifications.</div>
+                <div class="feature-body">Runs from the system tray with live status, light/dark themes, in-app crash reports, and update notifications.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔗</div>
@@ -1484,10 +1574,10 @@
 
         <div class="req-grid">
             <div class="req-item">
-                <div class="req-icon">🪟</div>
+                <div class="req-icon">🖥️</div>
                 <div>
                     <div class="req-name">Windows 10 or 11</div>
-                    <div class="req-detail">64-bit · fully tested release</div>
+                    <div class="req-detail">64-bit tested build · macOS/Linux experimental</div>
                 </div>
             </div>
             <div class="req-item">
@@ -1645,6 +1735,24 @@
                 </div>
             </div>
         </div>
+
+        <div class="rec-box">
+            <img src="assets/spacescan-logo.webp" alt="Spacescan" class="rec-box-logo">
+            <div class="rec-box-content">
+                <div class="rec-box-label">Optional enhancement</div>
+                <div class="rec-box-title">Spacescan API key</div>
+                <p class="rec-box-body">
+                    CATalyst works without a Spacescan key, but an API key improves token-health context, holder/activity data, and Smart Settings risk estimates. Live quote pricing still comes from Dexie and TibetSwap.
+                </p>
+                <div class="rec-box-features">
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> Token icons and basic data</span>
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> Holder and activity panels</span>
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> On-chain risk context</span>
+                    <span class="rec-box-tag"><span class="check">&#10003;</span> Better Smart Settings inputs</span>
+                </div>
+                <a href="https://spacescan.io/apis" target="_blank" rel="noopener" class="btn btn-primary">View Spacescan APIs</a>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -1683,6 +1791,7 @@
                 <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage</a></li>
                 <li><a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a></li>
                 <li><a href="https://v2.tibetswap.io" target="_blank" rel="noopener">TibetSwap</a></li>
+                <li><a href="https://coinset.org" target="_blank" rel="noopener">Coinset</a></li>
             </ul>
             <p class="footer-copy">
                 Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>.<br>
