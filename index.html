@@ -3,92 +3,150 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CATalyst — Automated CAT Market Maker for Chia</title>
-    <meta name="description" content="CATalyst is a native desktop market-making bot for Chia CAT tokens on Dexie. Run a live bid/ask ladder, auto-requote on price moves, and manage your liquidity — all from one window.">
-    <meta property="og:title" content="CATalyst — Automated CAT Market Maker">
-    <meta property="og:description" content="Native desktop market-making bot for Chia CAT tokens on Dexie.">
-    <meta property="og:image" content="assets/icon.png">
+    <title>CATalyst | Automated CAT Market Maker for Chia</title>
+    <meta name="description" content="A native desktop market-making bot for Chia CAT tokens. Tiered bid/ask ladder, auto-requote, mempool fill detection, arb sniper, and gap-closing probes, all from a Sage wallet, all local.">
+    <link rel="canonical" href="https://catalystxch.com/">
+    <meta name="theme-color" content="#080C12">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://catalystxch.com/">
+    <meta property="og:title" content="CATalyst | Automated CAT Market Maker for Chia">
+    <meta property="og:description" content="Native desktop market-making bot for Chia CAT tokens. Tiered ladder, auto-requote, mempool fills, arb sniper. Runs locally against Sage.">
+    <meta property="og:image" content="https://catalystxch.com/assets/screenshots/01_dashboard.png">
+    <meta property="og:image:width" content="1920">
+    <meta property="og:image:height" content="1080">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CATalyst | Automated CAT Market Maker for Chia">
+    <meta name="twitter:description" content="Tiered bid/ask ladder · Auto-requote · Mempool fills · Arb sniper. Native desktop. Local Sage.">
+    <meta name="twitter:image" content="https://catalystxch.com/assets/screenshots/01_dashboard.png">
+
     <link rel="icon" type="image/png" href="assets/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
+            /* Brand */
             --cat-teal:    #3EC9A3;
+            --cat-teal-2:  #2AA887;
             --cat-gold:    #D4A84B;
-            --bg-app:      #080C12;
-            --bg-surface:  #0F172A;
-            --bg-card:     #111827;
-            --bg-card-2:   #141E2E;
-            --border:      rgba(255,255,255,0.07);
-            --border-mid:  rgba(255,255,255,0.12);
+            --cat-red:     #F87171;
+
+            /* Surfaces */
+            --bg-app:      #06090E;
+            --bg-surface:  #0B1018;
+            --bg-card:     #0F1622;
+            --bg-card-2:   #131C2C;
+            --bg-elevated: #18223A;
+
+            /* Lines */
+            --border:      rgba(255,255,255,0.06);
+            --border-mid:  rgba(255,255,255,0.10);
+            --border-strong: rgba(255,255,255,0.16);
+
+            /* Text */
             --text-primary:   #F1F5F9;
             --text-secondary: #94A3B8;
             --text-muted:     #475569;
-            --radius-card: 16px;
+
+            /* Effects */
+            --radius-sm: 8px;
+            --radius:    12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 30px 80px -20px rgba(0,0,0,0.6);
         }
 
         html { scroll-behavior: smooth; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-app);
+            background:
+                radial-gradient(1200px 600px at 50% -100px, rgba(62,201,163,0.08) 0%, transparent 60%),
+                radial-gradient(800px 400px at 90% 600px, rgba(212,168,75,0.05) 0%, transparent 60%),
+                var(--bg-app);
+            background-attachment: fixed;
             color: var(--text-primary);
             overflow-x: hidden;
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Utilities ── */
+        /* ── Type ── */
         .cat   { color: var(--cat-teal); }
         .alyst { color: var(--cat-gold); }
-        .mono  { font-family: 'JetBrains Mono', monospace; }
+        .mono  { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; }
+        .num   { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; letter-spacing: -0.02em; }
 
+        a { color: inherit; }
+        .text-link {
+            color: var(--cat-teal);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(62,201,163,0.30);
+        }
+        .text-link:hover { border-bottom-color: var(--cat-teal); }
+
+        /* ── Layout ── */
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .container-narrow {
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        .section { padding: 96px 0; }
-        .section-sm { padding: 64px 0; }
+        .section { padding: 112px 0; }
+        .section-sm { padding: 72px 0; }
 
-        .section-label {
+        .section-kicker {
+            display: inline-block;
             font-size: 11px;
             font-weight: 700;
-            letter-spacing: 0.18em;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
             color: var(--cat-teal);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            padding: 4px 10px;
+            background: rgba(62,201,163,0.08);
+            border: 1px solid rgba(62,201,163,0.18);
+            border-radius: 999px;
         }
+        .section-kicker.is-spaced { margin-bottom: 18px; }
 
         .section-title {
-            font-size: clamp(28px, 4vw, 40px);
+            font-size: clamp(30px, 4.4vw, 46px);
             font-weight: 800;
-            line-height: 1.15;
-            margin-bottom: 16px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 18px;
         }
 
         .section-subtitle {
             font-size: 17px;
             color: var(--text-secondary);
-            max-width: 560px;
-            line-height: 1.7;
+            max-width: 620px;
+            line-height: 1.6;
         }
 
         /* ── Nav ── */
-        nav {
+        nav.site {
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 100;
-            background: rgba(8,12,18,0.85);
-            backdrop-filter: blur(16px);
+            background: rgba(6,9,14,0.72);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
             border-bottom: 1px solid var(--border);
         }
 
         .nav-inner {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
             height: 64px;
@@ -107,13 +165,13 @@
         }
 
         .nav-brand img {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 8px;
         }
 
         .nav-brand-name {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             letter-spacing: -0.3px;
         }
@@ -121,7 +179,7 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             list-style: none;
         }
 
@@ -130,9 +188,9 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            padding: 6px 12px;
+            padding: 7px 13px;
             border-radius: 8px;
-            transition: color 0.2s, background 0.2s;
+            transition: color 0.15s, background 0.15s;
         }
 
         .nav-links a:hover {
@@ -140,261 +198,535 @@
             background: rgba(255,255,255,0.05);
         }
 
+        .nav-cta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* ── Buttons ── */
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.12s, box-shadow 0.18s, background 0.15s, border-color 0.15s, color 0.15s;
             white-space: nowrap;
+            font-family: inherit;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--cat-teal), #2AA887);
-            color: #0A1810;
+            background: linear-gradient(135deg, var(--cat-teal), var(--cat-teal-2));
+            color: #04140D;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.20) inset, 0 8px 24px -4px rgba(62,201,163,0.30);
         }
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(62,201,163,0.30);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.20) inset, 0 12px 32px -4px rgba(62,201,163,0.45);
         }
 
         .btn-ghost {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-secondary);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-primary);
             border: 1px solid var(--border-mid);
         }
 
         .btn-ghost:hover {
-            background: rgba(255,255,255,0.09);
+            background: rgba(255,255,255,0.08);
+            border-color: var(--border-strong);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-mid);
+        }
+
+        .btn-outline:hover {
             color: var(--text-primary);
+            border-color: var(--border-strong);
         }
 
         .btn-lg {
-            padding: 14px 28px;
-            font-size: 16px;
+            padding: 14px 24px;
+            font-size: 15px;
             border-radius: 12px;
         }
 
         /* ── Hero ── */
         .hero {
-            padding: 160px 0 112px;
-            text-align: center;
+            padding: 148px 0 80px;
             position: relative;
             overflow: hidden;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -200px; left: 50%;
-            transform: translateX(-50%);
-            width: 800px; height: 800px;
-            background: radial-gradient(ellipse, rgba(62,201,163,0.08) 0%, transparent 65%);
-            pointer-events: none;
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 72px;
+            align-items: center;
         }
 
-
-        .hero-icon {
-            width: 112px;
-            height: 112px;
-            border-radius: 26px;
-            margin: 0 auto 32px;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
-            animation: float 3s ease-in-out infinite;
-            display: block;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50%       { transform: translateY(-8px); }
-        }
-
-        .hero-badge {
+        .hero-eyebrow {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            background: rgba(62,201,163,0.10);
-            border: 1px solid rgba(62,201,163,0.25);
+            gap: 8px;
+            padding: 5px 12px;
+            background: rgba(62,201,163,0.08);
+            border: 1px solid rgba(62,201,163,0.22);
             border-radius: 999px;
             font-size: 12px;
             font-weight: 600;
             color: var(--cat-teal);
             margin-bottom: 24px;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.02em;
         }
 
-        .hero-badge .dot {
+        .hero-eyebrow .dot {
             width: 6px; height: 6px;
             border-radius: 50%;
             background: var(--cat-teal);
+            box-shadow: 0 0 8px var(--cat-teal);
             animation: pulse 2s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50%       { opacity: 0.4; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.45; transform: scale(0.85); }
         }
 
         .hero-title {
-            font-size: clamp(52px, 9vw, 88px);
+            font-size: clamp(40px, 6.6vw, 72px);
             font-weight: 900;
-            letter-spacing: -2px;
-            line-height: 1;
-            margin-bottom: 24px;
+            letter-spacing: -0.035em;
+            line-height: 0.98;
+            margin-bottom: 22px;
+        }
+
+        .hero-title .tag-accent {
+            background: linear-gradient(135deg, var(--cat-teal) 0%, var(--cat-gold) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .hero-sub {
-            font-size: clamp(16px, 2.2vw, 20px);
+            font-size: 18px;
             color: var(--text-secondary);
             max-width: 520px;
-            margin: 0 auto 40px;
-            line-height: 1.7;
+            margin-bottom: 32px;
+            line-height: 1.6;
         }
 
         .hero-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 12px;
             flex-wrap: wrap;
         }
 
-        .hero-note {
-            margin-top: 20px;
+        .hero-meta {
+            margin-top: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 22px;
             font-size: 13px;
             color: var(--text-muted);
+            align-items: center;
         }
 
-        .hero-note a { color: var(--text-secondary); text-decoration: underline; text-underline-offset: 3px; }
+        .hero-meta .meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hero-meta svg {
+            color: var(--cat-teal);
+            opacity: 0.8;
+        }
+
+        .hero-meta a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        /* Hero screenshot frame */
+        .hero-shot {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border-mid);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04),
+                0 60px 120px -30px rgba(0,0,0,0.7),
+                0 0 80px -20px rgba(62,201,163,0.15);
+            transform: perspective(1400px) rotateY(-4deg) rotateX(2deg);
+            transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+        }
+        .hero-shot:hover { transform: perspective(1400px) rotateY(-2deg) rotateX(1deg); }
+
+        .hero-shot::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(62,201,163,0.08) 0%, transparent 40%, transparent 60%, rgba(212,168,75,0.06) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .hero-shot img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .hero-shot-chrome {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-shot-chrome .dot {
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+        }
+
+        .hero-shot-chrome .label {
+            margin-left: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+        }
 
         /* ── Stats bar ── */
         .stats-bar {
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
             background: var(--bg-surface);
-            padding: 28px 0;
+            padding: 32px 0;
+            margin-top: 32px;
         }
 
         .stats-inner {
-            display: flex;
-            justify-content: center;
-            gap: 64px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
         }
 
         .stat {
-            text-align: center;
+            text-align: left;
+            padding: 0 8px;
         }
 
         .stat-value {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
             line-height: 1.1;
+            margin-bottom: 4px;
         }
 
         .stat-label {
             font-size: 12px;
             color: var(--text-muted);
-            margin-top: 4px;
             font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        /* ── Pillars (Why) ── */
+        .pillars {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 56px;
+        }
+
+        .pillar {
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-2) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: border-color 0.2s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pillar:hover { border-color: var(--border-mid); transform: translateY(-2px); }
+
+        .pillar-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--cat-teal);
+            letter-spacing: 0.18em;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .pillar-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .pillar-body {
+            font-size: 14.5px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        /* ── Showcase (screenshot gallery) ── */
+        .showcase {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 16px;
+            margin-top: 56px;
+        }
+
+        .showcase-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .showcase-card:hover { border-color: var(--border-mid); transform: translateY(-2px); }
+
+        .showcase-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .showcase-card-body {
+            padding: 22px 24px 26px;
+        }
+
+        .showcase-card-kicker {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--cat-teal);
+            letter-spacing: 0.16em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .showcase-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .showcase-card-body p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .showcase-stack {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 16px;
         }
 
         /* ── Features ── */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
             margin-top: 56px;
         }
 
         .feature-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: var(--radius-card);
-            padding: 28px;
-            transition: border-color 0.2s, transform 0.2s;
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: border-color 0.2s, transform 0.2s, background 0.2s;
         }
 
         .feature-card:hover {
             border-color: var(--border-mid);
-            transform: translateY(-2px);
+            background: var(--bg-card-2);
+            transform: translateY(-1px);
         }
 
         .feature-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
+            width: 38px; height: 38px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            margin-bottom: 16px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
+            font-size: 18px;
+            margin-bottom: 14px;
+            background: rgba(62,201,163,0.08);
+            border: 1px solid rgba(62,201,163,0.18);
+            color: var(--cat-teal);
         }
 
         .feature-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
         }
 
         .feature-body {
-            font-size: 14px;
+            font-size: 13.5px;
             color: var(--text-secondary);
-            line-height: 1.65;
+            line-height: 1.6;
         }
 
-        /* ── How it works ── */
-        .how-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2px;
+        /* ── How it works (loop) ── */
+        .loop-wrap {
             margin-top: 56px;
-            background: var(--border);
-            border-radius: var(--radius-card);
-            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: center;
         }
 
-        .how-step {
+        .loop-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .loop-step {
+            display: flex;
+            gap: 18px;
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            background: transparent;
+            border: 1px solid transparent;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .loop-step:hover {
             background: var(--bg-card);
-            padding: 36px 32px;
+            border-color: var(--border);
+        }
+
+        .loop-step-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--cat-teal);
+            opacity: 0.7;
+            min-width: 28px;
+            padding-top: 1px;
+        }
+
+        .loop-step-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .loop-step-body {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .loop-shot {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-mid);
+            box-shadow: var(--shadow-card);
             position: relative;
         }
+        .loop-shot img { display: block; width: 100%; height: auto; }
 
-        .how-step-num {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--cat-teal);
+        /* ── Tier visualization ── */
+        .tier-section {
+            margin-top: 64px;
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-2) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+        }
+
+        .tier-section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .tier-section h3 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
             margin-bottom: 14px;
         }
 
-        .how-step-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .how-step-body {
-            font-size: 14px;
+        .tier-section p {
+            font-size: 15px;
             color: var(--text-secondary);
             line-height: 1.65;
         }
+
+        .tier-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tier-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 80px;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+        }
+
+        .tier-row .label { color: var(--text-secondary); font-weight: 600; letter-spacing: 0.04em; }
+
+        .tier-row .bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--cat-teal), var(--cat-teal-2));
+            opacity: 0.85;
+        }
+
+        .tier-row .size { color: var(--text-primary); text-align: right; font-weight: 600; }
+
+        .tier-row.t-inner   .bar { width: 100%; }
+        .tier-row.t-mid     .bar { width: 78%; }
+        .tier-row.t-outer   .bar { width: 56%; }
+        .tier-row.t-extreme .bar { width: 32%; opacity: 0.55; }
 
         /* ── Requirements ── */
         .req-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 12px;
             margin-top: 40px;
         }
@@ -402,143 +734,248 @@
         .req-item {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 14px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 18px;
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            transition: border-color 0.2s;
         }
+        .req-item:hover { border-color: var(--border-mid); }
 
         .req-icon {
-            font-size: 20px;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: rgba(62,201,163,0.08);
+            border: 1px solid rgba(62,201,163,0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
             flex-shrink: 0;
-            margin-top: 2px;
         }
 
-        .req-name { font-size: 14px; font-weight: 600; }
-        .req-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .req-name { font-size: 14.5px; font-weight: 600; margin-bottom: 2px; }
+        .req-detail { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
 
         /* ── Download ── */
-        .download-box {
-            background: var(--bg-card);
+        .download-wrap {
+            margin-top: 56px;
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-2) 100%);
             border: 1px solid var(--border-mid);
-            border-radius: 20px;
+            border-radius: var(--radius-xl);
             padding: 48px;
             text-align: center;
-            margin-top: 56px;
             position: relative;
             overflow: hidden;
         }
 
-        .download-box::before {
+        .download-wrap::before {
             content: '';
             position: absolute;
-            top: -100px; left: 50%;
+            top: -180px; left: 50%;
             transform: translateX(-50%);
-            width: 500px; height: 300px;
-            background: radial-gradient(ellipse, rgba(212,168,75,0.08) 0%, transparent 70%);
+            width: 600px; height: 360px;
+            background: radial-gradient(ellipse, rgba(62,201,163,0.10) 0%, transparent 70%);
             pointer-events: none;
         }
 
-        .download-box img {
-            width: 80px; height: 80px;
-            border-radius: 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+        .download-wrap > * { position: relative; }
+
+        .download-icon {
+            width: 72px; height: 72px;
+            border-radius: 18px;
+            margin: 0 auto 22px;
+            box-shadow: 0 12px 40px -8px rgba(62,201,163,0.30);
+            display: block;
         }
 
         .download-title {
-            font-size: 28px;
+            font-size: clamp(28px, 3.8vw, 36px);
             font-weight: 800;
             margin-bottom: 10px;
+            letter-spacing: -0.02em;
         }
 
         .download-sub {
             font-size: 15px;
             color: var(--text-secondary);
             margin-bottom: 32px;
-            max-width: 420px;
+            max-width: 480px;
             margin-left: auto;
             margin-right: auto;
         }
 
-        .download-platforms {
-            display: flex;
-            justify-content: center;
+        .platforms {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            flex-wrap: wrap;
+            max-width: 720px;
+            margin: 0 auto;
         }
 
-        .platform-btn {
+        .platform-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-mid);
+            background: rgba(255,255,255,0.02);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: border-color 0.2s, background 0.2s;
+            text-align: left;
+        }
+
+        .platform-card:hover {
+            border-color: var(--border-strong);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .platform-row {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 14px 24px;
-            border-radius: 12px;
+        }
+
+        .platform-icon {
+            font-size: 22px;
+        }
+
+        .platform-name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .platform-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: 999px;
+        }
+
+        .platform-tag.tested {
+            color: var(--cat-teal);
+            background: rgba(62,201,163,0.10);
+            border: 1px solid rgba(62,201,163,0.25);
+        }
+
+        .platform-tag.experimental {
+            color: var(--cat-gold);
+            background: rgba(212,168,75,0.10);
+            border: 1px solid rgba(212,168,75,0.25);
+        }
+
+        .platform-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .download-note {
+            margin: 28px auto 0;
+            max-width: 650px;
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .release-status {
+            max-width: 860px;
+            margin: 28px auto 0;
+            display: grid;
+            grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+            gap: 14px;
+            text-align: left;
+        }
+
+        .release-card {
             border: 1px solid var(--border-mid);
-            background: rgba(255,255,255,0.04);
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.025);
+            padding: 20px;
+        }
+
+        .release-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .release-version {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
             color: var(--text-primary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-weight: 700;
+            line-height: 1.1;
         }
 
-        .platform-btn:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-1px);
+        .release-meta {
+            margin-top: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
         }
 
-        .platform-btn .platform-icon { font-size: 20px; }
-        .platform-btn .platform-info { text-align: left; }
-        .platform-btn .platform-name { display: block; font-weight: 700; }
-        .platform-btn .platform-note { display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+        .release-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.7;
+        }
 
-        /* ── Setup guide ── */
+        /* ── Setup steps ── */
         .setup-steps {
             margin-top: 56px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
 
         .setup-step {
-            display: flex;
-            gap: 24px;
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 22px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: var(--radius-card);
-            padding: 28px 32px;
+            border-radius: var(--radius-lg);
+            padding: 26px 30px;
             transition: border-color 0.2s;
         }
 
         .setup-step:hover { border-color: var(--border-mid); }
 
         .setup-step-num {
-            width: 36px; height: 36px;
+            width: 40px; height: 40px;
             border-radius: 10px;
-            background: rgba(62,201,163,0.12);
+            background: rgba(62,201,163,0.10);
             border: 1px solid rgba(62,201,163,0.25);
             color: var(--cat-teal);
+            font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
-            font-weight: 800;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
 
-        .setup-step-content { flex: 1; }
-
         .setup-step-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
             margin-bottom: 6px;
         }
 
         .setup-step-body {
-            font-size: 14px;
+            font-size: 14.5px;
             color: var(--text-secondary);
             line-height: 1.65;
         }
@@ -546,30 +983,75 @@
         .setup-step-body a {
             color: var(--cat-teal);
             text-decoration: none;
+            border-bottom: 1px solid rgba(62,201,163,0.30);
         }
 
-        .setup-step-body a:hover { text-decoration: underline; }
+        .setup-step-body a:hover { border-bottom-color: var(--cat-teal); }
 
-        .code-block {
-            display: block;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            color: var(--cat-teal);
-            margin-top: 10px;
-            width: 100%;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
+        .tip-block {
+            display: flex;
+            gap: 10px;
+            padding: 12px 14px;
+            margin-top: 14px;
+            background: rgba(62,201,163,0.06);
+            border: 1px solid rgba(62,201,163,0.18);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.55;
         }
+        .tip-block strong { color: var(--cat-teal); }
+
+        /* ── Risk disclosure ── */
+        .risk {
+            margin-top: 96px;
+            background: linear-gradient(180deg, rgba(248,113,113,0.04) 0%, transparent 100%);
+            border: 1px solid rgba(248,113,113,0.20);
+            border-radius: var(--radius-lg);
+            padding: 32px 36px;
+        }
+
+        .risk-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .risk-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(248,113,113,0.08);
+            border: 1px solid rgba(248,113,113,0.30);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cat-red);
+            flex-shrink: 0;
+        }
+
+        .risk-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .risk p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .risk p:last-child { margin-bottom: 0; }
+
+        .risk strong { color: var(--text-primary); }
 
         /* ── Footer ── */
         footer {
             border-top: 1px solid var(--border);
             padding: 48px 0;
+            margin-top: 64px;
         }
 
         .footer-inner {
@@ -586,19 +1068,12 @@
             gap: 10px;
         }
 
-        .footer-brand img {
-            width: 28px; height: 28px;
-            border-radius: 7px;
-        }
-
-        .footer-brand-name {
-            font-size: 15px;
-            font-weight: 700;
-        }
+        .footer-brand img { width: 26px; height: 26px; border-radius: 7px; }
+        .footer-brand-name { font-size: 14px; font-weight: 700; }
 
         .footer-links {
             display: flex;
-            gap: 24px;
+            gap: 22px;
             list-style: none;
             flex-wrap: wrap;
         }
@@ -607,45 +1082,54 @@
             color: var(--text-muted);
             text-decoration: none;
             font-size: 13px;
-            transition: color 0.2s;
+            transition: color 0.15s;
         }
-
         .footer-links a:hover { color: var(--text-secondary); }
 
         .footer-copy {
             font-size: 13px;
             color: var(--text-muted);
         }
-
         .footer-copy a {
             color: var(--cat-teal);
             text-decoration: none;
         }
 
-        /* ── Divider ── */
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 0;
-        }
+        .divider { height: 1px; background: var(--border); margin: 0; }
 
         /* ── Responsive ── */
+        @media (max-width: 960px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 56px;
+            }
+            .hero-shot { transform: none; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+            .pillars { grid-template-columns: 1fr; }
+            .showcase { grid-template-columns: 1fr; }
+            .loop-wrap { grid-template-columns: 1fr; }
+            .tier-section-grid { grid-template-columns: 1fr; gap: 32px; }
+            .platforms { grid-template-columns: 1fr; }
+            .release-status { grid-template-columns: 1fr; }
+        }
+
         @media (max-width: 640px) {
             .nav-links { display: none; }
-            .hero { padding: 120px 0 80px; }
-            .hero-title { letter-spacing: -1px; }
-            .stats-inner { gap: 32px; }
-            .how-grid { grid-template-columns: 1fr; }
-            .download-box { padding: 32px 24px; }
-            .setup-step { flex-direction: column; gap: 12px; }
-            .footer-inner { flex-direction: column; align-items: flex-start; }
+            .hero { padding: 120px 0 60px; }
+            .section { padding: 80px 0; }
+            .tier-section { padding: 32px 24px; }
+            .download-wrap { padding: 36px 24px; }
+            .setup-step { padding: 22px 20px; grid-template-columns: 40px 1fr; gap: 16px; }
+            .footer-inner { flex-direction: column; align-items: flex-start; gap: 18px; }
+            .stats-inner { grid-template-columns: 1fr 1fr; }
+            .stat-value { font-size: 20px; }
         }
     </style>
 </head>
 <body>
 
 <!-- ── Navigation ── -->
-<nav>
+<nav class="site">
     <div class="nav-inner">
         <a href="#" class="nav-brand">
             <img src="assets/icon.png" alt="CATalyst">
@@ -655,115 +1139,274 @@
             <li><a href="#features">Features</a></li>
             <li><a href="#how-it-works">How it works</a></li>
             <li><a href="#setup">Setup</a></li>
-            <li><a href="#download">Download</a></li>
+            <li><a href="docs.html">Docs</a></li>
+            <li><a href="https://github.com/Lowestofttim/catalystxch" target="_blank" rel="noopener">GitHub</a></li>
         </ul>
-        <a href="#download" class="btn btn-primary">Download</a>
+        <div class="nav-cta">
+            <a href="#download" class="btn btn-primary">Get CATalyst</a>
+        </div>
     </div>
 </nav>
 
 <!-- ── Hero ── -->
 <section class="hero">
     <div class="container">
-        <img src="assets/icon.png" alt="CATalyst" class="hero-icon">
-        <div class="hero-badge">
-            <span class="dot"></span>
-            Now available for Windows
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <span class="hero-eyebrow">
+                    <span class="dot"></span>
+                    Public downloads coming soon · current beta v1.2.5
+                </span>
+                <h1 class="hero-title">
+                    Automated <span class="tag-accent">market making</span><br>
+                    for Chia CAT tokens.
+                </h1>
+                <p class="hero-sub">
+                    Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book, requotes when price moves, snipes arb gaps, and tightens toward the safest edge, all from a Sage wallet on your own machine.
+                </p>
+                <div class="hero-actions">
+                    <a href="#download" class="btn btn-primary btn-lg">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Get CATalyst
+                    </a>
+                    <a href="docs.html" class="btn btn-ghost btn-lg">Read the docs</a>
+                </div>
+                <div class="hero-meta">
+                    <span class="meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Free to use
+                    </span>
+                    <span class="meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Local-only · keys stay in Sage
+                    </span>
+                    <span class="meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Built on <a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a> &amp; <a href="https://v2.tibetswap.io" target="_blank" rel="noopener">TibetSwap</a>
+                    </span>
+                </div>
+            </div>
+
+            <div class="hero-shot">
+                <div class="hero-shot-chrome">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="label">CATalyst · Dashboard · current beta</span>
+                </div>
+                <img src="assets/screenshots/01_dashboard.png" alt="CATalyst dashboard showing live market making session" loading="eager">
+            </div>
         </div>
-        <h1 class="hero-title">
-            <span class="cat">CAT</span><span class="alyst">alyst</span>
-        </h1>
-        <p class="hero-sub">
-            Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book and requotes when price moves. Runs as a proper Windows desktop app.
-        </p>
-        <div class="hero-actions">
-            <a href="#download" class="btn btn-primary btn-lg">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Download for Windows
-            </a>
-            <a href="#setup" class="btn btn-ghost btn-lg">Setup Guide</a>
-        </div>
-        <p class="hero-note">
-            Requires <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> · Windows 10/11 · Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>
-        </p>
     </div>
 </section>
 
-<!-- ── Stats ── -->
+<!-- ── Stats bar ── -->
 <div class="stats-bar">
     <div class="container">
         <div class="stats-inner">
             <div class="stat">
-                <div class="stat-value"><span class="cat">4</span> tiers</div>
-                <div class="stat-label">Inner / Mid / Outer / Extreme</div>
+                <div class="stat-value cat">4 tiers</div>
+                <div class="stat-label">Inner · Mid · Outer · Extreme</div>
             </div>
             <div class="stat">
-                <div class="stat-value"><span class="alyst">Live</span></div>
+                <div class="stat-value">~12 s</div>
                 <div class="stat-label">Mempool fill detection</div>
             </div>
             <div class="stat">
-                <div class="stat-value"><span class="cat">Dexie</span></div>
-                <div class="stat-label">Native integration</div>
+                <div class="stat-value">2 venues</div>
+                <div class="stat-label">Dexie + TibetSwap pricing</div>
             </div>
             <div class="stat">
-                <div class="stat-value"><span class="alyst">Smart</span></div>
-                <div class="stat-label">One-click capital planning</div>
+                <div class="stat-value alyst">Local</div>
+                <div class="stat-label">Keys stay in Sage</div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ── Pillars ── -->
+<section class="section" id="why">
+    <div class="container">
+        <span class="section-kicker">Why CATalyst</span>
+        <h2 class="section-title">Built for the Chia CAT market, not retrofitted.</h2>
+        <p class="section-subtitle">Every piece is wired around how Chia actually works: UTXO coins, mempool flow, and pool-aware pricing across Dexie and TibetSwap.</p>
+
+        <div class="pillars">
+            <div class="pillar">
+                <div class="pillar-num">01</div>
+                <div class="pillar-title">A real ladder, always on the book</div>
+                <div class="pillar-body">Tiered offers around mid-price, larger inside, smaller outside. Auto-requote when price drifts past your threshold. Pre-emptive refresh before offers expire.</div>
+            </div>
+            <div class="pillar">
+                <div class="pillar-num">02</div>
+                <div class="pillar-title">Aware of the pool, not just the book</div>
+                <div class="pillar-body">Dynamic spreads adapt to volatility, depth, fill rate, and competitor positioning. The Arb Sniper fires probes when Dexie and TibetSwap diverge.</div>
+            </div>
+            <div class="pillar">
+                <div class="pillar-num">03</div>
+                <div class="pillar-title">Yours, on your hardware</div>
+                <div class="pillar-body">Talks to Sage Wallet over local RPC. No telemetry, no cloud, no custody. Closes to your system tray and keeps trading without a window open.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Showcase ── -->
+<section class="section" id="inside">
+    <div class="container">
+        <span class="section-kicker">Inside the app</span>
+        <h2 class="section-title">A trading desk you can actually read.</h2>
+        <p class="section-subtitle">Five core views: Dashboard, Offers, P&amp;L, Market Intel, and Settings. Each tuned for a single job. No tab clutter, no screen-of-numbers.</p>
+
+        <div class="showcase">
+            <div class="showcase-card">
+                <img src="assets/screenshots/02_offers.png" alt="Offers view: order book depth chart and active offer cards" class="showcase-img" loading="lazy">
+                <div class="showcase-card-body">
+                    <div class="showcase-card-kicker">OFFERS</div>
+                    <div class="showcase-card-title">See your ladder, side by side with the book.</div>
+                    <p>The depth chart shows your buys and sells against mid-price. Each offer card lists tier, spread, coin ID, Dexie status, and a one-click link to the live offer.</p>
+                </div>
+            </div>
+            <div class="showcase-stack">
+                <div class="showcase-card">
+                    <img src="assets/screenshots/03_pnl.png" alt="P&amp;L view: cumulative profit chart and inventory position" class="showcase-img" loading="lazy">
+                    <div class="showcase-card-body">
+                        <div class="showcase-card-kicker">P&amp;L &amp; INVENTORY</div>
+                        <div class="showcase-card-title">Round-trip matching, not vanity metrics.</div>
+                        <p>Realised PnL pairs buy fills with sells of similar size. Net position, drift, and unmatched legs are all visible.</p>
+                    </div>
+                </div>
+                <div class="showcase-card">
+                    <img src="assets/screenshots/04_intel.png" alt="Market Intel view: competitor orderbook, pool depth, Spacescan data" class="showcase-img" loading="lazy">
+                    <div class="showcase-card-body">
+                        <div class="showcase-card-kicker">MARKET INTEL</div>
+                        <div class="showcase-card-title">Competitor and pool context in one place.</div>
+                        <p>Orderbook depth, TibetSwap slippage, DBX rewards eligibility, Splash P2P broadcast counters.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
 <!-- ── Features ── -->
 <section class="section" id="features">
     <div class="container">
-        <p class="section-label">What it does</p>
-        <h2 class="section-title">Everything a market maker needs</h2>
-        <p class="section-subtitle">Set it up once and it takes care of the rest.</p>
+        <span class="section-kicker">What it does</span>
+        <h2 class="section-title">Everything a CAT market maker needs.</h2>
+        <p class="section-subtitle">Set it up once and it handles the rest every loop cycle: quoting, requoting, fills, coin prep, and risk.</p>
 
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">📊</div>
-                <div class="feature-title">Live Bid/Ask Ladder</div>
-                <div class="feature-body">Places buy and sell offers in tiers around the mid price. Closer offers are bigger, wider ones are smaller. You set the spread and the bot handles the rest.</div>
+                <div class="feature-title">Tiered Bid/Ask Ladder</div>
+                <div class="feature-body">Buy and sell offers across four tiers, Inner, Mid, Outer, Extreme. Larger nearest mid, smaller out wide.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
                 <div class="feature-title">Auto-Requote</div>
-                <div class="feature-body">When price moves past your threshold the bot cancels old offers and puts fresh ones up at the new prices. You don't have to watch it.</div>
+                <div class="feature-body">Cancels and replaces offers when price drifts past your threshold. Pre-emptive refresh within 5 minutes of expiry.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🧠</div>
                 <div class="feature-title">Smart Settings</div>
-                <div class="feature-body">Point it at your wallet and it works out a sensible starting config. Reads your balance, checks the current market, and suggests offer sizes and spread width. Useful if you're not sure where to begin.</div>
+                <div class="feature-body">Reads your wallet balance and current market and proposes a sensible starting config, sizes, spread, tiers.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔭</div>
                 <div class="feature-title">Mempool Fill Detection</div>
-                <div class="feature-body">Fills show up in the mempool before they're confirmed on chain. CATalyst catches them there so requotes go out faster.</div>
+                <div class="feature-body">Watches Coinset's mempool every 5 seconds for fills on your offers, replacements go up before chain confirmation.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Arb Sniper</div>
+                <div class="feature-body">Fires probe pairs when Dexie and TibetSwap diverge. Inventory-aware, cooled-down, and uses a dedicated coin pool.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧭</div>
+                <div class="feature-title">Close the Gap</div>
+                <div class="feature-body">Adaptive spread-tightening probes that find the safest edge above the arb floor, then plant a real inner-tier offer there.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">Round-Trip PnL</div>
+                <div class="feature-body">Matches buys with sells of similar size. Tracks realised profit, win rate, average trip time, and unmatched legs.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🪙</div>
-                <div class="feature-title">Coin Prep</div>
-                <div class="feature-body">Chia offers need coins pre-split to specific sizes. CATalyst does this in the background so there's no delay when it needs to place a new offer.</div>
+                <div class="feature-title">Adaptive Coin Prep</div>
+                <div class="feature-body">Pre-splits coins to offer-sized denominations, then tops up automatically based on busy/normal/slow trading pace.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🛡️</div>
                 <div class="feature-title">Risk Controls</div>
-                <div class="feature-body">Price bounds, position limits, a circuit breaker, and reserve amounts you set yourself. Guardrails to stop it doing something dumb if the market goes sideways.</div>
+                <div class="feature-body">Position circuit breakers, reserve floors, mass-disappearance guard, price-shock detection, and per-side limits.</div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">📈</div>
+                <div class="feature-icon">📡</div>
                 <div class="feature-title">Market Intelligence</div>
-                <div class="feature-body">Grabs live prices from TibetSwap and checks what's already sitting on the Dexie order book before deciding where to put your offers.</div>
+                <div class="feature-body">Competitor spreads on Dexie, TibetSwap pool depth and slippage, Spacescan token health, DBX reward eligibility.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">↔️</div>
+                <div class="feature-title">Single &amp; Two-Sided Modes</div>
+                <div class="feature-body">Run a normal two-sided book or a one-sided accumulate/distribute strategy with parked-state fuel tracking.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🖥️</div>
                 <div class="feature-title">Native Desktop App</div>
-                <div class="feature-body">Runs in your system tray. There's a proper window you can open and close but the bot keeps going in the background. No browser tab to lose.</div>
+                <div class="feature-body">System-tray persistence, light/dark themes, in-app crash report viewer, auto-update notifications.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔗</div>
                 <div class="feature-title">Sage Wallet Integration</div>
-                <div class="feature-body">Talks to Sage over local RPC. Your keys stay in Sage, CATalyst just tells it what to do. Nothing leaves your machine.</div>
+                <div class="feature-body">Local RPC on port 9257. Your keys never leave Sage, CATalyst just signs offers through it.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📡</div>
+                <div class="feature-title">Splash P2P Broadcast</div>
+                <div class="feature-body">Optional decentralised peer broadcast for wider visibility beyond Dexie. Inbound peer offer counters too.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Tier visualisation ── -->
+<section class="section" id="tiers">
+    <div class="container">
+        <div class="tier-section">
+            <div class="tier-section-grid">
+                <div>
+                    <span class="section-kicker is-spaced">The ladder</span>
+                    <h3>Four tiers, weighted toward mid.</h3>
+                    <p>Closer offers are larger because they're more likely to fill. Wider offers are smaller, they exist to catch dislocations and hold the shape of your book. Tiered sizing is on by default; you can tune the size per tier in Settings → Setup.</p>
+                </div>
+                <div class="tier-list">
+                    <div class="tier-row t-inner">
+                        <span class="label">INNER</span>
+                        <span class="bar"></span>
+                        <span class="size">1.00 ×</span>
+                    </div>
+                    <div class="tier-row t-mid">
+                        <span class="label">MID</span>
+                        <span class="bar"></span>
+                        <span class="size">0.78 ×</span>
+                    </div>
+                    <div class="tier-row t-outer">
+                        <span class="label">OUTER</span>
+                        <span class="bar"></span>
+                        <span class="size">0.56 ×</span>
+                    </div>
+                    <div class="tier-row t-extreme">
+                        <span class="label">EXTREME</span>
+                        <span class="bar"></span>
+                        <span class="size">0.32 ×</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -774,30 +1417,57 @@
 <!-- ── How it works ── -->
 <section class="section" id="how-it-works">
     <div class="container">
-        <p class="section-label">The loop</p>
-        <h2 class="section-title">How it works</h2>
-        <p class="section-subtitle">Every few seconds it runs through the same steps.</p>
+        <span class="section-kicker">The loop</span>
+        <h2 class="section-title">A steady loop, with fast watchers between cycles.</h2>
+        <p class="section-subtitle">The main loop defaults to 90 seconds, while TibetSwap, AMM, and Coinset watchers can wake it early when fills or price shocks appear.</p>
 
-        <div class="how-grid">
-            <div class="how-step">
-                <div class="how-step-num">Step 01</div>
-                <div class="how-step-title">Price Check</div>
-                <div class="how-step-body">Grabs the current price from TibetSwap and checks what's on the Dexie order book. Has a look at where other people are sitting before deciding where to put your offers.</div>
+        <div class="loop-wrap">
+            <div class="loop-steps">
+                <div class="loop-step">
+                    <div class="loop-step-num">01</div>
+                    <div>
+                        <div class="loop-step-title">Fetch prices</div>
+                        <div class="loop-step-body">Mid-price from Dexie + TibetSwap, plus arb-gap measurement and competitor spread.</div>
+                    </div>
+                </div>
+                <div class="loop-step">
+                    <div class="loop-step-num">02</div>
+                    <div>
+                        <div class="loop-step-title">Detect fills</div>
+                        <div class="loop-step-body">Compare offers cycle-over-cycle; mempool watcher flags fills before chain confirmation.</div>
+                    </div>
+                </div>
+                <div class="loop-step">
+                    <div class="loop-step-num">03</div>
+                    <div>
+                        <div class="loop-step-title">Match round trips</div>
+                        <div class="loop-step-body">Pair buy and sell fills into completed trades for realised PnL. Open legs surface on the P&amp;L tab.</div>
+                    </div>
+                </div>
+                <div class="loop-step">
+                    <div class="loop-step-num">04</div>
+                    <div>
+                        <div class="loop-step-title">Quote &amp; requote</div>
+                        <div class="loop-step-body">Emergency requote on price shocks, normal requote past your drift threshold, otherwise just refresh expirers.</div>
+                    </div>
+                </div>
+                <div class="loop-step">
+                    <div class="loop-step-num">05</div>
+                    <div>
+                        <div class="loop-step-title">Snipe &amp; tighten</div>
+                        <div class="loop-step-body">Arb Sniper fires probes if the gap is wide. Close the Gap tightens toward the floor when enabled.</div>
+                    </div>
+                </div>
+                <div class="loop-step">
+                    <div class="loop-step-num">06</div>
+                    <div>
+                        <div class="loop-step-title">Top up coins</div>
+                        <div class="loop-step-body">Adaptive coin prep checks spare coins per side and splits more in the background as needed.</div>
+                    </div>
+                </div>
             </div>
-            <div class="how-step">
-                <div class="how-step-num">Step 02</div>
-                <div class="how-step-title">Ladder Management</div>
-                <div class="how-step-body">Checks whether your open offers are still in the right place. If price has moved enough that they're stale, it cancels them and puts new ones up.</div>
-            </div>
-            <div class="how-step">
-                <div class="how-step-num">Step 03</div>
-                <div class="how-step-title">Fill Handling</div>
-                <div class="how-step-body">Spots fills in the mempool as soon as they happen. Logs the trade, updates the position, and gets a replacement offer out.</div>
-            </div>
-            <div class="how-step">
-                <div class="how-step-num">Step 04</div>
-                <div class="how-step-title">Coin Replenishment</div>
-                <div class="how-step-body">Offers use up pre-split coins. When it's running low it splits more in the background. The ladder keeps going while this happens.</div>
+            <div class="loop-shot">
+                <img src="assets/screenshots/05_settings_live.png" alt="Settings → Live: hot-reloadable controls for spread, skew, and feature toggles" loading="lazy">
             </div>
         </div>
     </div>
@@ -808,37 +1478,37 @@
 <!-- ── Requirements ── -->
 <section class="section-sm" id="requirements">
     <div class="container">
-        <p class="section-label">Before you start</p>
+        <span class="section-kicker">Before you start</span>
         <h2 class="section-title">Requirements</h2>
-        <p class="section-subtitle">Nothing complicated, just make sure you have these before you start.</p>
+        <p class="section-subtitle">Nothing exotic. If you're already running Sage, you're 90% there.</p>
 
         <div class="req-grid">
             <div class="req-item">
                 <div class="req-icon">🪟</div>
                 <div>
                     <div class="req-name">Windows 10 or 11</div>
-                    <div class="req-detail">64-bit required</div>
+                    <div class="req-detail">64-bit · fully tested release</div>
                 </div>
             </div>
             <div class="req-item">
                 <div class="req-icon">👛</div>
                 <div>
                     <div class="req-name">Sage Wallet</div>
-                    <div class="req-detail">v0.12.10 or later · RPC enabled</div>
+                    <div class="req-detail">Latest stable · RPC enabled</div>
                 </div>
             </div>
             <div class="req-item">
                 <div class="req-icon">🌿</div>
                 <div>
                     <div class="req-name">Chia CAT tokens</div>
-                    <div class="req-detail">In your Sage wallet, listed on Dexie</div>
+                    <div class="req-detail">In Sage · listed on Dexie</div>
                 </div>
             </div>
             <div class="req-item">
                 <div class="req-icon">💎</div>
                 <div>
                     <div class="req-name">XCH balance</div>
-                    <div class="req-detail">For buy offers and transaction fees</div>
+                    <div class="req-detail">For buy offers + transaction fees</div>
                 </div>
             </div>
         </div>
@@ -850,23 +1520,59 @@
 <!-- ── Download ── -->
 <section class="section" id="download">
     <div class="container">
-        <p class="section-label">Get started</p>
+        <span class="section-kicker">Get started</span>
         <h2 class="section-title">Download <span class="cat">CAT</span><span class="alyst">alyst</span></h2>
         <p class="section-subtitle">Free to use. No account required. Your keys stay on your machine.</p>
 
-        <div class="download-box">
-            <img src="assets/icon.png" alt="CATalyst">
-            <div class="download-title"><span class="cat">CAT</span><span class="alyst">alyst</span></div>
-            <p class="download-sub">Grab the latest release from GitHub, run the installer, and connect your Sage wallet.</p>
-            <div class="download-platforms">
-                <a href="https://github.com/Lowestofttim/catalystxch/releases/latest" target="_blank" rel="noopener" class="platform-btn">
-                    <span class="platform-icon">🪟</span>
-                    <span class="platform-info">
-                        <span class="platform-name">Windows Installer</span>
-                        <span class="platform-note">.exe · Windows 10/11 · 64-bit</span>
-                    </span>
-                </a>
+        <div class="download-wrap">
+            <img src="assets/icon.png" alt="CATalyst" class="download-icon">
+            <div class="download-title">Coming soon</div>
+            <p class="download-sub">Builds are in final QA. Windows ships first as a fully-tested release; macOS and Linux follow as experimental builds.</p>
+            <div class="platforms">
+                <div class="platform-card" aria-disabled="true">
+                    <div class="platform-row">
+                        <span class="platform-icon">🪟</span>
+                        <span class="platform-name">Windows</span>
+                        <span class="platform-tag tested">Stable</span>
+                    </div>
+                    <div class="platform-note">Windows 10/11 · 64-bit · Coming soon</div>
+                </div>
+                <div class="platform-card" aria-disabled="true">
+                    <div class="platform-row">
+                        <span class="platform-icon">🍎</span>
+                        <span class="platform-name">macOS</span>
+                        <span class="platform-tag experimental">Experimental</span>
+                    </div>
+                    <div class="platform-note">Apple Silicon &amp; Intel · Not fully tested · Coming soon</div>
+                </div>
+                <div class="platform-card" aria-disabled="true">
+                    <div class="platform-row">
+                        <span class="platform-icon">🐧</span>
+                        <span class="platform-name">Linux</span>
+                        <span class="platform-tag experimental">Experimental</span>
+                    </div>
+                    <div class="platform-note">Linux archive · Not fully tested · Coming soon</div>
+                </div>
             </div>
+            <div class="release-status">
+                <div class="release-card">
+                    <div class="release-label">Latest prepared build</div>
+                    <div class="release-version">v1.2.5</div>
+                    <div class="release-meta">Beta · staged for public release</div>
+                </div>
+                <div class="release-card">
+                    <div class="release-label">What changed recently</div>
+                    <ul class="release-list">
+                        <li>Hardened Sage recovery and dashboard health signals.</li>
+                        <li>Stabilised startup inner-spread display while market data warms up.</li>
+                        <li>Improved offer replacement after sweep fills and reduced noisy topup retries.</li>
+                        <li>Kept the app update checker ready for GitHub Releases once the app repo is public.</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="download-note">
+                Early tester downloads are being kept private until the main CATalyst app repository is public. This section is already structured for the switch: when public releases are enabled, the Windows installer, portable archives, checksums, and release notes can be linked here directly.
+            </p>
         </div>
     </div>
 </section>
@@ -876,66 +1582,85 @@
 <!-- ── Setup Guide ── -->
 <section class="section" id="setup">
     <div class="container">
-        <p class="section-label">Installation</p>
-        <h2 class="section-title">Setup Guide</h2>
-        <p class="section-subtitle">Shouldn't take more than ten minutes if you've already got Sage installed.</p>
+        <span class="section-kicker">Installation</span>
+        <h2 class="section-title">Setup guide</h2>
+        <p class="section-subtitle">About ten minutes if Sage is already installed. The full version of every step lives in the <a href="docs.html" class="text-link">docs</a>.</p>
 
         <div class="setup-steps">
             <div class="setup-step">
                 <div class="setup-step-num">1</div>
-                <div class="setup-step-content">
+                <div>
                     <div class="setup-step-title">Install Sage Wallet</div>
                     <div class="setup-step-body">
-                        Download and install <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a> (v0.12.10 or later). Let it sync, then go to <strong>Settings &gt; Advanced</strong> and turn on <strong>RPC</strong>. CATalyst uses this to talk to Sage.
+                        Install the latest stable release of <a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a>. Let it sync, then go to <strong>Settings → Advanced</strong> and turn on <strong>RPC</strong>. CATalyst uses this to talk to Sage on port 9257.
                     </div>
                 </div>
             </div>
             <div class="setup-step">
                 <div class="setup-step-num">2</div>
-                <div class="setup-step-content">
-                    <div class="setup-step-title">Add your CAT token to Sage</div>
+                <div>
+                    <div class="setup-step-title">Add your CAT and fund the wallet</div>
                     <div class="setup-step-body">
-                        Add the CAT you want to trade in the Sage token manager. You'll need a balance of that token and some XCH — one for sell offers, the other for buys.
+                        Add the CAT you want to trade in Sage's token manager. You'll need a balance of that CAT and some XCH, one for sells, the other for buys and fees.
                     </div>
                 </div>
             </div>
             <div class="setup-step">
                 <div class="setup-step-num">3</div>
-                <div class="setup-step-content">
+                <div>
                     <div class="setup-step-title">Download and run CATalyst</div>
                     <div class="setup-step-body">
-                        Download the installer from the <a href="#download">Download section</a> above and run it. When it opens for the first time it'll check Sage is running and help you connect.
+                        Public downloads are coming soon. Early testers receive the installer directly for now; on first launch it checks Sage is reachable and walks you through connecting.
                     </div>
                 </div>
             </div>
             <div class="setup-step">
                 <div class="setup-step-num">4</div>
-                <div class="setup-step-content">
-                    <div class="setup-step-title">Select your trading pair</div>
+                <div>
+                    <div class="setup-step-title">Pick your trading pair</div>
                     <div class="setup-step-body">
-                        Pick the CAT you want to trade from the selector at the top. It'll pull the current price from TibetSwap and show you what the market looks like.
+                        Use the pair selector at the top of the dashboard to choose your CAT / XCH pair. CATalyst pulls the live price from TibetSwap and the orderbook from Dexie.
                     </div>
                 </div>
             </div>
             <div class="setup-step">
                 <div class="setup-step-num">5</div>
-                <div class="setup-step-content">
+                <div>
                     <div class="setup-step-title">Run Smart Settings</div>
                     <div class="setup-step-body">
-                        Click <strong>Smart Settings</strong>. It looks at your balance and the current market and suggests a config. Have a look over the numbers and click Apply if they look sensible.
+                        In Settings → Setup, click <strong>Smart Settings</strong>. It reads your balances and the live market, then proposes sizes, spread, and tier weights. Apply if the numbers look sensible, you can fine-tune anything afterwards.
                     </div>
                 </div>
             </div>
             <div class="setup-step">
                 <div class="setup-step-num">6</div>
-                <div class="setup-step-content">
-                    <div class="setup-step-title">Run Coin Prep, then Start</div>
+                <div>
+                    <div class="setup-step-title">Coin prep, then Start Bot</div>
                     <div class="setup-step-body">
-                        The bot needs coins pre-split before it can place offers. Hit <strong>Run Coin Prep</strong> and wait for it to finish — usually a few minutes the first time. Then click <strong>Start Bot</strong> and it'll go.
-                        <div class="code-block">💡 Tip: you don't need to keep the window open. Close it and CATalyst keeps running from the system tray.</div>
+                        Click <strong>Prepare Coins</strong> to split your wallet into offer-sized UTXOs (a few minutes the first time). Then hit <strong>Start Bot</strong>. The dashboard switches to live mode and the ladder goes up.
+                        <div class="tip-block">
+                            <strong>Tip:</strong>&nbsp;close the window and CATalyst keeps running from the system tray. Re-open it any time to inspect the session.
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Risk disclosure ── -->
+<section>
+    <div class="container">
+        <div class="risk">
+            <div class="risk-header">
+                <div class="risk-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                </div>
+                <div class="risk-title">Risk disclosure</div>
+            </div>
+            <p>CATalyst is <strong>beta software</strong> for advanced users. It places real offers using real funds in your Sage wallet. Bugs, edge cases, and adverse market conditions can cause losses, including filling at unfavourable prices, getting stuck on one side of an inventory limit, or having open offers cancelled mid-trade.</p>
+            <p>Nothing in this app or on this site constitutes financial advice. <strong>Use only with capital you can afford to lose.</strong> CATalyst is provided as-is, with no warranty, support obligation, or guarantee of profit. You are responsible for your own trading decisions, tax reporting, and operational security.</p>
+            <p>Read the <a href="docs.html#troubleshooting" class="text-link">Troubleshooting</a> section before running for the first time. Start with small trade sizes and a wide spread until you understand how the bot behaves with your specific CAT pair.</p>
         </div>
     </div>
 </section>
@@ -950,14 +1675,18 @@
             </div>
             <ul class="footer-links">
                 <li><a href="#features">Features</a></li>
-                <li><a href="#setup">Setup Guide</a></li>
+                <li><a href="docs.html">Docs</a></li>
+                <li><a href="#setup">Setup</a></li>
                 <li><a href="#download">Download</a></li>
-                <li><a href="https://github.com/Lowestofttim/catalystxch/releases" target="_blank" rel="noopener">Releases</a></li>
+                <li><a href="https://github.com/Lowestofttim/catalystxch" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="#download">Release status</a></li>
+                <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage</a></li>
                 <li><a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a></li>
-                <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage Wallet</a></li>
+                <li><a href="https://v2.tibetswap.io" target="_blank" rel="noopener">TibetSwap</a></li>
             </ul>
             <p class="footer-copy">
-                Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>. Use at your own risk.
+                Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a>.<br>
+                Use at your own risk.
             </p>
         </div>
     </div>
