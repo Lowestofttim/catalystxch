@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "source_repo": "Lowestofttim/catalyst-bot",
+  "generated_at": "2026-05-03T20:22:54Z",
+  "downloads_enabled": false,
+  "download_status": "coming_soon",
+  "latest": {
+    "version": "v1.2.6",
+    "name": "CATalyst v1.2.6",
+    "published_at": "2026-05-03T18:51:19Z",
+    "channel": "stable",
+    "release_notes": [
+      "Improved the order book depth chart so buy and sell sides use balanced horizontal price lanes.",
+      "Preserved the shared cumulative XCH depth scale so genuine liquidity imbalance remains visible."
+    ],
+    "verification_notes": [
+      "Release workflow passed on Windows, macOS, and Linux.",
+      "Downloaded Catalyst-windows-v1.2.6.zip, extracted it, launched Catalyst.exe --flask, and confirmed /api/health returned version: 1.2.6.",
+      "Downloaded Catalyst-Setup-v1.2.6.exe, installed it silently to a temp folder, launched the installed app, and confirmed /api/health returned version: 1.2.6."
+    ],
+    "assets": [
+      {
+        "name": "Catalyst-Setup-v1.2.6.exe",
+        "platform": "windows",
+        "kind": "installer",
+        "size_bytes": 24233710,
+        "download_url": null,
+        "sha256": null
+      },
+      {
+        "name": "Catalyst-windows-v1.2.6.zip",
+        "platform": "windows",
+        "kind": "archive",
+        "size_bytes": 29772331,
+        "download_url": null,
+        "sha256": null
+      },
+      {
+        "name": "Catalyst-macos-v1.2.6.zip",
+        "platform": "macos",
+        "kind": "archive",
+        "size_bytes": 79223184,
+        "download_url": null,
+        "sha256": null
+      },
+      {
+        "name": "Catalyst-linux-v1.2.6.tar.gz",
+        "platform": "linux",
+        "kind": "archive",
+        "size_bytes": 44322320,
+        "download_url": null,
+        "sha256": null
+      }
+    ]
+  }
+}
