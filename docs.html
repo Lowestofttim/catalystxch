@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation | CATalyst</title>
+    <meta name="description" content="Complete documentation for CATalyst: the Chia CAT market-making bot. Setup, dashboards, offers, spreads, PnL, coin management, sniper, gap closer, and troubleshooting.">
+    <link rel="canonical" href="https://catalystxch.com/docs.html">
+    <meta name="theme-color" content="#080C12">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://catalystxch.com/docs.html">
+    <meta property="og:title" content="CATalyst Documentation">
+    <meta property="og:description" content="Complete docs for CATalyst: setup, features, settings, and troubleshooting.">
+    <meta property="og:image" content="https://catalystxch.com/assets/screenshots/01_dashboard.png">
+
+    <link rel="icon" type="image/png" href="assets/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --cat-teal:    #3EC9A3;
+            --cat-teal-2:  #2AA887;
+            --cat-gold:    #D4A84B;
+            --cat-red:     #F87171;
+            --cat-amber:   #F59E0B;
+
+            --bg-app:      #06090E;
+            --bg-surface:  #0B1018;
+            --bg-card:     #0F1622;
+            --bg-card-2:   #131C2C;
+            --bg-elevated: #18223A;
+
+            --border:      rgba(255,255,255,0.06);
+            --border-mid:  rgba(255,255,255,0.10);
+            --border-strong: rgba(255,255,255,0.16);
+
+            --text-primary:   #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-muted:     #475569;
+
+            --radius-sm: 8px;
+            --radius:    12px;
+            --radius-lg: 18px;
+
+            --sidebar-w: 280px;
+            --toc-w: 220px;
+        }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-app);
+            color: var(--text-primary);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; }
+        .cat   { color: var(--cat-teal); }
+        .alyst { color: var(--cat-gold); }
+        .mono  { font-family: 'JetBrains Mono', monospace; }
+        .text-link {
+            color: var(--cat-teal);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(62,201,163,0.30);
+        }
+        .text-link:hover { border-bottom-color: var(--cat-teal); }
+
+        /* ── Nav ── */
+        nav.site {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(6,9,14,0.78);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .nav-brand img { width: 30px; height: 30px; border-radius: 8px; }
+        .nav-brand-name { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 7px 13px;
+            border-radius: 8px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .nav-links a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav-links a.active { color: var(--cat-teal); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.12s, box-shadow 0.18s, background 0.15s, border-color 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cat-teal), var(--cat-teal-2));
+            color: #04140D;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.20) inset, 0 8px 24px -4px rgba(62,201,163,0.30);
+        }
+        .btn-primary:hover { transform: translateY(-1px); }
+
+        /* ── Layout ── */
+        .docs-shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 88px 24px 96px;
+            display: grid;
+            grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--toc-w);
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: sticky;
+            top: 88px;
+            max-height: calc(100vh - 104px);
+            overflow-y: auto;
+            padding-right: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-mid) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 3px; }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-heading {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            padding: 0 12px;
+        }
+
+        .sidebar-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .sidebar-list a {
+            display: block;
+            padding: 7px 12px;
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            border-left: 2px solid transparent;
+            transition: color 0.15s, background 0.15s, border-color 0.15s;
+        }
+
+        .sidebar-list a:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .sidebar-list a.is-active {
+            color: var(--cat-teal);
+            background: rgba(62,201,163,0.06);
+            border-left-color: var(--cat-teal);
+            font-weight: 600;
+        }
+
+        /* ── Main content ── */
+        .docs-main {
+            min-width: 0;
+            max-width: 800px;
+        }
+
+        .docs-header {
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .docs-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--cat-teal);
+            margin-bottom: 14px;
+        }
+
+        .docs-title {
+            font-size: clamp(34px, 5vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+            margin-bottom: 14px;
+        }
+
+        .docs-lead {
+            font-size: 17px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 640px;
+        }
+
+        .docs-section {
+            margin-bottom: 64px;
+            scroll-margin-top: 88px;
+        }
+
+        .docs-section h2 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .docs-section .section-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--cat-teal);
+            letter-spacing: 0.16em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .docs-section h3 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin: 32px 0 10px;
+            color: var(--text-primary);
+            scroll-margin-top: 88px;
+        }
+
+        .docs-section h4 {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--cat-amber);
+            margin: 24px 0 6px;
+        }
+
+        .docs-section p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .docs-section p strong, .docs-section li strong { color: var(--text-primary); font-weight: 600; }
+
+        .docs-section ul, .docs-section ol {
+            margin: 12px 0 16px 22px;
+            color: var(--text-secondary);
+        }
+
+        .docs-section li {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+
+        .docs-section em { color: var(--text-primary); font-style: italic; }
+
+        .docs-section a {
+            color: var(--cat-teal);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(62,201,163,0.30);
+        }
+        .docs-section a:hover { border-bottom-color: var(--cat-teal); }
+
+        .diagram-grid {
+            display: grid;
+            gap: 16px;
+            margin: 24px 0 4px;
+        }
+
+        .diagram-card {
+            overflow: hidden;
+            border: 1px solid var(--border-mid);
+            border-radius: var(--radius);
+            background: #fff;
+        }
+
+        .diagram-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .diagram-caption {
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .version-card {
+            margin: 20px 0 0;
+            padding: 18px;
+            border: 1px solid rgba(62,201,163,0.22);
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(62,201,163,0.08), rgba(212,168,75,0.05));
+        }
+
+        .version-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .version-name {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .version-state {
+            color: var(--cat-teal);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .version-list {
+            color: var(--text-secondary);
+            padding-left: 20px;
+        }
+
+        .path-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .path-item {
+            display: grid;
+            grid-template-columns: 82px minmax(0, 1fr);
+            gap: 10px;
+            align-items: start;
+            color: var(--text-secondary);
+        }
+
+        .path-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .path-item .mono { color: var(--text-primary); }
+
+        .docs-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .docs-section th, .docs-section td {
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .docs-section th {
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .docs-section td:first-child {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: var(--cat-teal);
+            white-space: nowrap;
+            font-weight: 600;
+            width: 200px;
+        }
+
+        .docs-section td { color: var(--text-secondary); line-height: 1.6; }
+
+        /* Note / tip / warning blocks */
+        .callout {
+            display: flex;
+            gap: 14px;
+            padding: 16px 18px;
+            margin: 20px 0;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-mid);
+            background: var(--bg-card);
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .callout-icon {
+            flex-shrink: 0;
+            width: 22px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 1px;
+        }
+
+        .callout strong { color: var(--text-primary); }
+
+        .callout.tip {
+            border-color: rgba(62,201,163,0.20);
+            background: rgba(62,201,163,0.04);
+        }
+        .callout.tip .callout-icon { color: var(--cat-teal); }
+
+        .callout.warn {
+            border-color: rgba(245,158,11,0.20);
+            background: rgba(245,158,11,0.04);
+        }
+        .callout.warn .callout-icon { color: var(--cat-amber); }
+
+        .callout.danger {
+            border-color: rgba(248,113,113,0.20);
+            background: rgba(248,113,113,0.04);
+        }
+        .callout.danger .callout-icon { color: var(--cat-red); }
+
+        /* Screenshots */
+        .docs-shot {
+            margin: 24px 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-mid);
+            background: var(--bg-card);
+            box-shadow: 0 24px 60px -20px rgba(0,0,0,0.5);
+        }
+
+        .docs-shot img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .docs-shot-cap {
+            padding: 10px 14px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.04em;
+            background: rgba(0,0,0,0.25);
+        }
+
+        /* TOC */
+        .toc {
+            position: sticky;
+            top: 88px;
+            max-height: calc(100vh - 104px);
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        .toc-heading {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .toc-list {
+            list-style: none;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 5px 14px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12.5px;
+            border-left: 2px solid transparent;
+            margin-left: -1px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .toc-list a:hover { color: var(--text-secondary); }
+        .toc-list a.is-active { color: var(--cat-teal); border-left-color: var(--cat-teal); }
+
+        .toc-list a.indent { padding-left: 26px; }
+
+        /* Footer */
+        footer.docs-footer {
+            border-top: 1px solid var(--border);
+            padding: 36px 24px;
+            margin-top: 64px;
+        }
+
+        .docs-footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .docs-footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .docs-footer-brand img { width: 24px; height: 24px; border-radius: 6px; }
+        .docs-footer-brand-name { font-size: 14px; font-weight: 700; }
+
+        .docs-footer-links {
+            display: flex;
+            gap: 22px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .docs-footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .docs-footer-links a:hover { color: var(--text-secondary); }
+
+        .docs-footer-copy {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .docs-footer-copy a {
+            color: var(--cat-teal);
+            text-decoration: none;
+        }
+
+        /* Mobile menu */
+        .mobile-menu-btn {
+            display: none;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-mid);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        @media (max-width: 1100px) {
+            .docs-shell {
+                grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+            }
+            .toc { display: none; }
+        }
+
+        @media (max-width: 820px) {
+            .docs-shell {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .sidebar {
+                position: static;
+                max-height: none;
+                margin-bottom: 32px;
+                padding-bottom: 24px;
+                border-bottom: 1px solid var(--border);
+                display: none;
+            }
+            .sidebar.is-open { display: block; }
+            .mobile-menu-btn { display: inline-flex; }
+            .nav-links { display: none; }
+            .docs-section td:first-child { width: auto; white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="site">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-brand">
+            <img src="assets/icon.png" alt="CATalyst">
+            <span class="nav-brand-name"><span class="cat">CAT</span><span class="alyst">alyst</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#how-it-works">How it works</a></li>
+            <li><a href="index.html#setup">Setup</a></li>
+            <li><a href="docs.html" class="active">Docs</a></li>
+            <li><a href="https://github.com/Lowestofttim/catalystxch" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+        <button class="mobile-menu-btn" type="button" id="mobileMenuBtn">☰ Menu</button>
+        <a href="index.html#download" class="btn btn-primary">Get CATalyst</a>
+    </div>
+</nav>
+
+<!-- ── Shell ── -->
+<div class="docs-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Documentation sections">
+        <div class="sidebar-section">
+            <div class="sidebar-heading">Documentation</div>
+            <ul class="sidebar-list">
+                <li><a href="#overview" class="is-active">Overview</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-heading">The app</div>
+            <ul class="sidebar-list">
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#offers">Offers &amp; Fills</a></li>
+                <li><a href="#spreads">Spreads &amp; Pricing</a></li>
+                <li><a href="#inventory">Inventory &amp; PnL</a></li>
+                <li><a href="#coins">Coin Management</a></li>
+                <li><a href="#intel">Market Intel</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-heading">Strategies</div>
+            <ul class="sidebar-list">
+                <li><a href="#sniper">Arb Sniper</a></li>
+                <li><a href="#gap-closer">Close the Gap</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-heading">Reference</div>
+            <ul class="sidebar-list">
+                <li><a href="#wallet">Sage Wallet</a></li>
+                <li><a href="#config">Config Guide</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="docs-main">
+
+        <header class="docs-header">
+            <div class="docs-eyebrow">📖 Documentation</div>
+            <h1 class="docs-title">Everything you need to run CATalyst.</h1>
+            <p class="docs-lead">CATalyst is a beta desktop market-making app for Chia CATs. This guide walks through the current app screens, setup flow, wallet requirements, safety controls, and troubleshooting notes for early testers.</p>
+        </header>
+
+        <!-- 1. Overview -->
+        <section class="docs-section" id="overview">
+            <div class="section-meta">01 · OVERVIEW</div>
+            <h2>What is CATalyst?</h2>
+            <p>CATalyst is an <strong>automated market maker</strong> for Chia blockchain CAT tokens. It runs locally on your computer, connects to <strong>Sage Wallet</strong> over RPC, builds a buy/sell ladder around a live reference price, and posts offers to <strong>Dexie</strong> with optional <strong>Splash P2P</strong> broadcasting.</p>
+
+            <h3>How it works, the cycle</h3>
+            <p>The bot runs a complete cycle every loop interval, with the current default set to <strong>90 seconds</strong>. Background watchers keep the app responsive between cycles: the price watcher polls TibetSwap for swaps, the AMM monitor tracks Tibet pool reserve drift, and the mempool watcher checks Coinset for pending spends on the Tibet pool coin and coins locked by your live offers. These signals can wake the main loop early, so fills and price shifts are usually handled faster than the base loop interval.</p>
+
+            <p>Each cycle runs these steps:</p>
+            <ol>
+                <li><strong>Fetch prices</strong> from Dexie and TibetSwap to find the current mid-price</li>
+                <li><strong>Check health</strong>. Is the wallet reachable and ready? Any circuit breakers active?</li>
+                <li><strong>Detect fills</strong>. Reconcile wallet state, known offer coins, Dexie status, and chain data where needed</li>
+                <li><strong>Match PnL</strong>. Pair up buy fills with sell fills to calculate profit</li>
+                <li><strong>Update inventory</strong>. Track net position (are we accumulating CAT or XCH?)</li>
+                <li><strong>Clean expired offers</strong> and pre-emptively refresh any expiring within 5 minutes</li>
+                <li><strong>Fire sniper</strong> if there's an arb opportunity between Dexie and TibetSwap</li>
+                <li><strong>Emergency requote</strong> if a price shock is detected (large sudden arb gap)</li>
+                <li><strong>Regular requote</strong> if the price has drifted beyond the threshold</li>
+                <li><strong>Create new offers</strong> with tiered sizing and inventory-skewed spreads</li>
+                <li><strong>Post to Dexie</strong> and optionally broadcast to Splash P2P for visibility</li>
+                <li><strong>Check coins</strong>. Adaptive topup based on trading pace (busy/normal/slow)</li>
+            </ol>
+
+            <div class="diagram-grid">
+                <figure class="diagram-card">
+                    <img src="assets/diagrams/catalyst-app-flow-v2.svg" alt="CATalyst app flow diagram">
+                    <figcaption class="diagram-caption">App flow</figcaption>
+                </figure>
+                <figure class="diagram-card">
+                    <img src="assets/diagrams/catalyst-offer-fill-flow-v2.svg" alt="CATalyst offer and fill flow diagram">
+                    <figcaption class="diagram-caption">Offer and fill flow</figcaption>
+                </figure>
+                <figure class="diagram-card">
+                    <img src="assets/diagrams/catalyst-coin-prep-topup-flow-v2.svg" alt="CATalyst coin preparation and topup flow diagram">
+                    <figcaption class="diagram-caption">Coin prep and topup flow</figcaption>
+                </figure>
+            </div>
+
+            <h3>Key concepts</h3>
+            <p><strong>Spread</strong>. The difference between your buy and sell price, shown as a %. Wider = safer but fewer fills. Narrower = more fills but more risk.</p>
+            <p><strong>Inventory</strong>. Your net position. If people keep buying your CAT, you accumulate XCH (go short CAT). The bot skews spreads to rebalance.</p>
+            <p><strong>Coins</strong>. Chia uses a UTXO model, each offer locks a specific coin. You need pre-split coins of the right size.</p>
+        </section>
+
+        <!-- 2. Getting Started -->
+        <section class="docs-section" id="getting-started">
+            <div class="section-meta">02 · GETTING STARTED</div>
+            <h2>Welcome, here's how to get started.</h2>
+            <p>The bot is designed to work out of the box once Sage is running. Public downloads are still marked coming soon until the main CATalyst app repository is public, but the website is ready for direct release links when that switch happens.</p>
+            <div class="version-card">
+                <div class="version-head">
+                    <div class="version-name">Latest prepared beta: v1.2.5</div>
+                    <div class="version-state">Public links coming soon</div>
+                </div>
+                <ul class="version-list">
+                    <li>Windows installer and platform archives are staged in the private app release flow.</li>
+                    <li>Recent work hardened Sage recovery, dashboard health signals, offer replacement after sweep fills, and startup spread display.</li>
+                    <li>The app update checker is already pointed at GitHub Releases and can surface future release notes once the app repo is public.</li>
+                </ul>
+            </div>
+            <ol>
+                <li><strong>Install CATalyst</strong>. Early testers receive the installer directly for now. When public releases go live, use the website download section for the latest build.</li>
+                <li><strong>Make sure Sage is running</strong>. Open Sage Wallet and enable RPC in Sage Settings -&gt; Advanced. CATalyst talks to Sage on port 9257.</li>
+                <li><strong>Select a signing wallet</strong>. Use a normal signing fingerprint, not a watch-only key, so the app can create, cancel, and replace offers.</li>
+                <li><strong>Pick your trading pair</strong>. Use Quick Start on the dashboard to choose the CAT token you want to trade against XCH.</li>
+                <li><strong>Run Smart Settings</strong>. Review spread, trade sizes, reserves, tiers, and safety limits before going live.</li>
+                <li><strong>Prepare your coins</strong>. Split your wallet balance into the right coin sizes for your ladder.</li>
+                <li><strong>Start the bot</strong>. The app creates offers, watches fills, updates inventory, and manages requotes automatically.</li>
+            </ol>
+
+            <h3>Tips for beginners</h3>
+            <p><strong>Start small</strong>. Use small trade sizes while you're learning. You can always increase them later in Settings.</p>
+            <p><strong>Everything is in Settings</strong>. All normal app configuration is done through the Settings screen. No manual file editing should be needed for day-to-day use.</p>
+            <p><strong>Live vs Setup</strong>. Settings has two sub-tabs. <em>Live</em> holds the hot-reloadable tweaks (spread slider, skew, feature toggles) and is safe to touch while the bot is running. <em>Setup</em> holds the full configuration; saved changes apply on next restart when the bot is live.</p>
+            <p><strong>Guidance + Activity</strong>. Once running, the two panels below the info cards show what to act on (Guidance) and what the bot is doing right now (Activity). Anything with a button goes to Guidance; informational notes sit below the same card.</p>
+            <p><strong>Command Centre</strong>. The three-panel summary further down shows your settings, market health, and wallet performance at a glance. Hover over any <strong>?</strong> icon for an explanation.</p>
+        </section>
+
+        <!-- 3. Dashboard -->
+        <section class="docs-section" id="dashboard">
+            <div class="section-meta">03 · DASHBOARD</div>
+            <h2>Dashboard, your live command centre.</h2>
+
+            <div class="docs-shot">
+                <img src="assets/screenshots/01_dashboard.png" alt="CATalyst dashboard">
+                <div class="docs-shot-cap">DASHBOARD · LIVE SESSION</div>
+            </div>
+
+            <p>Top-to-bottom order is tuned so bot state and market context are visible without scrolling:</p>
+            <ol>
+                <li><strong>Token pill</strong>. The active CAT / XCH pair.</li>
+                <li><strong>Running bar</strong>. Start / Stop / Cancel All on the left, status badge in the middle, Sync indicator + wallet badge + fingerprint on the right.</li>
+                <li><strong>TibetSwap Live AMM</strong>. Labelled strip showing live pool price, drift from your mid, reserves, and freshness. Source chip reads <em>Source · TibetSwap</em>.</li>
+                <li><strong>Volume &amp; Token Info</strong>. 7d / 30d volume, 7d range, description, and website link. Source chip reads <em>Source · Dexie</em>. While data is loading, a "Gathering…" placeholder shows instead of an empty row.</li>
+                <li><strong>10 info cards</strong> (5×2 symmetric grid), Mid Price, Active Offers, Session PnL, Position, Uptime, Best Bid, Best Ask, 24h Volume, Liquidity, Arb Gap.</li>
+                <li><strong>Guidance + Activity row</strong>. Two equal-width panels side by side (see below).</li>
+                <li><strong>Market Health / Command Centre</strong>. The three-column summary of your settings, market health metrics, and wallet performance. Sits just below the fold on 1080p windows so you see the top of it without scrolling.</li>
+            </ol>
+
+            <h3>Guidance panel (left of Activity)</h3>
+            <p>One merged card replaces the old separate Recommendations and Advisor panels. It has two sections, divided by a subtle dashed line:</p>
+            <ul>
+                <li><strong>Actions</strong> (top), everything you can act on with one click: circuit-breaker tripped, wallet sync stale, Restart Sage, <em>Tighten to X%</em>, <em>Widen to X%</em>, <em>Enable Inventory Mgmt</em>, <em>Allocate deposit</em>, etc.</li>
+                <li><strong>Advisor notes</strong> (bottom), context that explains what the current state means: quiet token, wide arb gap, price-gap sanity warnings. Tips that depend on the Spacescan 24h cache automatically hide themselves when the cache is stale.</li>
+            </ul>
+            <p>Dedup logic ensures each concern surfaces once: if a backend alert has raised <em>circuit_breaker</em>, the advisor won't push a duplicate tip about the same breaker.</p>
+
+            <h3>Activity feed (right of Guidance)</h3>
+            <p>Rolling 5-line feed of recent bot work, postings, cancels, fills, probes, requotes, coin work, recoveries. New events flow in at the top with a timestamp; older events drop off the bottom. No scrollbar; the full history lives in the <strong>Logs</strong> tab.</p>
+
+            <h3>Command Centre metrics</h3>
+            <ul>
+                <li><strong>Active Settings</strong> (left), Read-only view of your current trading, spread, inventory, tier, and safety settings.</li>
+                <li><strong>Market Health</strong> (centre), Traffic light + five metrics: your spread, market spread, competitors, arb gap, pool depth.</li>
+                <li><strong>Wallet &amp; Performance</strong> (right), Sage balances, coin breakdown, reserves, and session uptime / fills / PnL / errors.</li>
+            </ul>
+
+            <h3>Where did Live Controls go?</h3>
+            <p>Live Controls (Dynamic Spreads, Inventory Mgmt, Sniper, Competitor Aware toggles + Base Spread / Skew sliders + Close the Gap) moved to <strong>Settings → Live</strong> tab. Click Settings in the left sidebar while the bot is running and the Live sub-tab auto-opens.</p>
+        </section>
+
+        <!-- 4. Offers & Fills -->
+        <section class="docs-section" id="offers">
+            <div class="section-meta">04 · EXECUTION</div>
+            <h2>Offers &amp; Fills</h2>
+
+            <div class="docs-shot">
+                <img src="assets/screenshots/02_offers.png" alt="Offers view">
+                <div class="docs-shot-cap">OFFERS · ORDER BOOK DEPTH + ACTIVE OFFERS</div>
+            </div>
+
+            <h3>Understanding offers</h3>
+            <p>The bot creates <strong>buy offers</strong> (offering XCH, requesting CAT) and <strong>sell offers</strong> (offering CAT, requesting XCH) around the current mid-price.</p>
+
+            <h3>Active Offers tab</h3>
+            <p>Shows all currently open offers with: side (buy/sell), price, size, tier, time remaining until expiry, and Dexie link.</p>
+            <p><strong>Tiers</strong>. If tiered sizing is enabled, offers are placed at different distances from mid-price: Inner (closest, largest), Mid, Outer, Extreme (furthest, smallest).</p>
+
+            <h3>How fills work</h3>
+            <p>When someone takes your offer on Dexie, that's a "fill". The bot detects fills by comparing offers before and after each cycle.</p>
+            <div class="callout warn">
+                <span class="callout-icon">⚠</span>
+                <div><strong>Mass disappearance guard:</strong> If more than 50% of offers vanish at once, the bot requires 3 confirmations before treating them as fills (protects against wallet glitches).</div>
+            </div>
+
+            <h3>History tab</h3>
+            <p>Shows completed fills with: side, price, size, timestamp, and whether it was matched into a round-trip trade.</p>
+        </section>
+
+        <!-- 5. Spreads & Pricing -->
+        <section class="docs-section" id="spreads">
+            <div class="section-meta">05 · QUOTING</div>
+            <h2>Spreads &amp; Pricing</h2>
+
+            <h3>How pricing works</h3>
+            <p>The bot builds live executable pricing from the two venues it can actually trade against:</p>
+            <ul>
+                <li><strong>Dexie</strong>. The current orderbook and ticker context</li>
+                <li><strong>TibetSwap</strong>. The pool-implied price and slippage context</li>
+            </ul>
+            <p>The <strong>mid-price</strong> and <strong>arb gap</strong> come from Dexie and TibetSwap because those are the executable market venues. <strong>Spacescan</strong> is not used as a direct live price source; instead it supports on-chain verification, balance checks, and token-health context where available.</p>
+
+            <h3>Dynamic spreads</h3>
+            <p>When enabled, the spread adjusts automatically based on:</p>
+            <ul>
+                <li><strong>Volatility</strong>. More volatile = wider spread (self-protection)</li>
+                <li><strong>Arb gap</strong>. Large gap = wider spread (don't get picked off)</li>
+                <li><strong>Fill rate</strong>. Too many fills = wider spread; too few = tighter</li>
+                <li><strong>Pool depth</strong>. Shallow TibetSwap pool = wider spread (more slippage risk)</li>
+                <li><strong>Competitors</strong>. If Competitor Awareness is enabled, pricing also nudges based on what other market makers are doing on Dexie</li>
+            </ul>
+
+            <h3>Spread settings</h3>
+            <p><strong>Base Spread</strong>. Starting point as a percentage for the dynamic engine, not a minor "aggression" trim. <strong>Inner Edge</strong>. Where your closest offers start (the ladder begins here and widens to the full spread). <strong>Min/Max Spread</strong>. Hard limits the dynamic engine can't exceed. Turning Dynamic Spreads off disables the volatility/fill-rate/pool-depth engine, but inventory skew and competitor nudges can still move quotes if those features stay on.</p>
+
+            <div class="docs-shot">
+                <img src="assets/screenshots/05_settings_live.png" alt="Settings → Live">
+                <div class="docs-shot-cap">SETTINGS · LIVE · HOT-RELOADABLE CONTROLS</div>
+            </div>
+        </section>
+
+        <!-- 6. Inventory & PnL -->
+        <section class="docs-section" id="inventory">
+            <div class="section-meta">06 · PERFORMANCE</div>
+            <h2>Inventory &amp; PnL</h2>
+
+            <div class="docs-shot">
+                <img src="assets/screenshots/03_pnl.png" alt="P&amp;L view">
+                <div class="docs-shot-cap">PNL · ROUND TRIPS · INVENTORY POSITION</div>
+            </div>
+
+            <h3>Inventory tracking</h3>
+            <p>The bot tracks your <strong>net position</strong>. How much CAT you've accumulated (or sold) relative to where you started.</p>
+            <ul>
+                <li><strong>Long CAT</strong>. You've bought more CAT than sold. Bot widens buy spread, tightens sell (encourages selling).</li>
+                <li><strong>Short CAT</strong>. You've sold more CAT than bought. Bot tightens buy spread, widens sell (encourages buying).</li>
+                <li><strong>Balanced</strong>. Roughly equal. Spreads are symmetric.</li>
+            </ul>
+            <p><strong>Skew Intensity</strong> controls how aggressively spreads skew (0 = off, 1 = aggressive). You can set this in Settings → Live.</p>
+
+            <h3>PnL (Profit &amp; Loss)</h3>
+            <p><strong>Realised PnL:</strong> Profit from completed round-trips (matched buy + sell). This is actual locked-in profit.</p>
+            <p><strong>Round-trip matching:</strong> Pairs buys with sells of similar size (within 20%). The difference is your spread capture. Fills that differ in size by more than 20% are left unmatched, they represent one-directional inventory movement, not a completed trade.</p>
+            <p><strong>Unmatched fills:</strong> The amber panel on the PnL tab shows any "open legs", fills waiting for a partner. This is why PnL can show zero even when you have fills. It will update once a matching fill comes in from the opposite side.</p>
+            <p><strong>PnL tab statistics:</strong> Along with realised PnL and round trips, the tab shows: total XCH + CAT volume traded, average profit per round trip, average fill size, buy/sell fill count split, and average time between buy and sell legs.</p>
+
+            <div class="callout danger">
+                <span class="callout-icon">🛑</span>
+                <div><strong>Circuit breaker:</strong> If your position exceeds the Max Position limit, the bot stops creating offers on the overweight side until the position rebalances.</div>
+            </div>
+        </section>
+
+        <!-- 7. Coin Management -->
+        <section class="docs-section" id="coins">
+            <div class="section-meta">07 · UTXO PLUMBING</div>
+            <h2>Coin Management</h2>
+
+            <h3>Why coins matter</h3>
+            <p>Chia's UTXO model means every offer locks a specific coin. If you have one big coin, you can only make one offer. The bot needs many pre-split coins of the right size.</p>
+
+            <h3>Coin preparation</h3>
+            <p>Click <strong>"Prepare Coins"</strong> to split your wallet into offer-sized coins. This:</p>
+            <ol>
+                <li>Calculates how many XCH and CAT coins you need based on your tier sizes</li>
+                <li>Finds your largest coin and splits it using blockchain transactions</li>
+                <li>Waits for confirmations (~60 seconds)</li>
+                <li>Leaves a reserve coin for future expansion</li>
+            </ol>
+
+            <h3>Adaptive live topup</h3>
+            <p>While running, the bot monitors coin counts and tops up automatically based on trading pace:</p>
+            <ul>
+                <li><strong>Busy</strong> (many fills/hour), tops up when spare coins drop below 50%</li>
+                <li><strong>Normal</strong>. Tops up at 30% spare coins</li>
+                <li><strong>Slow</strong> (few fills/hour), tops up at 20% spare coins</li>
+            </ul>
+
+            <h3>Coin health in the dashboard</h3>
+            <p>The Wallet &amp; Performance panel shows Free, Locked, and Total coin counts for both XCH and CAT. The bot also tracks locked XCH and CAT values to show how much capital is committed to open offers.</p>
+        </section>
+
+        <!-- 8. Market Intel -->
+        <section class="docs-section" id="intel">
+            <div class="section-meta">08 · MARKET INTEL</div>
+            <h2>Market Intelligence</h2>
+
+            <div class="docs-shot">
+                <img src="assets/screenshots/04_intel.png" alt="Market Intel view">
+                <div class="docs-shot-cap">MARKET INTEL · DEXIE + TIBETSWAP + SPACESCAN</div>
+            </div>
+
+            <p>The Market Intel tab provides ecosystem awareness for the live CAT pair. Today it is driven mainly by the Dexie orderbook and TibetSwap pool context, with Spacescan supporting the app's wider on-chain verification and token-health analysis.</p>
+
+            <h3>Competitor monitoring</h3>
+            <p>When Competitor Aware is enabled, the bot scans the Dexie orderbook for other market makers and adjusts your spread:</p>
+            <ul>
+                <li>If competitors are <strong>wider</strong>. You can safely widen too (captures 25% of the gap)</li>
+                <li>If competitors are <strong>tighter</strong>. You tighten to stay competitive (30% of the gap)</li>
+                <li>If one side is <strong>thin</strong> (few offers), bonus spread on that side</li>
+            </ul>
+
+            <h3>TibetSwap pool depth</h3>
+            <p>Shows the ratio of your trade size to the TibetSwap pool. If your trade is large relative to the pool, the bot widens spreads to account for slippage.</p>
+
+            <h3>Where Spacescan helps</h3>
+            <p>Spacescan is used in this app as an on-chain helper rather than a live orderbook feed. It assists with fill verification, balance discrepancy checks, and token-health inputs used by Smart Settings and safety checks. It also provides the <strong>holder count</strong> shown in the Market Health panel, and the <strong>token icon</strong> displayed throughout the app. Spacescan data is cached for 24 hours due to API rate limits, it won't update every cycle.</p>
+
+            <div class="callout tip">
+                <span class="callout-icon">💡</span>
+                <div><strong>Free tier vs Pro tier.</strong> If you skipped the API-key step during setup you're on the <em>free tier</em>, which only returns the token icon and basic price/supply data. The Activity Level, On-Chain Risk, and Holders panels will show "Free tier" instead of a value, that's expected, not a fault. Adding a Spacescan Pro API key (Settings → Spacescan → Save &amp; Verify) unlocks all three fields and improves the Smart Settings risk estimate.</div>
+            </div>
+
+            <h3>Token icons</h3>
+            <p>When you select a trading pair, the app automatically fetches the token's logo from the <strong>Dexie icon CDN</strong> and shows it next to the token name in the titlebar, pair selector, and wallet balance labels. If no icon exists for a token, the space is simply left blank, no broken images.</p>
+
+            <h3>Splash incoming offers</h3>
+            <p>If Splash listening is enabled, the <strong>Received</strong> counter in the Market Intel tab counts every inbound peer offer seen this session (cumulative). The <strong>Relevant</strong> counter shows how many of those matched your current trading pair. These numbers only reset when the bot restarts.</p>
+
+            <h3>DBX rewards</h3>
+            <p>Dexie rewards liquidity providers with DBX tokens. You're eligible when your spread is below the DBX Max Spread threshold (default 5%). Check the Market Intel tab for your eligibility status.</p>
+
+            <h3>Offer broadcasting</h3>
+            <p>Your offers can be posted to multiple platforms for wider visibility:</p>
+            <ul>
+                <li><strong>Dexie</strong>. Always on. The primary exchange where your offers are posted.</li>
+                <li><strong>Splash P2P</strong>. Optional. A decentralised peer-to-peer network that broadcasts offers directly to other nodes. Runs a lightweight background process on your machine.</li>
+            </ul>
+            <p>Enable these in Settings under the Features section.</p>
+        </section>
+
+        <!-- 9. Sniper -->
+        <section class="docs-section" id="sniper">
+            <div class="section-meta">09 · STRATEGY</div>
+            <h2>Arb Sniper</h2>
+
+            <p>The sniper module watches for arbitrage opportunities between Dexie and TibetSwap.</p>
+
+            <h3>How it works</h3>
+            <p>When the <strong>arb gap</strong> (price difference between Dexie and TibetSwap) exceeds the configured threshold, the sniper fires a small probe pair to test the edge before deploying the main book.</p>
+            <ul>
+                <li><strong>Probe-first</strong>. Fires a small pair (one buy + one sell) at the safe edge. If both probes <strong>survive</strong> on the book, the safe edge is confirmed and the main ladder follows behind. If one is filled, the bot widens that side's buffer and retries.</li>
+                <li><strong>Inventory-aware</strong>. Won't probe in the direction that worsens your position</li>
+                <li><strong>30-second cooldown</strong> (configurable via SNIPER_COOLDOWN_SECS)</li>
+                <li><strong>Max 2 active probes</strong>. At most one buy + one sell at any time</li>
+                <li><strong>Direct Dexie post</strong>. Bypasses the normal queue for speed</li>
+                <li><strong>Dedicated coin pool</strong>. Uses pre-split sniper coins (SNIPER_PREP_COUNT in settings) so it never starves the main ladder</li>
+            </ul>
+
+            <h3>Fast response</h3>
+            <p>The background price watcher checks TibetSwap every 12 seconds. When it detects a swap, it wakes the main loop immediately, so the sniper can fire within seconds of an opportunity appearing, not minutes.</p>
+
+            <h3>Sniper stats</h3>
+            <p>The dashboard shows: attempts, successes, last gap detected, and total profit from snipes.</p>
+        </section>
+
+        <!-- 10. Close the Gap -->
+        <section class="docs-section" id="gap-closer">
+            <div class="section-meta">10 · STRATEGY</div>
+            <h2>Close the Gap</h2>
+
+            <div class="docs-shot">
+                <img src="assets/screenshots/10_modal_close_the_gap_confirm.png" alt="Close the Gap confirmation modal">
+                <div class="docs-shot-cap">PROBE LADDER · CONFIRMATION DIALOG</div>
+            </div>
+
+            <p>This feature gradually tightens your spread to find the best price you can safely offer, like slowly turning up a dial to see how far you can go.</p>
+
+            <h3>How it works</h3>
+            <ol>
+                <li>Creates a small pair of "probe" offers (buy + sell) starting at a wide spread</li>
+                <li>Every 60 seconds, it tightens the spread by 10%</li>
+                <li>If someone arbs the offers (fills both sides quickly), it backs off, the spread was too tight</li>
+                <li>The tightest safe spread becomes the "floor", it won't go below the arb gap plus a safety buffer</li>
+                <li>When it reaches the floor, it plants a real inner-tier offer at the proven price and swaps out the furthest inner offer</li>
+                <li>The rest of the ladder catches up naturally via the incremental reaction strategy</li>
+            </ol>
+
+            <h3>The arb floor</h3>
+            <p>The gap closer uses the current arb gap between Dexie and TibetSwap as an intelligent floor. It will never tighten your spread below the arb gap + a safety buffer (default 0.2%), because that would let arbitrageurs pick you off.</p>
+
+            <h3>Floor handoff</h3>
+            <p>When the floor is found and proven stable, the gap closer creates a real inner-tier offer at that price and cancels the furthest existing inner offer, swapping old for new. The main book then converges naturally over time.</p>
+
+            <h3>Using it</h3>
+            <p>Open <strong>Settings → Live</strong> and use the <strong>"Close the Gap"</strong> control there. You can set the aggression level (how wide to start). The control shows the current gap-closer spread while active. Stop it any time by clicking again.</p>
+        </section>
+
+        <!-- 11. Sage Wallet -->
+        <section class="docs-section" id="wallet">
+            <div class="section-meta">11 · WALLET</div>
+            <h2>Sage Wallet</h2>
+
+            <h3>Wallet connection</h3>
+            <p>This desktop app is built around <strong>Sage Wallet only</strong>. The live startup flow, health checks, signing checks, and wallet guidance all assume Sage is the active wallet.</p>
+
+            <h3>Sage Wallet</h3>
+            <ul>
+                <li>A lightweight wallet, <strong>no full node required</strong></li>
+                <li>Connects via RPC on port 9257</li>
+                <li>Much faster sync (minutes, not hours)</li>
+                <li>Supports advanced features like coin ID selection for faster offer creation</li>
+                <li>Make sure Sage is open and the RPC server is enabled in Settings → Advanced</li>
+                <li>Use a signing wallet, not a watch-only key, if you want the bot to create, cancel, and replace offers</li>
+            </ul>
+
+            <h3>Troubleshooting</h3>
+            <p>If the bot can't detect your wallet, make sure the wallet app is open. The sync indicator in the top-left will turn green when the wallet is connected. For Sage: ensure the RPC server is enabled in Sage's Settings → Advanced.</p>
+        </section>
+
+        <!-- 12. Config Guide -->
+        <section class="docs-section" id="config">
+            <div class="section-meta">12 · REFERENCE</div>
+            <h2>Config Guide</h2>
+
+            <div class="docs-shot">
+                <img src="assets/screenshots/06_settings_setup.png" alt="Settings → Setup">
+                <div class="docs-shot-cap">SETTINGS · SETUP · FULL CONFIGURATION</div>
+            </div>
+
+            <h3>Key settings explained</h3>
+            <table>
+                <thead>
+                    <tr><th>Setting</th><th>What it does</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Spread %</td><td>Your spread as a percentage. Higher = safer but fewer fills.</td></tr>
+                    <tr><td>Max Offers</td><td>How many buy + sell offers to maintain. More offers = better coverage but needs more coins.</td></tr>
+                    <tr><td>Trade Size</td><td>XCH amount per offer (or per tier if tiered sizing is on). Larger = more capital at risk per trade.</td></tr>
+                    <tr><td>Offer Expiry</td><td>How long offers live before auto-expiring (in minutes). The bot pre-emptively refreshes offers within 5 min of expiring.</td></tr>
+                    <tr><td>Dynamic Spread</td><td>Enable automatic spread adjustment based on volatility, arb gap, fill rate, pool depth, and competitors.</td></tr>
+                    <tr><td>Inventory Mgmt</td><td>Track net position and skew spreads to rebalance. Prevents accumulating too much of one side.</td></tr>
+                    <tr><td>Tiered Orders</td><td>Place tiered offers at different distances from mid-price. Inner (nearest) = largest, Extreme (furthest) = smallest.</td></tr>
+                    <tr><td>Max Position</td><td>Circuit breaker limit in XCH. If position exceeds this, the bot stops one side until it rebalances.</td></tr>
+                    <tr><td>Sniper</td><td>Fires targeted offers when the arb gap between Dexie and TibetSwap is large enough to capture.</td></tr>
+                    <tr><td>Competitor Aware</td><td>Scans the Dexie orderbook and adjusts your spread based on what other market makers are doing.</td></tr>
+                    <tr><td>Splash P2P</td><td>Broadcast offers to a decentralised peer-to-peer network for wider visibility beyond Dexie.</td></tr>
+                    <tr><td>Reserves</td><td>Minimum XCH and CAT held back from trading. Protects against going to zero.</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Live vs Setup sub-tabs</h3>
+            <p>The Settings view has two sub-tabs. Pick the one that matches what you need to change:</p>
+            <ul>
+                <li><strong>Live</strong>. Safe while the bot is running. Hot-reloads on the next loop cycle. Contains: Dynamic Spreads toggle, Inventory Mgmt toggle, Sniper toggle, Competitor Aware toggle, Base Spread slider, Skew Sensitivity slider, Close the Gap button. Auto-selected when the bot is running.</li>
+                <li><strong>Setup</strong>. Full configuration (trading pair, reserves, tier sizes, safety limits, ladder shape, coin-prep, etc). Saves persist across runs. If you save Setup changes while the bot is running, they <em>apply on next restart</em>, an amber banner at the top of the tab reminds you, and the Save button relabels to "Save (applies on restart)".</li>
+            </ul>
+            <p>Click Settings in the left sidebar to open this view. Dashboard no longer hosts Live Controls, they live in Settings → Live.</p>
+        </section>
+
+        <!-- 13. Troubleshooting -->
+        <section class="docs-section" id="troubleshooting">
+            <div class="section-meta">13 · TROUBLESHOOTING</div>
+            <h2>Troubleshooting</h2>
+
+            <h3>Common issues</h3>
+
+            <h4>Sync indicator is red</h4>
+            <p>Your Sage wallet is either not reachable, still warming up, or not reporting a healthy state yet. Make sure Sage is open, the RPC server is enabled in Settings → Advanced, and the selected fingerprint has finished loading.</p>
+
+            <h4>Bot starts but no offers appear</h4>
+            <p>Check: (1) the trading pair is selected, (2) coin prep has been run or existing coins are large enough, (3) the circuit breaker is not active, and (4) the active Sage wallet is not watch-only.</p>
+
+            <h4>Offers created but not on Dexie</h4>
+            <p>Check the Market Intel tab for Dexie posting stats. If there are failed posts, the bot retries automatically. Ensure your internet connection is stable.</p>
+
+            <h4>"Not enough coins" error</h4>
+            <p>Your wallet doesn't have enough pre-split coins. Click "Prepare Coins" to split your balance. Each active offer needs its own coin. The bot will also auto-topup while running.</p>
+
+            <h4>Price shows as 0 or "N/A"</h4>
+            <p>The bot cannot yet build a usable market view from Dexie and TibetSwap, or market intel is still warming up after startup. Check your internet connection and give the dashboard a little time to refresh.</p>
+
+            <h4>Logs show RPC errors</h4>
+            <p>The Sage RPC is not responding cleanly. Make sure Sage is open, the selected wallet fingerprint is loaded, and the app has not fallen into a watch-only or degraded wallet state. Restarting the app is often the quickest reset after repeated RPC timeouts.</p>
+
+            <h4>Mass disappearance warning</h4>
+            <p>The bot detected many offers vanishing at once. It requires 3 confirmations before treating them as fills (safety feature). This can happen during wallet restarts or network issues.</p>
+
+            <h4>PnL shows zero even though I have fills</h4>
+            <p>Realised PnL only counts when a buy fill and sell fill are matched into a round trip. If your fills are all on one side (e.g. two buy fills, no sells), or if the sizes differ by more than 20%, they remain as "open legs". Check the amber <strong>Unmatched Fills</strong> panel at the top of the PnL tab, it explains exactly which fills are waiting for a partner.</p>
+
+            <h4>Dashboard shows stale data</h4>
+            <p>Restart the app if a panel looks stale after an update. On startup or resume, Market Health and Advisor can take a short time to warm up while wallet and market data settle.</p>
+
+            <h4>Market Health shows amber/red</h4>
+            <p>Check the conditions listed below the traffic light. Common causes: position near circuit breaker limit, large arb gap, spread hitting the max clamp, or too many competitors. The bot adjusts automatically in most cases.</p>
+
+            <h3>Diagnostics &amp; support</h3>
+            <p>If the app crashes or behaves unexpectedly, in-app you can grab the crash report or the full data folder using <strong>View last crash report</strong> and <strong>Open data folder</strong> buttons in the Help -&gt; Troubleshooting tab. While the app repo is private, send bug reports through the early-tester channel. The public issue tracker will open with the main CATalyst repository.</p>
+
+            <div class="callout tip">
+                <span class="callout-icon">💡</span>
+                <div><strong>Where data lives.</strong> CATalyst stores its database, logs, and crash reports in a per-user data folder.
+                    <div class="path-list">
+                        <div class="path-item"><span class="path-label">Windows</span><span class="mono">%APPDATA%\Catalyst\</span></div>
+                        <div class="path-item"><span class="path-label">macOS</span><span class="mono">~/Library/Application Support/Catalyst/</span></div>
+                        <div class="path-item"><span class="path-label">Linux</span><span class="mono">~/.local/share/Catalyst/</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- TOC -->
+    <aside class="toc" aria-label="On this page">
+        <div class="toc-heading">On this page</div>
+        <ul class="toc-list" id="tocList">
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#offers">Offers &amp; Fills</a></li>
+            <li><a href="#spreads">Spreads &amp; Pricing</a></li>
+            <li><a href="#inventory">Inventory &amp; PnL</a></li>
+            <li><a href="#coins">Coin Management</a></li>
+            <li><a href="#intel">Market Intel</a></li>
+            <li><a href="#sniper">Arb Sniper</a></li>
+            <li><a href="#gap-closer">Close the Gap</a></li>
+            <li><a href="#wallet">Sage Wallet</a></li>
+            <li><a href="#config">Config Guide</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ul>
+    </aside>
+
+</div>
+
+<!-- Footer -->
+<footer class="docs-footer">
+    <div class="docs-footer-inner">
+        <div class="docs-footer-brand">
+            <img src="assets/icon.png" alt="CATalyst">
+            <span class="docs-footer-brand-name"><span class="cat">CAT</span><span class="alyst">alyst</span></span>
+        </div>
+        <ul class="docs-footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#download">Release status</a></li>
+            <li><a href="https://github.com/Lowestofttim/catalystxch" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="index.html#download">Downloads</a></li>
+        </ul>
+        <p class="docs-footer-copy">Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a> · Use at your own risk.</p>
+    </div>
+</footer>
+
+<script>
+    // Sidebar + TOC scroll-spy
+    (function() {
+        const sectionIds = [
+            'overview', 'getting-started', 'dashboard', 'offers', 'spreads',
+            'inventory', 'coins', 'intel', 'sniper', 'gap-closer',
+            'wallet', 'config', 'troubleshooting'
+        ];
+        const sidebar = document.querySelector('.sidebar');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebarLinks = document.querySelectorAll('.sidebar-list a');
+        const tocLinks = document.querySelectorAll('.toc-list a');
+
+        if (mobileMenuBtn && sidebar) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('is-open');
+            });
+        }
+
+        function setActive(id) {
+            sidebarLinks.forEach(a => {
+                a.classList.toggle('is-active', a.getAttribute('href') === '#' + id);
+            });
+            tocLinks.forEach(a => {
+                a.classList.toggle('is-active', a.getAttribute('href') === '#' + id);
+            });
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            // Find the first section currently in view
+            const visible = entries
+                .filter(e => e.isIntersecting)
+                .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+            if (visible.length) {
+                setActive(visible[0].target.id);
+            }
+        }, {
+            rootMargin: '-88px 0px -65% 0px',
+            threshold: 0
+        });
+
+        sectionIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        // Close mobile sidebar on link click
+        document.querySelectorAll('.sidebar-list a').forEach(a => {
+            a.addEventListener('click', () => {
+                if (sidebar) sidebar.classList.remove('is-open');
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>
