@@ -779,13 +779,12 @@
             <p>The bot is designed to work out of the box once Sage is running. Public downloads are still marked coming soon until the main CATalyst app repository is public, but the website is ready for direct release links when that switch happens.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest prepared beta: v1.2.5</div>
-                    <div class="version-state">Public links coming soon</div>
+                    <div class="version-name">Latest prepared beta: <span data-release-version>v1.2.6</span></div>
+                    <div class="version-state" data-release-status>Public links coming soon</div>
                 </div>
-                <ul class="version-list">
-                    <li>Windows installer and platform archives are staged in the private app release flow.</li>
-                    <li>Recent work hardened Sage recovery, dashboard health signals, offer replacement after sweep fills, and startup spread display.</li>
-                    <li>The app update checker is already pointed at GitHub Releases and can surface future release notes once the app repo is public.</li>
+                <ul class="version-list" data-release-notes>
+                    <li>Improved the order book depth chart so buy and sell sides use balanced horizontal price lanes.</li>
+                    <li>Preserved the shared cumulative XCH depth scale so genuine liquidity imbalance remains visible.</li>
                 </ul>
             </div>
             <ol>
@@ -1231,6 +1230,7 @@
     </div>
 </footer>
 
+<script src="assets/release.js" defer></script>
 <script src="assets/docs.js" defer></script>
 
 </body>

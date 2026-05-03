@@ -1273,7 +1273,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    Public downloads coming soon · current beta v1.2.5
+                    <span data-release-eyebrow>Public downloads coming soon - current beta v1.2.6</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -1675,16 +1675,14 @@
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest prepared build</div>
-                    <div class="release-version">v1.2.5</div>
-                    <div class="release-meta">Beta · staged for public release</div>
+                    <div class="release-version" data-release-version>v1.2.6</div>
+                    <div class="release-meta" data-release-meta>Stable - published 3 May 2026 - public links coming soon</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
-                    <ul class="release-list">
-                        <li>Hardened Sage recovery and dashboard health signals.</li>
-                        <li>Stabilised startup inner-spread display while market data warms up.</li>
-                        <li>Improved offer replacement after sweep fills and reduced noisy topup retries.</li>
-                        <li>Kept the app update checker ready for GitHub Releases once the app repo is public.</li>
+                    <ul class="release-list" data-release-notes>
+                        <li>Improved the order book depth chart so buy and sell sides use balanced horizontal price lanes.</li>
+                        <li>Preserved the shared cumulative XCH depth scale so genuine liquidity imbalance remains visible.</li>
                     </ul>
                 </div>
             </div>
@@ -1837,6 +1835,8 @@
         </div>
     </div>
 </footer>
+
+<script src="assets/release.js" defer></script>
 
 </body>
 </html>
