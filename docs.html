@@ -329,16 +329,20 @@
         }
 
         .diagram-card {
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
             border: 1px solid var(--border-mid);
             border-radius: var(--radius);
             background: #fff;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
         }
 
         .diagram-card img {
             display: block;
             width: 100%;
             height: auto;
+            max-width: none;
         }
 
         .diagram-caption {
@@ -350,6 +354,12 @@
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
+        }
+
+        @media (max-width: 720px) {
+            .diagram-card img {
+                min-width: 760px;
+            }
         }
 
         .version-card {
@@ -743,15 +753,15 @@
 
             <div class="diagram-grid">
                 <figure class="diagram-card">
-                    <img src="assets/diagrams/catalyst-app-flow-v2.png" alt="CATalyst app flow diagram">
+                    <img src="assets/diagrams/catalyst-app-flow-v2.svg" alt="CATalyst app flow diagram" loading="lazy" decoding="async">
                     <figcaption class="diagram-caption">App flow</figcaption>
                 </figure>
                 <figure class="diagram-card">
-                    <img src="assets/diagrams/catalyst-offer-fill-flow-v2.png" alt="CATalyst offer and fill flow diagram">
+                    <img src="assets/diagrams/catalyst-offer-fill-flow-v2.svg" alt="CATalyst offer and fill flow diagram" loading="lazy" decoding="async">
                     <figcaption class="diagram-caption">Offer and fill flow</figcaption>
                 </figure>
                 <figure class="diagram-card">
-                    <img src="assets/diagrams/catalyst-coin-prep-topup-flow-v2.png" alt="CATalyst coin preparation and topup flow diagram">
+                    <img src="assets/diagrams/catalyst-coin-prep-topup-flow-v2.svg" alt="CATalyst coin preparation and topup flow diagram" loading="lazy" decoding="async">
                     <figcaption class="diagram-caption">Coin prep and topup flow</figcaption>
                 </figure>
             </div>
