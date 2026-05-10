@@ -10,6 +10,8 @@ body:
         Thank you for helping test CATalyst. The main app source repo is private for now, so beta reports are collected here in the public website repo.
 
         Do not post seed phrases, private keys, wallet backups, API keys, or anything you would not want public. Logs can be useful, but please review and redact them before attaching.
+
+        If the app is still opening, go to the Logs tab and click Debug Bundle. The downloaded `bot_debug_bundle_...zip` can be attached here if it is under GitHub's file upload limit.
   - type: input
     id: catalyst-version
     attributes:
@@ -78,9 +80,9 @@ body:
   - type: textarea
     id: attachments
     attributes:
-      label: Screenshots, logs, or crash reports
-      description: In CATalyst, use Help -> Troubleshooting -> View last crash report or Open data folder. Attach only files you have checked for sensitive information.
-      placeholder: "Drag screenshots or redacted logs here, or describe what the report showed."
+      label: Screenshots, debug bundle, logs, or crash reports
+      description: Drag in the Logs tab Debug Bundle zip, screenshots, or a crash report after checking it for sensitive information. GitHub supports .zip and .log attachments, with a 25 MB limit for non-image files.
+      placeholder: "Attach bot_debug_bundle_...zip, screenshots, or redacted logs here, or describe what the report showed."
     validations:
       required: false
   - type: checkboxes
