@@ -9,9 +9,11 @@ body:
       value: |
         Thank you for helping test CATalyst. The main app source repo is private for now, so beta reports are collected here in the public website repo.
 
-        Do not post seed phrases, private keys, wallet backups, API keys, or anything you would not want public. Logs can be useful, but please review and redact them before attaching.
+        Do not post seed phrases, private keys, wallet backups, API keys, or anything you would not want public. Logs can be useful, but please review anything you attach because reports here are public.
 
-        If the app is still opening, go to the Logs tab and click Debug Bundle. The downloaded `bot_debug_bundle_...zip` can be attached here if it is under GitHub's file upload limit.
+        If the app is still opening, go to the Logs tab and click Debug Bundle. The bundle is redacted by default: wallet addresses and Sage fingerprints are redacted; the Spacescan API key, TLS paths, `.env`, database files, and wallet secret files are not included. Trade IDs, coin IDs, and asset IDs remain because they are public on-chain data and useful for debugging.
+
+        The downloaded `bot_debug_bundle_...zip` can be attached here if it is under GitHub's file upload limit.
   - type: input
     id: catalyst-version
     attributes:
@@ -81,7 +83,7 @@ body:
     id: attachments
     attributes:
       label: Screenshots, debug bundle, logs, or crash reports
-      description: Drag in the Logs tab Debug Bundle zip, screenshots, or a crash report after checking it for sensitive information. GitHub supports .zip and .log attachments, with a 25 MB limit for non-image files.
+      description: Drag in the Logs tab Debug Bundle zip, screenshots, or a crash report after reviewing it. The Debug Bundle is redacted by default, but GitHub reports are public. GitHub supports .zip and .log attachments, with a 25 MB limit for non-image files.
       placeholder: "Attach bot_debug_bundle_...zip, screenshots, or redacted logs here, or describe what the report showed."
     validations:
       required: false
