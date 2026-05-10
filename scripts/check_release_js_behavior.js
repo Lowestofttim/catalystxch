@@ -5,30 +5,29 @@ const fs = require("fs");
 const vm = require("vm");
 
 const RELEASE_JS = "assets/release.js";
-const PUBLIC_URL = "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.22/Catalyst-Setup-v1.2.22.exe";
-const SHA256 = "2c266f213a084128cb2bd6de74d45bb726baef1eb14584a727d7b4e4a03d1194";
+const metadata = JSON.parse(fs.readFileSync("assets/release/latest.json", "utf8"));
+const baseLatest = metadata.latest;
+const windowsInstaller = baseLatest.assets.find((asset) => asset.platform === "windows" && asset.kind === "installer");
 
-const baseLatest = {
-  version: "v1.2.22",
-  name: "CATalyst v1.2.22",
-  published_at: "2026-05-08T14:41:02Z",
-  channel: "stable",
-  release_notes: [
-    "Quiet native desktop notifications",
-    "Fix open inventory PnL marking",
-    "Fix UI layout and reset-all refresh"
-  ],
-  assets: [
-    {
-      name: "Catalyst-Setup-v1.2.22.exe",
-      platform: "windows",
-      kind: "installer",
-      size_bytes: 24482078,
-      download_url: PUBLIC_URL,
-      sha256: SHA256
-    }
-  ]
-};
+function formatBytes(value) {
+  const units = ["B", "KB", "MB", "GB"];
+  let size = value;
+  let unit = 0;
+  while (size >= 1024 && unit < units.length - 1) {
+    size /= 1024;
+    unit += 1;
+  }
+  return `${size.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
+}
+
+if (!windowsInstaller) {
+  throw new Error("latest.json must contain a Windows installer asset");
+}
+
+const PUBLIC_URL = windowsInstaller.download_url;
+const SHA256 = windowsInstaller.sha256;
+const DOWNLOAD_NAME = windowsInstaller.name;
+const DOWNLOAD_SIZE = formatBytes(windowsInstaller.size_bytes);
 
 function makeTextNode(textContent = "") {
   return { textContent };
@@ -88,8 +87,8 @@ function buildDocument(link) {
     ["[data-release-meta]", [makeTextNode()]],
     ["[data-release-eyebrow]", [makeTextNode()]],
     ["[data-release-date]", [makeTextNode()]],
-    ["[data-release-download-name]", [makeTextNode("Catalyst-Setup-v1.2.22.exe")]],
-    ["[data-release-download-size]", [makeTextNode("23.3 MB")]],
+    ["[data-release-download-name]", [makeTextNode(DOWNLOAD_NAME)]],
+    ["[data-release-download-size]", [makeTextNode(DOWNLOAD_SIZE)]],
     ["[data-release-sha256]", [makeTextNode(SHA256)]],
     ["[data-release-notes]", [makeListNode()]],
     ["[data-download-windows]", [link]]
@@ -167,7 +166,7 @@ async function main() {
     assets: [
       {
         ...baseLatest.assets[0],
-        download_url: "https://example.com/Catalyst-Setup-v1.2.22.exe"
+        download_url: `https://example.com/${DOWNLOAD_NAME}`
       }
     ]
   };
