@@ -6,6 +6,8 @@ from __future__ import annotations
 import json
 import re
 import sys
+from datetime import datetime
+from html.parser import HTMLParser
 from pathlib import Path
 
 
@@ -14,11 +16,85 @@ LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
 HTML_FILES = [ROOT / "index.html", ROOT / "docs.html"]
 VERSION_RE = re.compile(r"\bv\d+\.\d+\.\d+\b")
+DATA_RELEASE_ATTRS = {
+    "data-release-download-name",
+    "data-release-download-size",
+    "data-release-eyebrow",
+    "data-release-meta",
+    "data-release-notes",
+    "data-release-sha256",
+    "data-release-status",
+    "data-release-version",
+}
 
 
 def fail(message: str) -> None:
     print(f"release metadata check failed: {message}", file=sys.stderr)
     raise SystemExit(1)
+
+
+def normalize_text(value: str) -> str:
+    return re.sub(r"\s+", " ", value).strip()
+
+
+class ReleaseFallbackParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.records = {attr: [] for attr in DATA_RELEASE_ATTRS}
+        self._active = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        del tag
+        for frame in self._active:
+            frame["depth"] += 1
+
+        attr_names = {name for name, _ in attrs}
+        for attr in sorted(DATA_RELEASE_ATTRS & attr_names):
+            self._active.append({"attr": attr, "depth": 1, "parts": []})
+
+    def handle_data(self, data: str) -> None:
+        for frame in self._active:
+            frame["parts"].append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        del tag
+        remaining = []
+        for frame in self._active:
+            frame["depth"] -= 1
+            if frame["depth"] <= 0:
+                self.records[frame["attr"]].append(normalize_text("".join(frame["parts"])))
+            else:
+                remaining.append(frame)
+        self._active = remaining
+
+
+def parse_release_fallbacks(html: str) -> dict[str, list[str]]:
+    parser = ReleaseFallbackParser()
+    parser.feed(html)
+    return parser.records
+
+
+def format_date(value: str) -> str:
+    if not value:
+        return ""
+    try:
+        date = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return ""
+    return f"{date.day} {date.strftime('%b')} {date.year}"
+
+
+def format_bytes(value: int) -> str:
+    if not isinstance(value, int) or value <= 0:
+        return ""
+    units = ["B", "KB", "MB", "GB"]
+    size = float(value)
+    unit = 0
+    while size >= 1024 and unit < len(units) - 1:
+        size /= 1024
+        unit += 1
+    precision = 0 if unit == 0 else 1
+    return f"{size:.{precision}f} {units[unit]}"
 
 
 def load_metadata() -> dict:
@@ -93,7 +169,46 @@ def validate_metadata(data: dict) -> str:
     return version
 
 
-def validate_website_wiring(version: str) -> None:
+def validate_fallback_records(html_path: Path, html: str, data: dict, version: str) -> None:
+    latest = data["latest"]
+    asset = latest["assets"][0] if data["downloads_enabled"] else None
+    release_date = format_date(latest.get("published_at", ""))
+    status = "Windows download available" if asset else "Public links coming soon"
+    channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
+    meta = (
+        f"{channel} - published {release_date} - {status.lower()}"
+        if release_date
+        else f"{channel} - {status.lower()}"
+    )
+    expected = {
+        "data-release-version": version,
+        "data-release-status": status,
+        "data-release-meta": meta,
+        "data-release-eyebrow": (
+            f"Windows download available - current release {version}"
+            if asset
+            else f"Public downloads coming soon - current beta {version}"
+        ),
+        "data-release-download-name": asset["name"] if asset else "Not available",
+        "data-release-download-size": format_bytes(asset["size_bytes"]) if asset else "",
+        "data-release-sha256": asset["sha256"] if asset else "Not available",
+    }
+
+    rel = html_path.relative_to(ROOT)
+    fallbacks = parse_release_fallbacks(html)
+    for attr, expected_value in expected.items():
+        for actual in fallbacks[attr]:
+            if actual != expected_value:
+                fail(f"{rel} fallback {attr} is {actual!r}, expected {expected_value!r}")
+
+    release_notes = latest["release_notes"]
+    for notes_text in fallbacks["data-release-notes"]:
+        for note in release_notes:
+            if note not in notes_text:
+                fail(f"{rel} fallback release notes are missing {note!r}")
+
+
+def validate_website_wiring(data: dict, version: str) -> None:
     if not RELEASE_JS.exists():
         fail(f"missing {RELEASE_JS.relative_to(ROOT)}")
 
@@ -119,23 +234,17 @@ def validate_website_wiring(version: str) -> None:
         if html_path.name == "index.html" and re.search(r"<a\b[^>]*data-download-windows[^>]*\bhref=", html):
             fail("index.html must not hard-code the Windows download href")
 
-        literal_versions = sorted(
-            {
-                version
-                for line in html.splitlines()
-                if "data-release" not in line
-                for version in VERSION_RE.findall(line)
-            }
-        )
+        literal_versions = sorted(set(VERSION_RE.findall(html)))
         stale_versions = [item for item in literal_versions if item != version]
         if stale_versions:
             fail(f"{rel} contains stale literal versions: {', '.join(stale_versions)}")
+        validate_fallback_records(html_path, html, data, version)
 
 
 def main() -> None:
     data = load_metadata()
     version = validate_metadata(data)
-    validate_website_wiring(version)
+    validate_website_wiring(data, version)
     print(f"release metadata check passed for {version}")
 
 
