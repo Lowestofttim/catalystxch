@@ -1182,7 +1182,7 @@
             <p>Check the conditions listed below the traffic light. Common causes: position near circuit breaker limit, large arb gap, spread hitting the max clamp, or too many competitors. The bot adjusts automatically in most cases.</p>
 
             <h3>Diagnostics &amp; support</h3>
-            <p>If the app crashes or behaves unexpectedly, open the Logs tab and click <strong>Debug Bundle</strong> to download a troubleshooting zip. You can also grab the crash report or full data folder using <strong>View last crash report</strong> and <strong>Open data folder</strong> in Help -&gt; Troubleshooting. While the app repo is private, report bugs and feedback through the public website repo issue forms.</p>
+            <p>If the app crashes or behaves unexpectedly, open the Logs tab and click <strong>Debug Bundle</strong> to download a troubleshooting zip. Debug Bundles are redacted by default: wallet addresses and Sage fingerprints are redacted; the Spacescan API key, TLS paths, .env, database files, and wallet secret files are not included. You can also grab the crash report or full data folder using <strong>View last crash report</strong> and <strong>Open data folder</strong> in Help -&gt; Troubleshooting. While the app repo is private, report bugs and feedback through the public website repo issue forms.</p>
             <div class="support-actions">
                 <a class="btn btn-primary" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a>
                 <a class="btn" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a>
@@ -1190,7 +1190,7 @@
 
             <div class="callout tip">
                 <span class="callout-icon">💡</span>
-                <div><strong>Where data lives.</strong> CATalyst stores its database, logs, and crash reports in a per-user data folder. Reports are public, so review and redact files before attaching them. GitHub accepts .zip and .log attachments up to 25 MB for issue comments. Never share seed phrases, private keys, wallet backups, or API keys.
+                <div><strong>Where data lives.</strong> CATalyst stores its database, logs, and crash reports in a per-user data folder. The Debug Bundle is the safest troubleshooting file to attach because it is redacted by default. Reports are public, so review files before attaching them. GitHub accepts .zip and .log attachments up to 25 MB for issue comments. Never share seed phrases, private keys, wallet backups, or API keys.
                     <div class="path-list">
                         <div class="path-item"><span class="path-label">Windows</span><span class="mono">%APPDATA%\Catalyst\</span></div>
                         <div class="path-item"><span class="path-label">macOS</span><span class="mono">~/Library/Application Support/Catalyst/</span></div>
