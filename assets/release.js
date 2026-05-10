@@ -2,7 +2,7 @@
   const METADATA_URL = "assets/release/latest.json";
 
   const setText = (selector, value) => {
-    if (!value) return;
+    if (value === undefined || value === null) return;
     document.querySelectorAll(selector).forEach((node) => {
       node.textContent = value;
     });
@@ -60,6 +60,21 @@
     });
   };
 
+  const disableWindowsDownload = () => {
+    setText("[data-release-download-name]", "Not available");
+    setText("[data-release-download-size]", "");
+    setText("[data-release-sha256]", "Not available");
+
+    document.querySelectorAll("[data-download-windows]").forEach((link) => {
+      link.removeAttribute("href");
+      link.removeAttribute("target");
+      link.removeAttribute("rel");
+      link.setAttribute("aria-disabled", "true");
+      link.setAttribute("tabindex", "-1");
+      link.classList.add("is-disabled");
+    });
+  };
+
   const applyMetadata = (metadata) => {
     const latest = metadata && metadata.latest;
     if (!latest || typeof latest.version !== "string") return;
@@ -85,7 +100,10 @@
     setText("[data-release-date]", releaseDate ? `Released ${releaseDate}` : "");
     renderList("[data-release-notes]", latest.release_notes);
 
-    if (!downloadsAvailable) return;
+    if (!downloadsAvailable) {
+      disableWindowsDownload();
+      return;
+    }
 
     const size = formatBytes(windowsInstaller.size_bytes);
     setText("[data-release-download-name]", windowsInstaller.name);
@@ -94,7 +112,10 @@
 
     document.querySelectorAll("[data-download-windows]").forEach((link) => {
       link.setAttribute("href", windowsInstaller.download_url);
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener");
       link.removeAttribute("aria-disabled");
+      link.removeAttribute("tabindex");
       link.classList.remove("is-disabled");
     });
   };

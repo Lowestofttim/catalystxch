@@ -116,8 +116,8 @@ def validate_website_wiring(version: str) -> None:
             fail(f"{rel} must contain data-release-version hooks")
         if html_path.name == "index.html" and "data-download-windows" not in html:
             fail("index.html must contain a Windows download link hook")
-        if html_path.name == "index.html" and "https://github.com/Lowestofttim/catalyst-releases/releases/download/" not in html:
-            fail("index.html must include an official public CATalyst release fallback link")
+        if html_path.name == "index.html" and re.search(r"<a\b[^>]*data-download-windows[^>]*\bhref=", html):
+            fail("index.html must not hard-code the Windows download href")
 
         literal_versions = sorted(
             {
