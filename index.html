@@ -845,6 +845,11 @@
             opacity: 0.72;
         }
 
+        .platform-card.is-disabled {
+            cursor: default;
+            opacity: 0.72;
+        }
+
         .platform-row {
             display: flex;
             align-items: center;
@@ -1691,7 +1696,7 @@
             <div class="download-title">Download for Windows</div>
             <p class="download-sub">The latest Windows installer is available from the official CATalyst public GitHub release channel. macOS and Linux remain experimental for now.</p>
             <div class="platforms">
-                <a class="platform-card is-primary" data-download-windows href="https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.22/Catalyst-Setup-v1.2.22.exe" target="_blank" rel="noopener">
+                <a class="platform-card is-primary is-disabled" data-download-windows aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
                         <span class="platform-icon">🪟</span>
                         <span class="platform-name">Windows</span>
