@@ -360,6 +360,58 @@
             text-underline-offset: 2px;
         }
 
+        .beta-callout {
+            margin-top: 28px;
+            max-width: 560px;
+            border: 1px solid rgba(212,168,75,0.24);
+            border-radius: var(--radius);
+            background: rgba(212,168,75,0.075);
+            padding: 18px;
+        }
+
+        .beta-callout-title {
+            color: var(--cat-gold);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .beta-callout p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.65;
+            margin-bottom: 14px;
+        }
+
+        .feedback-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .feedback-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid rgba(212,168,75,0.26);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.035);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 12px;
+            text-decoration: none;
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+        }
+
+        .feedback-link:hover {
+            border-color: rgba(212,168,75,0.48);
+            background: rgba(212,168,75,0.10);
+            color: var(--cat-gold);
+        }
+
         /* Hero screenshot frame */
         .hero-shot {
             position: relative;
@@ -961,6 +1013,23 @@
             padding-left: 18px;
         }
 
+        .download-feedback {
+            max-width: 860px;
+            margin: 18px auto 0;
+            border: 1px solid rgba(212,168,75,0.22);
+            border-radius: var(--radius);
+            background: rgba(212,168,75,0.06);
+            padding: 18px 20px;
+            text-align: left;
+        }
+
+        .download-feedback p {
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
         .release-status {
             max-width: 860px;
             margin: 28px auto 0;
@@ -1337,6 +1406,14 @@
                         Get CATalyst
                     </a>
                     <a href="docs.html" class="btn btn-ghost btn-lg">Read the docs</a>
+                </div>
+                <div class="beta-callout" role="note" aria-labelledby="beta-callout-title">
+                    <div class="beta-callout-title" id="beta-callout-title">Public beta</div>
+                    <p>CATalyst is still beta software. We are actively looking for tester feedback, bug reports, and crash logs so we can harden it before the main app repo opens.</p>
+                    <div class="feedback-actions">
+                        <a class="feedback-link" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a>
+                        <a class="feedback-link" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a>
+                    </div>
                 </div>
                 <div class="hero-meta">
                     <span class="meta-item">
@@ -1739,6 +1816,14 @@
             <p class="download-note">
                 The Windows installer is hosted on the public CATalyst GitHub release channel. The main app source repo can stay private until ready; this button points only to the signed public release asset.
             </p>
+            <div class="download-feedback" role="note" aria-labelledby="download-feedback-title">
+                <div class="download-security-title" id="download-feedback-title">Beta testers wanted</div>
+                <p>Use small amounts while testing. If CATalyst crashes, behaves oddly, or the setup flow is confusing, please tell us through the public website issue tracker. Include the version shown above and any screenshots or logs that help explain what happened.</p>
+                <div class="feedback-actions">
+                    <a class="feedback-link" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a>
+                    <a class="feedback-link" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a>
+                </div>
+            </div>
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
@@ -1755,6 +1840,7 @@
                     <li>Public installers link only to official CATalyst GitHub Releases over HTTPS.</li>
                     <li>Each download shows its version, release notes, file size, and SHA-256 checksum.</li>
                     <li>There will be no mirror links, shortened URLs, or installer links posted only in chat.</li>
+                    <li>Bug reports and feedback go through the public website repo, not the private app source repo.</li>
                     <li>CATalyst never asks for your seed phrase or private keys; Sage signs locally on your machine.</li>
                 </ul>
             </div>
@@ -1882,6 +1968,7 @@
                 <li><a href="#setup">Setup</a></li>
                 <li><a href="#download">Download</a></li>
                 <li><a href="https://github.com/Lowestofttim/catalystxch" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a></li>
                 <li><a href="#download">Release status</a></li>
                 <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage</a></li>
                 <li><a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a></li>
