@@ -776,19 +776,20 @@
         <section class="docs-section" id="getting-started">
             <div class="section-meta">02 · GETTING STARTED</div>
             <h2>Welcome, here's how to get started.</h2>
-            <p>The bot is designed to work out of the box once Sage is running. Public downloads are still marked coming soon until the main CATalyst app repository is public, but the website is ready for direct release links when that switch happens.</p>
+            <p>The bot is designed to work out of the box once Sage is running. Windows users can download the latest installer from the website's official public GitHub release link; macOS and Linux remain experimental for now.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest prepared beta: <span data-release-version>v1.2.6</span></div>
-                    <div class="version-state" data-release-status>Public links coming soon</div>
+                    <div class="version-name">Latest Windows beta: <span data-release-version>v1.2.22</span></div>
+                    <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Improved the order book depth chart so buy and sell sides use balanced horizontal price lanes.</li>
-                    <li>Preserved the shared cumulative XCH depth scale so genuine liquidity imbalance remains visible.</li>
+                    <li>Quiet native desktop notifications.</li>
+                    <li>Fix open inventory PnL marking.</li>
+                    <li>Fix UI layout and reset-all refresh.</li>
                 </ul>
             </div>
             <ol>
-                <li><strong>Install CATalyst</strong>. Early testers receive the installer directly for now. When public releases go live, use the website download section for the latest build.</li>
+                <li><strong>Install CATalyst</strong>. Use the Windows download on the website for the latest public installer. The file is hosted by GitHub Releases and includes a visible SHA-256 checksum.</li>
                 <li><strong>Make sure Sage is running</strong>. Open Sage Wallet and enable RPC in Sage Settings -&gt; Advanced. CATalyst talks to Sage on port 9257.</li>
                 <li><strong>Select a signing wallet</strong>. Use a normal signing fingerprint, not a watch-only key, so the app can create, cancel, and replace offers.</li>
                 <li><strong>Pick your trading pair</strong>. Use Quick Start on the dashboard to choose the CAT token you want to trade against XCH.</li>

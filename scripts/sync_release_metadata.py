@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Sync sanitized release metadata from the private app repo.
+"""Sync sanitized release metadata from the public CATalyst release repo.
 
 This script uses the local GitHub CLI login. It does not store a token and, by
-default, it does not publish download URLs while the website is in coming-soon
-mode.
+default, it targets the Windows installer in the public update-channel repo.
 """
 
 from __future__ import annotations
@@ -18,7 +17,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_REPO = "Lowestofttim/catalyst-bot"
+DEFAULT_REPO = "Lowestofttim/catalyst-releases"
 DEFAULT_OUTPUT = ROOT / "assets" / "release" / "latest.json"
 GH_FIELDS = "tagName,name,isDraft,isPrerelease,publishedAt,body,assets"
 
@@ -59,6 +58,8 @@ def normalize_heading(line: str) -> str | None:
 def clean_bullet(line: str) -> str:
     item = re.sub(r"^\s*[-*]\s+", "", line).strip()
     item = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", item)
+    item = re.sub(r"^\[[^\]]+\]\s+", "", item)
+    item = re.sub(r"\s+by\s+@[A-Za-z0-9-]+$", "", item)
     item = item.replace("`", "")
     return item
 
@@ -107,6 +108,8 @@ def classify_platform(name: str) -> str:
 
 def classify_kind(name: str) -> str:
     lower = name.lower()
+    if lower.endswith((".sha256", ".sig")) or lower.endswith(".json"):
+        return "asset"
     if lower.endswith((".exe", ".msi", ".pkg", ".dmg")) or "setup" in lower:
         return "installer"
     if lower.endswith((".zip", ".tar.gz", ".tgz")):
@@ -134,7 +137,14 @@ def extract_sha256(asset: dict) -> str | None:
     return match.group(1).lower()
 
 
-def build_metadata(release: dict, repo: str, include_download_urls: bool) -> dict:
+def should_publish_asset(asset: dict, platform: str, kind: str) -> bool:
+    name = asset.get("name")
+    if not isinstance(name, str):
+        return False
+    return classify_platform(name) == platform and classify_kind(name) == kind
+
+
+def build_metadata(release: dict, repo: str, include_download_urls: bool, platform: str, kind: str) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
         raise SystemExit("release is missing tagName")
@@ -149,6 +159,8 @@ def build_metadata(release: dict, repo: str, include_download_urls: bool) -> dic
 
     assets = []
     for item in release.get("assets") or []:
+        if not should_publish_asset(item, platform, kind):
+            continue
         name = item.get("name")
         if not name:
             continue
@@ -166,6 +178,8 @@ def build_metadata(release: dict, repo: str, include_download_urls: bool) -> dic
             }
         )
     assets.sort(key=sort_asset_key)
+    if not assets:
+        raise SystemExit(f"release has no {platform} {kind} asset to publish")
 
     downloads_enabled = bool(include_download_urls)
 
@@ -192,6 +206,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", default=DEFAULT_REPO, help=f"source GitHub repo, default: {DEFAULT_REPO}")
     parser.add_argument("--tag", default=None, help="specific release tag; omitted means latest release")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="metadata JSON output path")
+    parser.add_argument("--platform", default="windows", choices=["windows"], help="download platform to publish")
+    parser.add_argument("--kind", default="installer", choices=["installer"], help="download asset kind to publish")
     parser.add_argument(
         "--include-download-urls",
         action="store_true",
@@ -206,7 +222,7 @@ def main() -> None:
     if release.get("isDraft"):
         raise SystemExit("refusing to publish metadata for a draft release")
 
-    metadata = build_metadata(release, args.repo, args.include_download_urls)
+    metadata = build_metadata(release, args.repo, args.include_download_urls, args.platform, args.kind)
     output = args.output if args.output.is_absolute() else ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(metadata, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")

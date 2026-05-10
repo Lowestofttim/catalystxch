@@ -835,6 +835,16 @@
             background: rgba(255,255,255,0.04);
         }
 
+        .platform-card.is-primary {
+            border-color: rgba(62,201,163,0.42);
+            background: rgba(62,201,163,0.08);
+        }
+
+        .platform-card[aria-disabled="true"] {
+            cursor: default;
+            opacity: 0.72;
+        }
+
         .platform-row {
             display: flex;
             align-items: center;
@@ -884,6 +894,39 @@
             color: var(--text-muted);
             font-size: 13px;
             line-height: 1.6;
+        }
+
+        .download-details {
+            max-width: 860px;
+            margin: 18px auto 0;
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: 14px;
+            text-align: left;
+        }
+
+        .download-detail {
+            border: 1px solid var(--border-mid);
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.025);
+            padding: 16px 18px;
+        }
+
+        .download-detail-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .download-detail-value {
+            color: var(--text-secondary);
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 12px;
+            line-height: 1.55;
+            overflow-wrap: anywhere;
         }
 
         .download-security {
@@ -1227,6 +1270,7 @@
             .tier-section-grid { grid-template-columns: 1fr; gap: 32px; }
             .platforms { grid-template-columns: 1fr; }
             .release-status { grid-template-columns: 1fr; }
+            .download-details { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 640px) {
@@ -1273,7 +1317,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Public downloads coming soon - current beta v1.2.6</span>
+                    <span data-release-eyebrow>Windows download available - current release v1.2.22</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -1644,17 +1688,17 @@
 
         <div class="download-wrap">
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
-            <div class="download-title">Coming soon</div>
-            <p class="download-sub">Builds are in final QA. Windows ships first as a fully-tested release; macOS and Linux follow as experimental builds.</p>
+            <div class="download-title">Download for Windows</div>
+            <p class="download-sub">The latest Windows installer is available from the official CATalyst public GitHub release channel. macOS and Linux remain experimental for now.</p>
             <div class="platforms">
-                <div class="platform-card" aria-disabled="true">
+                <a class="platform-card is-primary" data-download-windows href="https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.22/Catalyst-Setup-v1.2.22.exe" target="_blank" rel="noopener">
                     <div class="platform-row">
                         <span class="platform-icon">🪟</span>
                         <span class="platform-name">Windows</span>
                         <span class="platform-tag tested">Stable</span>
                     </div>
-                    <div class="platform-note">Windows 10/11 · 64-bit · Coming soon</div>
-                </div>
+                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>23.3 MB</span></div>
+                </a>
                 <div class="platform-card" aria-disabled="true">
                     <div class="platform-row">
                         <span class="platform-icon">🍎</span>
@@ -1674,26 +1718,37 @@
             </div>
             <div class="release-status">
                 <div class="release-card">
-                    <div class="release-label">Latest prepared build</div>
-                    <div class="release-version" data-release-version>v1.2.6</div>
-                    <div class="release-meta" data-release-meta>Stable - published 3 May 2026 - public links coming soon</div>
+                    <div class="release-label">Latest Windows build</div>
+                    <div class="release-version" data-release-version>v1.2.22</div>
+                    <div class="release-meta" data-release-meta>Stable - published 8 May 2026 - windows download available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>Improved the order book depth chart so buy and sell sides use balanced horizontal price lanes.</li>
-                        <li>Preserved the shared cumulative XCH depth scale so genuine liquidity imbalance remains visible.</li>
+                        <li>Quiet native desktop notifications.</li>
+                        <li>Fix open inventory PnL marking.</li>
+                        <li>Fix UI layout and reset-all refresh.</li>
                     </ul>
                 </div>
             </div>
             <p class="download-note">
-                Early tester downloads are being kept private until the main CATalyst app repository is public. This section is already structured for the switch: when public releases are enabled, the Windows installer, portable archives, checksums, and release notes can be linked here directly.
+                The Windows installer is hosted on the public CATalyst GitHub release channel. The main app source repo can stay private until ready; this button points only to the signed public release asset.
             </p>
+            <div class="download-details">
+                <div class="download-detail">
+                    <div class="download-detail-label">Installer</div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.22.exe</span></div>
+                </div>
+                <div class="download-detail">
+                    <div class="download-detail-label">SHA-256</div>
+                    <div class="download-detail-value" data-release-sha256>2c266f213a084128cb2bd6de74d45bb726baef1eb14584a727d7b4e4a03d1194</div>
+                </div>
+            </div>
             <div class="download-security">
                 <div class="download-security-title">Safe download rules</div>
                 <ul class="download-security-list">
-                    <li>Public installers will link only to official GitHub Releases over HTTPS.</li>
-                    <li>Each download will show its version, release notes, file size, and SHA-256 checksum.</li>
+                    <li>Public installers link only to official CATalyst GitHub Releases over HTTPS.</li>
+                    <li>Each download shows its version, release notes, file size, and SHA-256 checksum.</li>
                     <li>There will be no mirror links, shortened URLs, or installer links posted only in chat.</li>
                     <li>CATalyst never asks for your seed phrase or private keys; Sage signs locally on your machine.</li>
                 </ul>
@@ -1735,7 +1790,7 @@
                 <div>
                     <div class="setup-step-title">Download and run CATalyst</div>
                     <div class="setup-step-body">
-                        Public downloads are coming soon. Early testers receive the installer directly for now; on first launch it checks Sage is reachable and walks you through connecting.
+                        Use the Windows download above to install CATalyst from the public GitHub release channel. On first launch it checks Sage is reachable and walks you through connecting.
                     </div>
                 </div>
             </div>
