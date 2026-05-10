@@ -1,55 +1,28 @@
 {
   "schema_version": 1,
-  "source_repo": "Lowestofttim/catalyst-bot",
-  "generated_at": "2026-05-03T20:22:54Z",
-  "downloads_enabled": false,
-  "download_status": "coming_soon",
+  "source_repo": "Lowestofttim/catalyst-releases",
+  "generated_at": "2026-05-10T07:41:42Z",
+  "downloads_enabled": true,
+  "download_status": "available",
   "latest": {
-    "version": "v1.2.6",
-    "name": "CATalyst v1.2.6",
-    "published_at": "2026-05-03T18:51:19Z",
+    "version": "v1.2.22",
+    "name": "CATalyst v1.2.22",
+    "published_at": "2026-05-08T14:41:02Z",
     "channel": "stable",
     "release_notes": [
-      "Improved the order book depth chart so buy and sell sides use balanced horizontal price lanes.",
-      "Preserved the shared cumulative XCH depth scale so genuine liquidity imbalance remains visible."
+      "Quiet native desktop notifications",
+      "Fix open inventory PnL marking",
+      "Fix UI layout and reset-all refresh"
     ],
-    "verification_notes": [
-      "Release workflow passed on Windows, macOS, and Linux.",
-      "Downloaded Catalyst-windows-v1.2.6.zip, extracted it, launched Catalyst.exe --flask, and confirmed /api/health returned version: 1.2.6.",
-      "Downloaded Catalyst-Setup-v1.2.6.exe, installed it silently to a temp folder, launched the installed app, and confirmed /api/health returned version: 1.2.6."
-    ],
+    "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.6.exe",
+        "name": "Catalyst-Setup-v1.2.22.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24233710,
-        "download_url": null,
-        "sha256": null
-      },
-      {
-        "name": "Catalyst-windows-v1.2.6.zip",
-        "platform": "windows",
-        "kind": "archive",
-        "size_bytes": 29772331,
-        "download_url": null,
-        "sha256": null
-      },
-      {
-        "name": "Catalyst-macos-v1.2.6.zip",
-        "platform": "macos",
-        "kind": "archive",
-        "size_bytes": 79223184,
-        "download_url": null,
-        "sha256": null
-      },
-      {
-        "name": "Catalyst-linux-v1.2.6.tar.gz",
-        "platform": "linux",
-        "kind": "archive",
-        "size_bytes": 44322320,
-        "download_url": null,
-        "sha256": null
+        "size_bytes": 24482078,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.22/Catalyst-Setup-v1.2.22.exe",
+        "sha256": "2c266f213a084128cb2bd6de74d45bb726baef1eb14584a727d7b4e4a03d1194"
       }
     ]
   }

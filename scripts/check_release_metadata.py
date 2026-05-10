@@ -39,8 +39,8 @@ def validate_metadata(data: dict) -> str:
         if key not in data:
             fail(f"missing top-level field {key!r}")
 
-    if data["source_repo"] != "Lowestofttim/catalyst-bot":
-        fail("source_repo must be Lowestofttim/catalyst-bot")
+    if data["source_repo"] != "Lowestofttim/catalyst-releases":
+        fail("source_repo must be Lowestofttim/catalyst-releases")
 
     if not isinstance(data["downloads_enabled"], bool):
         fail("downloads_enabled must be a boolean")
@@ -66,6 +66,8 @@ def validate_metadata(data: dict) -> str:
     assets = latest["assets"]
     if not isinstance(assets, list) or not assets:
         fail("latest.assets must be a non-empty list")
+    if data["downloads_enabled"] and len(assets) != 1:
+        fail("enabled website downloads must expose exactly one Windows installer asset")
 
     for asset in assets:
         if not isinstance(asset, dict):
@@ -74,10 +76,12 @@ def validate_metadata(data: dict) -> str:
             if key not in asset:
                 fail(f"asset is missing {key}")
         if data["downloads_enabled"]:
+            if asset["platform"] != "windows" or asset["kind"] != "installer":
+                fail("enabled website downloads must expose only the Windows installer")
             if not isinstance(asset["download_url"], str) or not asset["download_url"].startswith(
-                "https://github.com/Lowestofttim/catalyst-bot/releases/download/"
+                "https://github.com/Lowestofttim/catalyst-releases/releases/download/"
             ):
-                fail("enabled downloads must use official GitHub release URLs")
+                fail("enabled downloads must use official public CATalyst release URLs")
             if not isinstance(asset["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", asset["sha256"]):
                 fail("enabled downloads must include a lowercase SHA-256 checksum")
         else:
@@ -98,6 +102,10 @@ def validate_website_wiring(version: str) -> None:
         fail("assets/release.js must fetch assets/release/latest.json")
     if ".innerHTML" in release_js:
         fail("assets/release.js must not write release data with innerHTML")
+    if "data-download-windows" not in release_js:
+        fail("assets/release.js must wire the Windows download button")
+    if "https://github.com/Lowestofttim/catalyst-releases/releases/download/" not in release_js:
+        fail("assets/release.js must allow only the public CATalyst release download host")
 
     for html_path in HTML_FILES:
         html = html_path.read_text(encoding="utf-8")
@@ -106,6 +114,10 @@ def validate_website_wiring(version: str) -> None:
             fail(f"{rel} must load assets/release.js")
         if "data-release-version" not in html:
             fail(f"{rel} must contain data-release-version hooks")
+        if html_path.name == "index.html" and "data-download-windows" not in html:
+            fail("index.html must contain a Windows download link hook")
+        if html_path.name == "index.html" and "https://github.com/Lowestofttim/catalyst-releases/releases/download/" not in html:
+            fail("index.html must include an official public CATalyst release fallback link")
 
         literal_versions = sorted(
             {
