@@ -1,0 +1,92 @@
+name: CATalyst beta bug report
+description: Report a problem with the CATalyst beta app, installer, website, or docs.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping test CATalyst. The main app source repo is private for now, so beta reports are collected here in the public website repo.
+
+        Do not post seed phrases, private keys, wallet backups, API keys, or anything you would not want public. Logs can be useful, but please review and redact them before attaching.
+  - type: input
+    id: catalyst-version
+    attributes:
+      label: CATalyst version
+      description: Use the version shown in the app or on the website download panel.
+      placeholder: "v1.2.22"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did it happen?
+      options:
+        - Installer / update
+        - First launch / setup
+        - Sage wallet connection
+        - Dashboard
+        - Offers / fills
+        - PnL / inventory
+        - Market Intel
+        - Settings
+        - Website / docs
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: A short description of the problem.
+      placeholder: "The app..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What were you doing just before it happened?
+      placeholder: |
+        1. Opened CATalyst
+        2. Chose ...
+        3. Clicked ...
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+      placeholder: "I expected..."
+    validations:
+      required: false
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 23H2"
+    validations:
+      required: false
+  - type: input
+    id: sage-version
+    attributes:
+      label: Sage Wallet version
+      placeholder: "Sage ..."
+    validations:
+      required: false
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Screenshots, logs, or crash reports
+      description: In CATalyst, use Help -> Troubleshooting -> View last crash report or Open data folder. Attach only files you have checked for sensitive information.
+      placeholder: "Drag screenshots or redacted logs here, or describe what the report showed."
+    validations:
+      required: false
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public report safety check
+      options:
+        - label: I have not included seed phrases, private keys, wallet backups, API keys, or other sensitive secrets.
+          required: true

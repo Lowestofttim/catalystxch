@@ -497,6 +497,13 @@
         }
         .callout.danger .callout-icon { color: var(--cat-red); }
 
+        .support-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 14px 0 22px;
+        }
+
         /* Screenshots */
         .docs-shot {
             margin: 24px 0;
@@ -1175,11 +1182,15 @@
             <p>Check the conditions listed below the traffic light. Common causes: position near circuit breaker limit, large arb gap, spread hitting the max clamp, or too many competitors. The bot adjusts automatically in most cases.</p>
 
             <h3>Diagnostics &amp; support</h3>
-            <p>If the app crashes or behaves unexpectedly, in-app you can grab the crash report or the full data folder using <strong>View last crash report</strong> and <strong>Open data folder</strong> buttons in the Help -&gt; Troubleshooting tab. While the app repo is private, send bug reports through the early-tester channel. The public issue tracker will open with the main CATalyst repository.</p>
+            <p>If the app crashes or behaves unexpectedly, in-app you can grab the crash report or the full data folder using <strong>View last crash report</strong> and <strong>Open data folder</strong> buttons in the Help -&gt; Troubleshooting tab. While the app repo is private, report bugs and feedback through the public website repo issue forms.</p>
+            <div class="support-actions">
+                <a class="btn btn-primary" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a>
+                <a class="btn" href="https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a>
+            </div>
 
             <div class="callout tip">
                 <span class="callout-icon">💡</span>
-                <div><strong>Where data lives.</strong> CATalyst stores its database, logs, and crash reports in a per-user data folder.
+                <div><strong>Where data lives.</strong> CATalyst stores its database, logs, and crash reports in a per-user data folder. Reports are public, so review and redact files before attaching them. Never share seed phrases, private keys, wallet backups, or API keys.
                     <div class="path-list">
                         <div class="path-item"><span class="path-label">Windows</span><span class="mono">%APPDATA%\Catalyst\</span></div>
                         <div class="path-item"><span class="path-label">macOS</span><span class="mono">~/Library/Application Support/Catalyst/</span></div>
@@ -1225,6 +1236,7 @@
             <li><a href="index.html#features">Features</a></li>
             <li><a href="index.html#download">Release status</a></li>
             <li><a href="https://github.com/Lowestofttim/catalystxch" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a></li>
             <li><a href="index.html#download">Downloads</a></li>
         </ul>
         <p class="docs-footer-copy">Built by <a href="https://monkeyzoo.net" target="_blank" rel="noopener">MonkeyZoo</a> · Use at your own risk.</p>
