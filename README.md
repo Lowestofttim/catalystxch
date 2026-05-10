@@ -1,0 +1,88 @@
+# CATalyst website and beta feedback
+
+This is the public website repository for CATalyst:
+
+- Website: https://catalystxch.com
+- Docs: https://catalystxch.com/docs.html
+- Windows downloads: https://catalystxch.com/#download
+
+This repository is intentionally separate from the main CATalyst bot source code. The app source repository is private while the beta is being prepared for wider public release. This public repository is here so testers can read the website, download the current public installer, and report bugs or feedback without needing access to the private app repo.
+
+## What this repository contains
+
+- The static CATalyst website and help docs.
+- Public release metadata used by the website download panel.
+- Public issue templates for beta bug reports and feedback.
+- Security rules for the website and public download links.
+
+The website is static HTML, CSS, JavaScript, and image assets. It does not run a backend service, store visitor data, or process wallet information.
+
+## What this repository is not
+
+This is not the main CATalyst trading bot source repository.
+
+Please do not expect the full app code, trading engine, wallet adapters, build scripts, or private development history to be visible here yet. Those live in the private CATalyst app repo until the project is ready to make that repo public.
+
+## Download CATalyst
+
+Use the download section on the website:
+
+https://catalystxch.com/#download
+
+Current public Windows installers are hosted through the official CATalyst public release channel:
+
+https://github.com/Lowestofttim/catalyst-releases/releases
+
+The website shows the current version, release notes, file size, and SHA-256 checksum next to the Windows download. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
+
+## Report a bug
+
+Use the public bug report form:
+
+https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml
+
+Bug reports are useful for:
+
+- Installer or update problems.
+- First launch and setup issues.
+- Sage wallet connection problems.
+- App crashes or confusing behavior.
+- Website or docs mistakes.
+
+If the app still opens, go to the Logs tab and click **Debug Bundle**. You can attach the downloaded `bot_debug_bundle_...zip` to the bug report if it is under GitHub's file upload limit.
+
+Debug Bundles are redacted by default. Wallet addresses, Sage fingerprints, RPC/TLS paths, API tokens, cookies, passwords, seed/private-key labels, and local user-folder paths are redacted from bundled log tails and snapshots. `.env`, database files, wallet secret files, and wallet key material are not included.
+
+GitHub issues are public. Please review anything you attach before submitting it.
+
+## Send feedback
+
+Use the public feedback form:
+
+https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml
+
+Feedback is useful for:
+
+- Setup steps that were confusing.
+- App wording that was unclear.
+- Missing help page content.
+- Feature ideas.
+- Workflow improvements for non-technical users.
+
+## Do not post secrets
+
+Do not include seed phrases, private keys, wallet backups, API keys, passwords, `.env` files, database files, or anything you would not want public.
+
+CATalyst should never ask for your seed phrase or private keys. Sage signs locally on your machine.
+
+## Website changes
+
+Small website, docs, and README fixes can be proposed in this repository. Changes should keep the site static, avoid unnecessary third-party scripts, and keep download links pointed only at official CATalyst GitHub Releases.
+
+Release metadata is stored in `assets/release/latest.json`. Maintainers can validate release wiring with:
+
+```bash
+python scripts/check_release_metadata.py
+node scripts/check_release_js_behavior.js
+npx --yes html-validate index.html docs.html
+```
