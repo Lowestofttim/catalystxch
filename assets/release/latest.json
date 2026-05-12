@@ -1,27 +1,32 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-12T06:07:09Z",
+  "generated_at": "2026-05-12T07:24:57Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.24",
-    "name": "CATalyst v1.2.24",
-    "published_at": "2026-05-12T06:05:57Z",
+    "version": "v1.2.25",
+    "name": "CATalyst v1.2.25",
+    "published_at": "2026-05-12T07:21:08Z",
     "channel": "stable",
     "release_notes": [
-      "Fix side-specific topup tier planning",
-      "Add Sage setup and fingerprint settings"
+      "Reject Sage fingerprints that are not reported by Sage before saving the setting.",
+      "Keep tier-mode coin prep targets aligned with the active ladder instead of stale static floors.",
+      "Preserve a nonzero critical prep threshold for small active ladders so empty wallets still trigger prep."
     ],
-    "verification_notes": [],
+    "verification_notes": [
+      "Full local test suite passed: 2997 passed, 12 skipped, 3 warnings, 42 subtests.",
+      "Release workflow passed on Windows, macOS, and Linux.",
+      "Windows installer build, packaged API smoke test, Sage RPC worker smoke test, and installer payload smoke test passed."
+    ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.24.exe",
+        "name": "Catalyst-Setup-v1.2.25.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24506089,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.24/Catalyst-Setup-v1.2.24.exe",
-        "sha256": "ede6c718af7ab23237d07a426e1eab04b078689afcd25815e94821a575026978"
+        "size_bytes": 24504752,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.25/Catalyst-Setup-v1.2.25.exe",
+        "sha256": "29f8d48b377f914eed42761feaef2f2aa4922097b5e624669c51d605e13814ed"
       }
     ]
   }
