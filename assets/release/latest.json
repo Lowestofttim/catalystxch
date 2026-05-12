@@ -1,28 +1,27 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-10T09:56:21Z",
+  "generated_at": "2026-05-12T06:07:09Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.23",
-    "name": "CATalyst v1.2.23",
-    "published_at": "2026-05-10T09:54:47Z",
+    "version": "v1.2.24",
+    "name": "CATalyst v1.2.24",
+    "published_at": "2026-05-12T06:05:57Z",
     "channel": "stable",
     "release_notes": [
-      "Improved Debug Bundle privacy before testers share support logs.",
-      "Redacts wallet addresses, Sage fingerprints, RPC/TLS paths, API tokens, cookies, passwords, seed/private-key labels, and local user-folder paths from bundled log tails and snapshots.",
-      "Updated the Logs tab help text so testers know what the bundle excludes or redacts."
+      "Fix side-specific topup tier planning",
+      "Add Sage setup and fingerprint settings"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.23.exe",
+        "name": "Catalyst-Setup-v1.2.24.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24485885,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.23/Catalyst-Setup-v1.2.23.exe",
-        "sha256": "a6ff085d7c98257c0081df4cb2c7caf58ee0ca65a4d3f41338580f7caef3f6e1"
+        "size_bytes": 24506089,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.24/Catalyst-Setup-v1.2.24.exe",
+        "sha256": "ede6c718af7ab23237d07a426e1eab04b078689afcd25815e94821a575026978"
       }
     ]
   }
