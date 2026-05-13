@@ -39,7 +39,7 @@ The website shows the current version, release notes, file size, and SHA-256 che
 
 Use the public bug report form:
 
-https://github.com/Lowestofttim/catalyst-bot/issues/new?template=bug_report.yml
+https://github.com/catalystxch/catalyst-bot/issues/new?template=bug_report.yml
 
 Bug reports are useful for:
 
@@ -59,7 +59,7 @@ GitHub issues are public. Please review anything you attach before submitting it
 
 Use the public feedback form:
 
-https://github.com/Lowestofttim/catalyst-bot/issues/new?template=feedback.yml
+https://github.com/catalystxch/catalyst-bot/issues/new?template=feedback.yml
 
 Feedback is useful for:
 
