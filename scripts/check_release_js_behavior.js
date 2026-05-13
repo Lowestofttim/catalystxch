@@ -149,6 +149,8 @@ async function main() {
   assert(enabled.link.attrs.get("rel") === "noopener", "enabled release should set rel");
   assert(!enabled.link.attrs.has("aria-disabled"), "enabled release should remove aria-disabled");
   assert(!enabled.link.classList.contains("is-disabled"), "enabled release should remove is-disabled");
+  assert(enabled.text("[data-release-name]") === baseLatest.name, "enabled release should show the release name");
+  assert(enabled.text("[data-release-version]") === baseLatest.version, "enabled release should show the release version");
   assert(enabled.text("[data-release-sha256]") === SHA256, "enabled release should show SHA-256");
 
   const disabled = await runRelease({ downloads_enabled: false, latest: baseLatest }, PUBLIC_URL);

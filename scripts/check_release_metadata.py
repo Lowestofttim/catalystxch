@@ -21,6 +21,7 @@ DATA_RELEASE_ATTRS = {
     "data-release-download-size",
     "data-release-eyebrow",
     "data-release-meta",
+    "data-release-name",
     "data-release-notes",
     "data-release-sha256",
     "data-release-status",
@@ -182,6 +183,7 @@ def validate_fallback_records(html_path: Path, html: str, data: dict, version: s
     )
     expected = {
         "data-release-version": version,
+        "data-release-name": latest["name"],
         "data-release-status": status,
         "data-release-meta": meta,
         "data-release-eyebrow": (
