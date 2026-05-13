@@ -1,28 +1,31 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-13T14:23:26Z",
+  "generated_at": "2026-05-13T15:58:17Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.28",
-    "name": "CATalyst v1.2.28",
-    "published_at": "2026-05-13T14:19:12Z",
+    "version": "v1.2.29",
+    "name": "CATalyst v1.2.29",
+    "published_at": "2026-05-13T15:54:31Z",
     "channel": "stable",
     "release_notes": [
-      "Move beta feedback intake to bot repo",
-      "handle crtl-c exit",
-      "Fix desktop update notification bridge"
+      "Update repository links after org transfer",
+      "chore(deps): update python-dotenv requirement from <2,>=1 to >=1.2.2,<2 by @dependabot[bot]",
+      "chore(deps-dev): update bandit requirement from <2,>=1.7 to >=1.9.4,<2 by @dependabot[bot]",
+      "chore(deps-dev): update playwright requirement from <2,>=1.58 to >=1.59.0,<2 by @dependabot[bot]",
+      "chore(deps-dev): update pyinstaller requirement from <7,>=6 to >=6.20.0,<7 by @dependabot[bot]",
+      "chore(deps): update requests requirement"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.28.exe",
+        "name": "Catalyst-Setup-v1.2.29.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24512248,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.28/Catalyst-Setup-v1.2.28.exe",
-        "sha256": "7e87adc6813e4bf97f800da54690c000a8cda0258c57b8454dc6543ac530d57b"
+        "size_bytes": 24511900,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.29/Catalyst-Setup-v1.2.29.exe",
+        "sha256": "6cee5d2892bba958b0b90463077f52af6004bd8ace865160eabb7127c768c781"
       }
     ]
   }
