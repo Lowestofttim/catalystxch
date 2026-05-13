@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for helping test CATalyst. The main app source repo is private for now, so beta reports are collected here in the public website repo.
+        Thank you for helping test CATalyst. Beta reports are collected here in the public website repo.
 
         Do not post seed phrases, private keys, wallet backups, API keys, or anything you would not want public. Logs can be useful, but please review anything you attach because reports here are public.
 

@@ -6,7 +6,7 @@ This is the public website repository for CATalyst:
 - Docs: https://catalystxch.com/docs.html
 - Windows downloads: https://catalystxch.com/#download
 
-This repository is intentionally separate from the main CATalyst bot source code. The app source repository is private while the beta is being prepared for wider public release. This public repository is here so testers can read the website, download the current public installer, and report bugs or feedback without needing access to the private app repo.
+This repository is intentionally separate from the main CATalyst bot source code. It gives testers a public place to read the website, download the current public installer, and report bugs or feedback while the app and release channel are managed in their own repositories.
 
 ## What this repository contains
 
@@ -21,7 +21,7 @@ The website is static HTML, CSS, JavaScript, and image assets. It does not run a
 
 This is not the main CATalyst trading bot source repository.
 
-Please do not expect the full app code, trading engine, wallet adapters, build scripts, or private development history to be visible here yet. Those live in the private CATalyst app repo until the project is ready to make that repo public.
+Please do not expect the full app code, trading engine, wallet adapters, build scripts, or development history to live in this website repository. Those belong in the separate CATalyst app source repository.
 
 ## Download CATalyst
 

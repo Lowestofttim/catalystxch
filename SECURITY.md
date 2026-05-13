@@ -14,7 +14,7 @@ This repository serves the static public website for CATalyst through GitHub Pag
 
 When public downloads are enabled:
 
-- Link only to official GitHub Releases for the main CATalyst app repository.
+- Link only to the official CATalyst public GitHub release channel.
 - Show the release version, release notes, file size, and SHA-256 checksum next to each download.
 - Do not use mirrors, URL shorteners, chat-only installer links, or files uploaded directly into this website repository.
 - Keep release asset names predictable, for example `Catalyst-Setup-vX.Y.Z.exe`.
@@ -22,7 +22,7 @@ When public downloads are enabled:
 
 ## Reporting
 
-While the app repository is private, report normal beta bugs and website/download issues through the public website issue tracker:
+Report normal beta bugs and website/download issues through the public website issue tracker:
 
 - Bug reports: https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml
 - Feedback: https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml
