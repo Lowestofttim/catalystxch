@@ -6,13 +6,13 @@ This is the public website repository for CATalyst:
 - Docs: https://catalystxch.com/docs.html
 - Windows downloads: https://catalystxch.com/#download
 
-This repository is intentionally separate from the main CATalyst bot source code. It gives testers a public place to read the website, download the current public installer, and report bugs or feedback while the app and release channel are managed in their own repositories.
+This repository is intentionally separate from the main CATalyst bot source code. It gives testers a public place to read the website and download the current public installer while the app source, bug reports, and beta feedback live in the public bot repository.
 
 ## What this repository contains
 
 - The static CATalyst website and help docs.
 - Public release metadata used by the website download panel.
-- Public issue templates for beta bug reports and feedback.
+- Redirect links for beta bug reports and feedback.
 - Security rules for the website and public download links.
 
 The website is static HTML, CSS, JavaScript, and image assets. It does not run a backend service, store visitor data, or process wallet information.
@@ -39,7 +39,7 @@ The website shows the current version, release notes, file size, and SHA-256 che
 
 Use the public bug report form:
 
-https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml
+https://github.com/Lowestofttim/catalyst-bot/issues/new?template=bug_report.yml
 
 Bug reports are useful for:
 
@@ -59,7 +59,7 @@ GitHub issues are public. Please review anything you attach before submitting it
 
 Use the public feedback form:
 
-https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml
+https://github.com/Lowestofttim/catalyst-bot/issues/new?template=feedback.yml
 
 Feedback is useful for:
 

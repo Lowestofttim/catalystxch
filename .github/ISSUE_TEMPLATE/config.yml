@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Report a CATalyst bug
+    url: https://github.com/Lowestofttim/catalyst-bot/issues/new?template=bug_report.yml
+    about: App, installer, website, and docs bug reports are now collected in the public bot repo.
+  - name: Send beta feedback
+    url: https://github.com/Lowestofttim/catalyst-bot/issues/new?template=feedback.yml
+    about: Share tester feedback, confusing setup steps, rough edges, or feature ideas.
   - name: CATalyst docs
     url: https://catalystxch.com/docs.html
     about: Read setup, troubleshooting, and safety guidance before filing a report.

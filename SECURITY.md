@@ -22,9 +22,9 @@ When public downloads are enabled:
 
 ## Reporting
 
-Report normal beta bugs and website/download issues through the public website issue tracker:
+Report normal beta bugs and website/download issues through the public bot repository:
 
-- Bug reports: https://github.com/Lowestofttim/catalystxch/issues/new?template=bug_report.yml
-- Feedback: https://github.com/Lowestofttim/catalystxch/issues/new?template=feedback.yml
+- Bug reports: https://github.com/Lowestofttim/catalyst-bot/issues/new?template=bug_report.yml
+- Feedback: https://github.com/Lowestofttim/catalyst-bot/issues/new?template=feedback.yml
 
 Do not post seed phrases, private keys, wallet backups, API keys, `.env` files, database files, or other secrets in public issues. If a report is security-sensitive or contains private data, use the early-tester support channel instead of opening a public GitHub issue.
