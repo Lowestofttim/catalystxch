@@ -1,26 +1,26 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-12T17:53:47Z",
+  "generated_at": "2026-05-13T10:16:10Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.26",
-    "name": "CATalyst v1.2.26",
-    "published_at": "2026-05-12T17:51:27Z",
+    "version": "v1.2.27",
+    "name": "CATalyst v1.2.27",
+    "published_at": "2026-05-13T10:15:41Z",
     "channel": "stable",
     "release_notes": [
-      "Improve shock recovery offer handling"
+      "Maintenance update."
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.26.exe",
+        "name": "Catalyst-Setup-v1.2.27.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24514045,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.26/Catalyst-Setup-v1.2.26.exe",
-        "sha256": "28ec925968751702f93b7e9a0f1c808497680b961ed9cb9349e49be12add9848"
+        "size_bytes": 24511175,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.27/Catalyst-Setup-v1.2.27.exe",
+        "sha256": "f424c0c743a3f9d7856cdd6e6509ede571f6f3c71c336ece11a06b5821d9d2cd"
       }
     ]
   }
