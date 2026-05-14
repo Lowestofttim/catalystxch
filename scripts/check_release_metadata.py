@@ -16,10 +16,16 @@ LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
 HTML_FILES = [ROOT / "index.html", ROOT / "docs.html"]
 VERSION_RE = re.compile(r"\bv\d+\.\d+\.\d+\b")
+PUBLIC_RELEASE_URL_PREFIX = "https://github.com/Lowestofttim/catalyst-releases/releases/download/"
+BOT_RELEASE_URL_PREFIX = "https://github.com/catalystxch/catalyst-bot/releases/download/"
 DATA_RELEASE_ATTRS = {
     "data-release-download-name",
     "data-release-download-size",
     "data-release-eyebrow",
+    "data-release-linux-size",
+    "data-release-linux-sha256",
+    "data-release-macos-size",
+    "data-release-macos-sha256",
     "data-release-meta",
     "data-release-name",
     "data-release-notes",
@@ -143,7 +149,13 @@ def validate_metadata(data: dict) -> str:
     assets = latest["assets"]
     if not isinstance(assets, list) or not assets:
         fail("latest.assets must be a non-empty list")
-    if data["downloads_enabled"] and len(assets) != 1:
+    windows_assets = [
+        asset for asset in assets
+        if isinstance(asset, dict)
+        and asset.get("platform") == "windows"
+        and asset.get("kind") == "installer"
+    ]
+    if data["downloads_enabled"] and len(windows_assets) != 1:
         fail("enabled website downloads must expose exactly one Windows installer asset")
 
     for asset in assets:
@@ -152,13 +164,14 @@ def validate_metadata(data: dict) -> str:
         for key in ["name", "platform", "kind", "size_bytes", "download_url", "sha256"]:
             if key not in asset:
                 fail(f"asset is missing {key}")
+        platform = asset["platform"]
+        kind = asset["kind"]
+        if (platform, kind) not in {("windows", "installer"), ("macos", "archive"), ("linux", "archive")}:
+            fail(f"unsupported website download asset: {platform} {kind}")
         if data["downloads_enabled"]:
-            if asset["platform"] != "windows" or asset["kind"] != "installer":
-                fail("enabled website downloads must expose only the Windows installer")
-            if not isinstance(asset["download_url"], str) or not asset["download_url"].startswith(
-                "https://github.com/Lowestofttim/catalyst-releases/releases/download/"
-            ):
-                fail("enabled downloads must use official public CATalyst release URLs")
+            expected_prefix = PUBLIC_RELEASE_URL_PREFIX if platform == "windows" else BOT_RELEASE_URL_PREFIX
+            if not isinstance(asset["download_url"], str) or not asset["download_url"].startswith(expected_prefix):
+                fail("enabled downloads must use official CATalyst release URLs")
             if not isinstance(asset["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", asset["sha256"]):
                 fail("enabled downloads must include a lowercase SHA-256 checksum")
         else:
@@ -170,9 +183,21 @@ def validate_metadata(data: dict) -> str:
     return version
 
 
+def find_asset(data: dict, platform: str, kind: str) -> dict | None:
+    return next(
+        (
+            asset for asset in data["latest"]["assets"]
+            if asset.get("platform") == platform and asset.get("kind") == kind
+        ),
+        None,
+    )
+
+
 def validate_fallback_records(html_path: Path, html: str, data: dict, version: str) -> None:
     latest = data["latest"]
-    asset = latest["assets"][0] if data["downloads_enabled"] else None
+    asset = find_asset(data, "windows", "installer") if data["downloads_enabled"] else None
+    macos_asset = find_asset(data, "macos", "archive") if data["downloads_enabled"] else None
+    linux_asset = find_asset(data, "linux", "archive") if data["downloads_enabled"] else None
     release_date = format_date(latest.get("published_at", ""))
     status = "Windows download available" if asset else "Public links coming soon"
     channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
@@ -194,6 +219,10 @@ def validate_fallback_records(html_path: Path, html: str, data: dict, version: s
         "data-release-download-name": asset["name"] if asset else "Not available",
         "data-release-download-size": format_bytes(asset["size_bytes"]) if asset else "",
         "data-release-sha256": asset["sha256"] if asset else "Not available",
+        "data-release-macos-size": format_bytes(macos_asset["size_bytes"]) if macos_asset else "",
+        "data-release-linux-size": format_bytes(linux_asset["size_bytes"]) if linux_asset else "",
+        "data-release-macos-sha256": macos_asset["sha256"] if macos_asset else "Not available",
+        "data-release-linux-sha256": linux_asset["sha256"] if linux_asset else "Not available",
     }
 
     rel = html_path.relative_to(ROOT)
@@ -221,8 +250,12 @@ def validate_website_wiring(data: dict, version: str) -> None:
         fail("assets/release.js must not write release data with innerHTML")
     if "data-download-windows" not in release_js:
         fail("assets/release.js must wire the Windows download button")
-    if "https://github.com/Lowestofttim/catalyst-releases/releases/download/" not in release_js:
+    if "data-download-macos" not in release_js or "data-download-linux" not in release_js:
+        fail("assets/release.js must wire macOS and Linux download buttons")
+    if PUBLIC_RELEASE_URL_PREFIX not in release_js:
         fail("assets/release.js must allow only the public CATalyst release download host")
+    if BOT_RELEASE_URL_PREFIX not in release_js:
+        fail("assets/release.js must allow only the public CATalyst bot release host for experimental archives")
 
     for html_path in HTML_FILES:
         html = html_path.read_text(encoding="utf-8")
@@ -233,8 +266,13 @@ def validate_website_wiring(data: dict, version: str) -> None:
             fail(f"{rel} must contain data-release-version hooks")
         if html_path.name == "index.html" and "data-download-windows" not in html:
             fail("index.html must contain a Windows download link hook")
-        if html_path.name == "index.html" and re.search(r"<a\b[^>]*data-download-windows[^>]*\bhref=", html):
-            fail("index.html must not hard-code the Windows download href")
+        if html_path.name == "index.html" and (
+            "data-download-macos" not in html or "data-download-linux" not in html
+        ):
+            fail("index.html must contain macOS and Linux download link hooks")
+        for attr in ("data-download-windows", "data-download-macos", "data-download-linux"):
+            if html_path.name == "index.html" and re.search(rf"<a\b[^>]*{attr}[^>]*\bhref=", html):
+                fail(f"index.html must not hard-code the {attr} href")
 
         literal_versions = sorted(set(VERSION_RE.findall(html)))
         stale_versions = [item for item in literal_versions if item != version]

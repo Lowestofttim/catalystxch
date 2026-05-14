@@ -21,6 +21,22 @@
         "size_bytes": 24512356,
         "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.30/Catalyst-Setup-v1.2.30.exe",
         "sha256": "ee506756ca6e3785fb336b60016530b8ce4c5a19e2a3b80d2bca6b822f4f7beb"
+      },
+      {
+        "name": "Catalyst-macos-v1.2.30.zip",
+        "platform": "macos",
+        "kind": "archive",
+        "size_bytes": 79416638,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.30/Catalyst-macos-v1.2.30.zip",
+        "sha256": "e3ac891044240f8cc1b6acf938ac7b7a22426ac4675153e9804d5df9a3592069"
+      },
+      {
+        "name": "Catalyst-linux-v1.2.30.tar.gz",
+        "platform": "linux",
+        "kind": "archive",
+        "size_bytes": 44497392,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.30/Catalyst-linux-v1.2.30.tar.gz",
+        "sha256": "7d6c66b3be2cf5be9fbef49d9385a93bb218532333ded53f52c4e359282108be"
       }
     ]
   }

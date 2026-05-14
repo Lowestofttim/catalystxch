@@ -1778,7 +1778,7 @@
         <div class="download-wrap">
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
             <div class="download-title">Download CATalyst</div>
-            <p class="download-sub">Windows uses the signed public installer channel. macOS and Linux tester archives are published on the bot release page and remain experimental.</p>
+            <p class="download-sub">Windows uses the signed public installer channel. macOS and Linux tester archives are available too, but they are experimental and may not currently build or run correctly on every machine.</p>
             <div class="platforms">
                 <a class="platform-card is-primary is-disabled" data-download-windows aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
@@ -1788,21 +1788,21 @@
                     </div>
                     <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>23.4 MB</span></div>
                 </a>
-                <a class="platform-card" href="https://github.com/catalystxch/catalyst-bot/releases/latest" target="_blank" rel="noopener">
+                <a class="platform-card is-disabled" data-download-macos aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
                         <span class="platform-icon">🍎</span>
                         <span class="platform-name">macOS</span>
                         <span class="platform-tag experimental">Experimental</span>
                     </div>
-                    <div class="platform-note">Test archive on GitHub Releases · Ask Don to validate before wider use</div>
+                    <div class="platform-note">Tester archive · <span data-release-macos-size>75.7 MB</span> · May not currently build or run correctly</div>
                 </a>
-                <a class="platform-card" href="https://github.com/catalystxch/catalyst-bot/releases/latest" target="_blank" rel="noopener">
+                <a class="platform-card is-disabled" data-download-linux aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
                         <span class="platform-icon">🐧</span>
                         <span class="platform-name">Linux</span>
                         <span class="platform-tag experimental">Experimental</span>
                     </div>
-                    <div class="platform-note">Test archive on GitHub Releases · Ask Don to validate before wider use</div>
+                    <div class="platform-note">Tester archive · <span data-release-linux-size>42.4 MB</span> · May not currently build or run correctly</div>
                 </a>
             </div>
             <div class="release-status">
@@ -1820,7 +1820,7 @@
                 </div>
             </div>
             <p class="download-note">
-                The Windows installer is hosted on the public CATalyst GitHub release channel. macOS and Linux tester archives open the public bot release page so testers can choose the matching asset.
+                Windows is the recommended beta path. macOS and Linux downloads are experimental tester archives from the public bot release and may need developer help before they work reliably.
             </p>
             <div class="download-feedback" role="note" aria-labelledby="download-feedback-title">
                 <div class="download-security-title" id="download-feedback-title">Beta testers wanted</div>
@@ -1830,14 +1830,30 @@
                     <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a>
                 </div>
             </div>
+            <div class="download-feedback" role="note" aria-labelledby="download-dev-title">
+                <div class="download-security-title" id="download-dev-title">Developers wanted</div>
+                <p>CATalyst is now public. Developers who want to improve wallet handling, macOS/Linux packaging, trading safety, docs, tests, or UI polish should work from the bot repository and open pull requests there.</p>
+                <div class="feedback-actions">
+                    <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">Visit the bot repo</a>
+                    <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot/pulls" target="_blank" rel="noopener">Open a pull request</a>
+                </div>
+            </div>
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
                     <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.30.exe</span></div>
                 </div>
                 <div class="download-detail">
-                    <div class="download-detail-label">SHA-256</div>
+                    <div class="download-detail-label">Windows SHA-256</div>
                     <div class="download-detail-value" data-release-sha256>ee506756ca6e3785fb336b60016530b8ce4c5a19e2a3b80d2bca6b822f4f7beb</div>
+                </div>
+                <div class="download-detail">
+                    <div class="download-detail-label">macOS SHA-256</div>
+                    <div class="download-detail-value" data-release-macos-sha256>e3ac891044240f8cc1b6acf938ac7b7a22426ac4675153e9804d5df9a3592069</div>
+                </div>
+                <div class="download-detail">
+                    <div class="download-detail-label">Linux SHA-256</div>
+                    <div class="download-detail-value" data-release-linux-sha256>7d6c66b3be2cf5be9fbef49d9385a93bb218532333ded53f52c4e359282108be</div>
                 </div>
             </div>
             <div class="download-security">
