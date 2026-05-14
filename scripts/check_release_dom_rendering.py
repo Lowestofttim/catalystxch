@@ -98,9 +98,22 @@ def find_windows_installer(latest: dict) -> dict | None:
     )
 
 
+def find_archive(latest: dict, platform: str) -> dict | None:
+    return next(
+        (
+            asset
+            for asset in latest["assets"]
+            if asset["platform"] == platform and asset["kind"] == "archive"
+        ),
+        None,
+    )
+
+
 def assert_release_panel(page, metadata: dict) -> None:
     latest = metadata["latest"]
     installer = find_windows_installer(latest)
+    macos = find_archive(latest, "macos")
+    linux = find_archive(latest, "linux")
     downloads_available = bool(metadata["downloads_enabled"] and installer and installer["download_url"])
 
     expect(page.locator("[data-release-eyebrow]")).to_contain_text(latest["version"])
@@ -110,14 +123,24 @@ def assert_release_panel(page, metadata: dict) -> None:
         "windows download available" if downloads_available else "public links coming soon"
     )
     download_link = page.locator("[data-download-windows]")
+    macos_link = page.locator("[data-download-macos]")
+    linux_link = page.locator("[data-download-linux]")
     if downloads_available:
         expect(download_link).not_to_have_attribute("aria-disabled", "true")
+        expect(macos_link).not_to_have_attribute("aria-disabled", "true")
+        expect(linux_link).not_to_have_attribute("aria-disabled", "true")
     else:
         expect(download_link).to_have_attribute("aria-disabled", "true")
+        expect(macos_link).to_have_attribute("aria-disabled", "true")
+        expect(linux_link).to_have_attribute("aria-disabled", "true")
 
     if downloads_available:
         expect(page.locator("#download [data-release-download-name]")).to_have_text(installer["name"])
         expect(page.locator("#download [data-release-sha256]")).to_have_text(installer["sha256"])
+        if macos:
+            expect(macos_link).to_have_attribute("href", macos["download_url"])
+        if linux:
+            expect(linux_link).to_have_attribute("href", linux["download_url"])
     else:
         expect(page.locator("#download [data-release-download-name]")).to_have_text("Not available")
         expect(page.locator("#download [data-release-sha256]")).to_have_text("Not available")

@@ -4,7 +4,7 @@ This is the public website repository for CATalyst:
 
 - Website: https://catalystxch.com
 - Docs: https://catalystxch.com/docs.html
-- Windows downloads: https://catalystxch.com/#download
+- Downloads: https://catalystxch.com/#download
 
 This repository is intentionally separate from the main CATalyst bot source code. It gives testers a public place to read the website and download the current public installer while the app source, bug reports, and beta feedback live in the public bot repository.
 
@@ -33,7 +33,7 @@ Current public Windows installers are hosted through the official CATalyst publi
 
 https://github.com/Lowestofttim/catalyst-releases/releases
 
-The website shows the current version, release notes, file size, and SHA-256 checksum next to the Windows download. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
+The website shows the current version, release notes, file size, and SHA-256 checksum next to the Windows download. Experimental macOS and Linux archives are also linked from the download panel with a clear warning that they may not currently build or run correctly. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
 
 ## Report a bug
 
@@ -78,6 +78,10 @@ CATalyst should never ask for your seed phrase or private keys. Sage signs local
 ## Website changes
 
 Small website, docs, and README fixes can be proposed in this repository. Changes should keep the site static, avoid unnecessary third-party scripts, and keep download links pointed only at official CATalyst GitHub Releases.
+
+Developers who want to improve the bot itself should use the public bot repository:
+
+https://github.com/catalystxch/catalyst-bot
 
 Release metadata is stored in `assets/release/latest.json`. Maintainers can validate release wiring with:
 

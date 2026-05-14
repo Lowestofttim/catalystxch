@@ -8,6 +8,8 @@ const RELEASE_JS = "assets/release.js";
 const metadata = JSON.parse(fs.readFileSync("assets/release/latest.json", "utf8"));
 const baseLatest = metadata.latest;
 const windowsInstaller = baseLatest.assets.find((asset) => asset.platform === "windows" && asset.kind === "installer");
+const macosArchive = baseLatest.assets.find((asset) => asset.platform === "macos" && asset.kind === "archive");
+const linuxArchive = baseLatest.assets.find((asset) => asset.platform === "linux" && asset.kind === "archive");
 
 function formatBytes(value) {
   const units = ["B", "KB", "MB", "GB"];
@@ -23,11 +25,16 @@ function formatBytes(value) {
 if (!windowsInstaller) {
   throw new Error("latest.json must contain a Windows installer asset");
 }
+if (!macosArchive || !linuxArchive) {
+  throw new Error("latest.json must contain macOS and Linux archive assets");
+}
 
 const PUBLIC_URL = windowsInstaller.download_url;
 const SHA256 = windowsInstaller.sha256;
 const DOWNLOAD_NAME = windowsInstaller.name;
 const DOWNLOAD_SIZE = formatBytes(windowsInstaller.size_bytes);
+const MACOS_URL = macosArchive.download_url;
+const LINUX_URL = linuxArchive.download_url;
 
 function makeTextNode(textContent = "") {
   return { textContent };
@@ -79,7 +86,7 @@ function makeLinkNode(initialHref = "") {
   };
 }
 
-function buildDocument(link) {
+function buildDocument(link, macosLink, linuxLink) {
   const nodes = new Map([
     ["[data-release-version]", [makeTextNode()]],
     ["[data-release-name]", [makeTextNode()]],
@@ -89,9 +96,15 @@ function buildDocument(link) {
     ["[data-release-date]", [makeTextNode()]],
     ["[data-release-download-name]", [makeTextNode(DOWNLOAD_NAME)]],
     ["[data-release-download-size]", [makeTextNode(DOWNLOAD_SIZE)]],
+    ["[data-release-macos-size]", [makeTextNode(formatBytes(macosArchive.size_bytes))]],
+    ["[data-release-linux-size]", [makeTextNode(formatBytes(linuxArchive.size_bytes))]],
     ["[data-release-sha256]", [makeTextNode(SHA256)]],
+    ["[data-release-macos-sha256]", [makeTextNode(macosArchive.sha256)]],
+    ["[data-release-linux-sha256]", [makeTextNode(linuxArchive.sha256)]],
     ["[data-release-notes]", [makeListNode()]],
-    ["[data-download-windows]", [link]]
+    ["[data-download-windows]", [link]],
+    ["[data-download-macos]", [macosLink]],
+    ["[data-download-linux]", [linuxLink]]
   ]);
 
   return {
@@ -114,7 +127,9 @@ function buildDocument(link) {
 async function runRelease(metadata, initialHref = "") {
   const code = fs.readFileSync(RELEASE_JS, "utf8");
   const link = makeLinkNode(initialHref);
-  const { document, nodes } = buildDocument(link);
+  const macosLink = makeLinkNode(initialHref);
+  const linuxLink = makeLinkNode(initialHref);
+  const { document, nodes } = buildDocument(link, macosLink, linuxLink);
   const context = {
     console,
     document,
@@ -129,6 +144,8 @@ async function runRelease(metadata, initialHref = "") {
 
   return {
     link,
+    macosLink,
+    linuxLink,
     nodes,
     text(selector) {
       return nodes.get(selector)[0].textContent;
@@ -145,6 +162,8 @@ function assert(condition, message) {
 async function main() {
   const enabled = await runRelease({ downloads_enabled: true, latest: baseLatest });
   assert(enabled.link.href === PUBLIC_URL, "enabled release should set the Windows download href");
+  assert(enabled.macosLink.href === MACOS_URL, "enabled release should set the macOS download href");
+  assert(enabled.linuxLink.href === LINUX_URL, "enabled release should set the Linux download href");
   assert(enabled.link.attrs.get("target") === "_blank", "enabled release should set target");
   assert(enabled.link.attrs.get("rel") === "noopener", "enabled release should set rel");
   assert(!enabled.link.attrs.has("aria-disabled"), "enabled release should remove aria-disabled");
@@ -152,9 +171,15 @@ async function main() {
   assert(enabled.text("[data-release-name]") === baseLatest.name, "enabled release should show the release name");
   assert(enabled.text("[data-release-version]") === baseLatest.version, "enabled release should show the release version");
   assert(enabled.text("[data-release-sha256]") === SHA256, "enabled release should show SHA-256");
+  assert(enabled.text("[data-release-macos-size]") === formatBytes(macosArchive.size_bytes), "enabled release should show macOS size");
+  assert(enabled.text("[data-release-linux-size]") === formatBytes(linuxArchive.size_bytes), "enabled release should show Linux size");
+  assert(enabled.text("[data-release-macos-sha256]") === macosArchive.sha256, "enabled release should show macOS SHA-256");
+  assert(enabled.text("[data-release-linux-sha256]") === linuxArchive.sha256, "enabled release should show Linux SHA-256");
 
   const disabled = await runRelease({ downloads_enabled: false, latest: baseLatest }, PUBLIC_URL);
   assert(disabled.link.href === "", "disabled release should remove stale Windows download href");
+  assert(disabled.macosLink.href === "", "disabled release should remove stale macOS download href");
+  assert(disabled.linuxLink.href === "", "disabled release should remove stale Linux download href");
   assert(!disabled.link.attrs.has("target"), "disabled release should remove target");
   assert(!disabled.link.attrs.has("rel"), "disabled release should remove rel");
   assert(disabled.link.attrs.get("aria-disabled") === "true", "disabled release should mark the link disabled");
@@ -162,6 +187,8 @@ async function main() {
   assert(disabled.text("[data-release-download-name]") === "Not available", "disabled release should reset installer detail");
   assert(disabled.text("[data-release-download-size]") === "", "disabled release should reset file size");
   assert(disabled.text("[data-release-sha256]") === "Not available", "disabled release should reset SHA-256 detail");
+  assert(disabled.text("[data-release-macos-sha256]") === "Not available", "disabled release should reset macOS SHA-256 detail");
+  assert(disabled.text("[data-release-linux-sha256]") === "Not available", "disabled release should reset Linux SHA-256 detail");
 
   const guardedLatest = {
     ...baseLatest,
@@ -169,7 +196,8 @@ async function main() {
       {
         ...baseLatest.assets[0],
         download_url: `https://example.com/${DOWNLOAD_NAME}`
-      }
+      },
+      ...baseLatest.assets.slice(1)
     ]
   };
   const guardFailure = await runRelease({ downloads_enabled: true, latest: guardedLatest }, PUBLIC_URL);

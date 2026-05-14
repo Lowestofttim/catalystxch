@@ -31,21 +31,30 @@
     return `${size.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
   };
 
-  const isAllowedDownloadUrl = (value) => {
+  const isAllowedDownloadUrl = (value, platform) => {
     if (typeof value !== "string") return false;
-    return value.startsWith("https://github.com/Lowestofttim/catalyst-releases/releases/download/");
+    if (platform === "windows") {
+      return value.startsWith("https://github.com/Lowestofttim/catalyst-releases/releases/download/");
+    }
+    if (platform === "macos" || platform === "linux") {
+      return value.startsWith("https://github.com/catalystxch/catalyst-bot/releases/download/");
+    }
+    return false;
   };
 
-  const findWindowsInstaller = (latest) => {
+  const findAsset = (latest, platform, kind) => {
     if (!Array.isArray(latest.assets)) return null;
     return latest.assets.find((asset) => (
       asset &&
-      asset.platform === "windows" &&
-      asset.kind === "installer" &&
-      isAllowedDownloadUrl(asset.download_url) &&
+      asset.platform === platform &&
+      asset.kind === kind &&
+      isAllowedDownloadUrl(asset.download_url, platform) &&
       typeof asset.sha256 === "string"
     )) || null;
   };
+
+  const findWindowsInstaller = (latest) => findAsset(latest, "windows", "installer");
+  const findExperimentalArchive = (latest, platform) => findAsset(latest, platform, "archive");
 
   const renderList = (selector, items) => {
     if (!Array.isArray(items) || !items.length) return;
@@ -60,12 +69,8 @@
     });
   };
 
-  const disableWindowsDownload = () => {
-    setText("[data-release-download-name]", "Not available");
-    setText("[data-release-download-size]", "");
-    setText("[data-release-sha256]", "Not available");
-
-    document.querySelectorAll("[data-download-windows]").forEach((link) => {
+  const disableDownload = (selector) => {
+    document.querySelectorAll(selector).forEach((link) => {
       link.removeAttribute("href");
       link.removeAttribute("target");
       link.removeAttribute("rel");
@@ -75,6 +80,28 @@
     });
   };
 
+  const enableDownload = (selector, asset) => {
+    document.querySelectorAll(selector).forEach((link) => {
+      link.setAttribute("href", asset.download_url);
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener");
+      link.removeAttribute("aria-disabled");
+      link.removeAttribute("tabindex");
+      link.classList.remove("is-disabled");
+    });
+  };
+
+  const disableWindowsDownload = () => {
+    setText("[data-release-download-name]", "Not available");
+    setText("[data-release-download-size]", "");
+    setText("[data-release-sha256]", "Not available");
+    setText("[data-release-macos-size]", "");
+    setText("[data-release-linux-size]", "");
+    setText("[data-release-macos-sha256]", "Not available");
+    setText("[data-release-linux-sha256]", "Not available");
+    disableDownload("[data-download-windows]");
+  };
+
   const applyMetadata = (metadata) => {
     const latest = metadata && metadata.latest;
     if (!latest || typeof latest.version !== "string") return;
@@ -82,6 +109,8 @@
     const version = latest.version;
     const releaseDate = formatDate(latest.published_at);
     const windowsInstaller = metadata.downloads_enabled ? findWindowsInstaller(latest) : null;
+    const macosArchive = metadata.downloads_enabled ? findExperimentalArchive(latest, "macos") : null;
+    const linuxArchive = metadata.downloads_enabled ? findExperimentalArchive(latest, "linux") : null;
     const downloadsAvailable = Boolean(windowsInstaller);
     const status = downloadsAvailable ? "Windows download available" : "Public links coming soon";
     const channel = latest.channel === "prerelease" ? "Prerelease" : "Stable";
@@ -102,6 +131,8 @@
 
     if (!downloadsAvailable) {
       disableWindowsDownload();
+      disableDownload("[data-download-macos]");
+      disableDownload("[data-download-linux]");
       return;
     }
 
@@ -109,15 +140,16 @@
     setText("[data-release-download-name]", windowsInstaller.name);
     setText("[data-release-download-size]", size);
     setText("[data-release-sha256]", windowsInstaller.sha256);
+    setText("[data-release-macos-size]", macosArchive ? formatBytes(macosArchive.size_bytes) : "");
+    setText("[data-release-linux-size]", linuxArchive ? formatBytes(linuxArchive.size_bytes) : "");
+    setText("[data-release-macos-sha256]", macosArchive ? macosArchive.sha256 : "Not available");
+    setText("[data-release-linux-sha256]", linuxArchive ? linuxArchive.sha256 : "Not available");
 
-    document.querySelectorAll("[data-download-windows]").forEach((link) => {
-      link.setAttribute("href", windowsInstaller.download_url);
-      link.setAttribute("target", "_blank");
-      link.setAttribute("rel", "noopener");
-      link.removeAttribute("aria-disabled");
-      link.removeAttribute("tabindex");
-      link.classList.remove("is-disabled");
-    });
+    enableDownload("[data-download-windows]", windowsInstaller);
+    if (macosArchive) enableDownload("[data-download-macos]", macosArchive);
+    else disableDownload("[data-download-macos]");
+    if (linuxArchive) enableDownload("[data-download-linux]", linuxArchive);
+    else disableDownload("[data-download-linux]");
   };
 
   const loadMetadata = async () => {

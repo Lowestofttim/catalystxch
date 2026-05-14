@@ -1398,7 +1398,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows download available - current release v1.2.30</span>
+                    <span data-release-eyebrow>Windows download available - current release v1.2.31</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -1777,8 +1777,8 @@
 
         <div class="download-wrap">
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
-            <div class="download-title">Download for Windows</div>
-            <p class="download-sub">The latest Windows installer is available from the official CATalyst public GitHub release channel. macOS and Linux remain experimental for now.</p>
+            <div class="download-title">Download CATalyst</div>
+            <p class="download-sub">Windows uses the signed public installer channel. macOS and Linux tester archives are available too, but they are experimental and may not currently build or run correctly on every machine.</p>
             <div class="platforms">
                 <a class="platform-card is-primary is-disabled" data-download-windows aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
@@ -1788,39 +1788,41 @@
                     </div>
                     <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>23.4 MB</span></div>
                 </a>
-                <div class="platform-card" aria-disabled="true">
+                <a class="platform-card is-disabled" data-download-macos aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
                         <span class="platform-icon">🍎</span>
                         <span class="platform-name">macOS</span>
                         <span class="platform-tag experimental">Experimental</span>
                     </div>
-                    <div class="platform-note">Apple Silicon &amp; Intel · Not fully tested · Coming soon</div>
-                </div>
-                <div class="platform-card" aria-disabled="true">
+                    <div class="platform-note">Tester archive · <span data-release-macos-size>75.7 MB</span> · May not currently build or run correctly</div>
+                </a>
+                <a class="platform-card is-disabled" data-download-linux aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
                         <span class="platform-icon">🐧</span>
                         <span class="platform-name">Linux</span>
                         <span class="platform-tag experimental">Experimental</span>
                     </div>
-                    <div class="platform-note">Linux archive · Not fully tested · Coming soon</div>
-                </div>
+                    <div class="platform-note">Tester archive · <span data-release-linux-size>42.4 MB</span> · May not currently build or run correctly</div>
+                </a>
             </div>
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest Windows build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.2.30</div>
-                    <div class="release-version" data-release-version>v1.2.30</div>
-                    <div class="release-meta" data-release-meta>Stable - published 13 May 2026 - windows download available</div>
+                    <div class="release-name" data-release-name>CATalyst v1.2.31</div>
+                    <div class="release-version" data-release-version>v1.2.31</div>
+                    <div class="release-meta" data-release-meta>Stable - published 14 May 2026 - windows download available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>Require wallet selection on Sage startup</li>
+                        <li>Hardened public API error payloads and cleared the remaining CodeQL security alerts.</li>
+                        <li>Refreshed the app help/about content, public beta feedback prompts, and bug report links for the catalystxch/catalyst-bot repo.</li>
+                        <li>Ignored local Python virtual environments so developer workspace folders stay out of commits.</li>
                     </ul>
                 </div>
             </div>
             <p class="download-note">
-                The Windows installer is hosted on the public CATalyst GitHub release channel. This button points only to the signed public release asset.
+                Windows is the recommended beta path. macOS and Linux downloads are experimental tester archives from the public bot release and may need developer help before they work reliably.
             </p>
             <div class="download-feedback" role="note" aria-labelledby="download-feedback-title">
                 <div class="download-security-title" id="download-feedback-title">Beta testers wanted</div>
@@ -1830,14 +1832,30 @@
                     <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a>
                 </div>
             </div>
+            <div class="download-feedback" role="note" aria-labelledby="download-dev-title">
+                <div class="download-security-title" id="download-dev-title">Developers wanted</div>
+                <p>CATalyst is now public. Developers who want to improve wallet handling, macOS/Linux packaging, trading safety, docs, tests, or UI polish should work from the bot repository and open pull requests there.</p>
+                <div class="feedback-actions">
+                    <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">Visit the bot repo</a>
+                    <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot/pulls" target="_blank" rel="noopener">Open a pull request</a>
+                </div>
+            </div>
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.30.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.31.exe</span></div>
                 </div>
                 <div class="download-detail">
-                    <div class="download-detail-label">SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>ee506756ca6e3785fb336b60016530b8ce4c5a19e2a3b80d2bca6b822f4f7beb</div>
+                    <div class="download-detail-label">Windows SHA-256</div>
+                    <div class="download-detail-value" data-release-sha256>cecb9a18df35951acc5ac8544712e7b6a97c5b5751fc5eb46420756e953e7eaf</div>
+                </div>
+                <div class="download-detail">
+                    <div class="download-detail-label">macOS SHA-256</div>
+                    <div class="download-detail-value" data-release-macos-sha256>e9204bf4faa955a2b695aa8bd249a5a356fed1f68eb4000e9b8874e55b13cd85</div>
+                </div>
+                <div class="download-detail">
+                    <div class="download-detail-label">Linux SHA-256</div>
+                    <div class="download-detail-value" data-release-linux-sha256>f6fe3359b106c9b7e0e7005616f797a42f00a1bba81adb582a52824d5361f44f</div>
                 </div>
             </div>
             <div class="download-security">
