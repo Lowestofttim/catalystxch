@@ -1,42 +1,47 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-13T17:13:17Z",
+  "generated_at": "2026-05-14T07:39:38Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.30",
-    "name": "CATalyst v1.2.30",
-    "published_at": "2026-05-13T17:02:11Z",
+    "version": "v1.2.31",
+    "name": "CATalyst v1.2.31",
+    "published_at": "2026-05-14T07:31:35Z",
     "channel": "stable",
     "release_notes": [
-      "Require wallet selection on Sage startup"
+      "Hardened public API error payloads and cleared the remaining CodeQL security alerts.",
+      "Refreshed the app help/about content, public beta feedback prompts, and bug report links for the catalystxch/catalyst-bot repo.",
+      "Ignored local Python virtual environments so developer workspace folders stay out of commits."
     ],
-    "verification_notes": [],
+    "verification_notes": [
+      "Release workflow completed for Windows, macOS, and Linux artifacts.",
+      "Website release metadata and download rendering checks passed for v1.2.31."
+    ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.30.exe",
+        "name": "Catalyst-Setup-v1.2.31.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24512356,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.30/Catalyst-Setup-v1.2.30.exe",
-        "sha256": "ee506756ca6e3785fb336b60016530b8ce4c5a19e2a3b80d2bca6b822f4f7beb"
+        "size_bytes": 24523225,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.31/Catalyst-Setup-v1.2.31.exe",
+        "sha256": "cecb9a18df35951acc5ac8544712e7b6a97c5b5751fc5eb46420756e953e7eaf"
       },
       {
-        "name": "Catalyst-macos-v1.2.30.zip",
+        "name": "Catalyst-macos-v1.2.31.zip",
         "platform": "macos",
         "kind": "archive",
-        "size_bytes": 79416638,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.30/Catalyst-macos-v1.2.30.zip",
-        "sha256": "e3ac891044240f8cc1b6acf938ac7b7a22426ac4675153e9804d5df9a3592069"
+        "size_bytes": 79427600,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.31/Catalyst-macos-v1.2.31.zip",
+        "sha256": "e9204bf4faa955a2b695aa8bd249a5a356fed1f68eb4000e9b8874e55b13cd85"
       },
       {
-        "name": "Catalyst-linux-v1.2.30.tar.gz",
+        "name": "Catalyst-linux-v1.2.31.tar.gz",
         "platform": "linux",
         "kind": "archive",
-        "size_bytes": 44497392,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.30/Catalyst-linux-v1.2.30.tar.gz",
-        "sha256": "7d6c66b3be2cf5be9fbef49d9385a93bb218532333ded53f52c4e359282108be"
+        "size_bytes": 44505951,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.31/Catalyst-linux-v1.2.31.tar.gz",
+        "sha256": "f6fe3359b106c9b7e0e7005616f797a42f00a1bba81adb582a52824d5361f44f"
       }
     ]
   }
