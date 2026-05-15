@@ -773,6 +773,7 @@
                 <li><strong>Post to Dexie</strong> and optionally broadcast to Splash P2P for visibility</li>
                 <li><strong>Check coins</strong>. Adaptive topup based on trading pace (busy/normal/slow)</li>
             </ol>
+            <p><strong>Ladder rebuild timing</strong>. A filled or swept ladder is not always replaced in one instant. In quiet conditions, missing offers may come back within one or two 90-second cycles. If the Adverse Selection Guard is high, a side is temporarily throttled, coin top-up is waiting for Sage/chain state, or prices are moving, CATalyst can deliberately wait several cycles before rebuilding the full ladder. That slower rebuild is a safety feature, not necessarily a fault.</p>
 
             <div class="diagram-grid">
                 <figure class="diagram-card">

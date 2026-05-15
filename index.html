@@ -1698,6 +1698,7 @@
         <span class="section-kicker">The loop</span>
         <h2 class="section-title">A steady loop, with fast watchers between cycles.</h2>
         <p class="section-subtitle">The main loop defaults to 90 seconds, while TibetSwap, AMM, and Coinset watchers can wake it early when fills or price shocks appear.</p>
+        <p class="section-subtitle">After a sweep or toxic flow, the ladder may not rebuild instantly. In calm markets it can refill in a cycle or two; if adverse-selection scoring, coin top-up, or market movement is active, it may take several cycles while CATalyst widens, waits, and rebuilds safely.</p>
 
         <div class="loop-wrap">
             <div class="loop-steps">
