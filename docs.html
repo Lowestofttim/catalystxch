@@ -764,6 +764,7 @@
                 <li><strong>Detect fills</strong>. Reconcile wallet state, known offer coins, Dexie status, and chain data where needed</li>
                 <li><strong>Match PnL</strong>. Pair up buy fills with sell fills to calculate profit</li>
                 <li><strong>Update inventory</strong>. Track net position (are we accumulating CAT or XCH?)</li>
+                <li><strong>Score adverse selection</strong>. Track buy-side and sell-side pressure separately so repeated sweeps, thin depth, or one-sided flow can widen or pause the affected side</li>
                 <li><strong>Clean expired offers</strong> and pre-emptively refresh any expiring within 5 minutes</li>
                 <li><strong>Fire sniper</strong> if there's an arb opportunity between Dexie and TibetSwap</li>
                 <li><strong>Emergency requote</strong> if a price shock is detected (large sudden arb gap)</li>
@@ -791,6 +792,7 @@
             <h3>Key concepts</h3>
             <p><strong>Spread</strong>. The difference between your buy and sell price, shown as a %. Wider = safer but fewer fills. Narrower = more fills but more risk.</p>
             <p><strong>Inventory</strong>. Your net position. If people keep buying your CAT, you accumulate XCH (go short CAT). The bot skews spreads to rebalance.</p>
+            <p><strong>Adverse Selection Guard</strong>. CATalyst's side-aware market toxicity score. It is closest to order-flow toxicity or VPIN-style flow-imbalance monitoring, but implemented as practical beta heuristics for Dexie/TibetSwap conditions rather than a full academic VPIN model.</p>
             <p><strong>Coins</strong>. Chia uses a UTXO model, each offer locks a specific coin. You need pre-split coins of the right size.</p>
         </section>
 
@@ -921,6 +923,7 @@
                 <li><strong>Fill rate</strong>. Too many fills = wider spread; too few = tighter</li>
                 <li><strong>Pool depth</strong>. Shallow TibetSwap pool = wider spread (more slippage risk)</li>
                 <li><strong>Competitors</strong>. If Competitor Awareness is enabled, pricing also nudges based on what other market makers are doing on Dexie</li>
+                <li><strong>Adverse selection</strong>. Sweep-like or one-sided flow raises a side-specific toxicity score, then widens or temporarily pauses the risky side while the correcting side can keep working</li>
             </ul>
 
             <h3>Spread settings</h3>
@@ -1140,7 +1143,8 @@
                     <tr><td>Max Offers</td><td>How many buy + sell offers to maintain. More offers = better coverage but needs more coins.</td></tr>
                     <tr><td>Trade Size</td><td>XCH amount per offer (or per tier if tiered sizing is on). Larger = more capital at risk per trade.</td></tr>
                     <tr><td>Offer Expiry</td><td>How long offers live before auto-expiring (in minutes). The bot pre-emptively refreshes offers within 5 min of expiring.</td></tr>
-                    <tr><td>Dynamic Spread</td><td>Enable automatic spread adjustment based on volatility, arb gap, fill rate, pool depth, and competitors.</td></tr>
+                    <tr><td>Dynamic Spread</td><td>Enable automatic spread adjustment based on volatility, arb gap, fill rate, pool depth, competitors, and adverse-selection pressure.</td></tr>
+                    <tr><td>Adverse Selection Guard</td><td>Side-aware toxicity control. Scores buy and sell flow separately using sweeps, one-sided fills, thin public depth, and book imbalance; widens or temporarily pauses the affected side.</td></tr>
                     <tr><td>Inventory Mgmt</td><td>Track net position and skew spreads to rebalance. Prevents accumulating too much of one side.</td></tr>
                     <tr><td>Tiered Orders</td><td>Place tiered offers at different distances from mid-price. Inner (nearest) = largest, Extreme (furthest) = smallest.</td></tr>
                     <tr><td>Max Position</td><td>Circuit breaker limit in XCH. If position exceeds this, the bot stops one side until it rebalances.</td></tr>

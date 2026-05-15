@@ -1364,7 +1364,19 @@
 
         @media (max-width: 640px) {
             .nav-links { display: none; }
+            .nav-inner { padding: 0 18px; gap: 12px; }
+            .nav-brand { min-width: 0; }
+            .nav-brand-name { font-size: 16px; letter-spacing: 0; }
+            .nav-cta .btn { padding: 9px 12px; font-size: 13px; }
+            .container,
+            .container-narrow { padding: 0 20px; }
             .hero { padding: 120px 0 60px; }
+            .hero-copy { min-width: 0; }
+            .hero-eyebrow { max-width: 100%; white-space: normal; line-height: 1.35; }
+            .hero-title { font-size: 36px; line-height: 1.04; letter-spacing: 0; }
+            .hero-sub { max-width: 100%; font-size: 16px; }
+            .hero-actions .btn { justify-content: center; min-width: 0; }
+            .beta-callout { max-width: 100%; padding: 16px; }
             .section { padding: 80px 0; }
             .tier-section { padding: 32px 24px; }
             .download-wrap { padding: 36px 24px; }
@@ -1374,6 +1386,13 @@
             .footer-inner { flex-direction: column; align-items: flex-start; gap: 18px; }
             .stats-inner { grid-template-columns: 1fr 1fr; }
             .stat-value { font-size: 20px; }
+        }
+
+        @media (max-width: 380px) {
+            .hero-title { font-size: 32px; }
+            .hero-actions .btn { width: 100%; }
+            .feedback-actions { flex-direction: column; }
+            .feedback-link { justify-content: center; }
         }
     </style>
 </head>
@@ -1413,7 +1432,7 @@
                     for Chia CAT tokens.
                 </h1>
                 <p class="hero-sub">
-                    Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book, requotes when price moves, snipes arb gaps, and tightens toward the safest edge, all from a Sage wallet on your own machine.
+                    Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book, requotes when price moves, snipes arb gaps, and uses side-aware adverse-selection scoring to back off when flow turns toxic, all from a Sage wallet on your own machine.
                 </p>
                 <div class="hero-actions">
                     <a href="#download" class="btn btn-primary btn-lg">
@@ -1497,7 +1516,7 @@
             <div class="pillar">
                 <div class="pillar-num">02</div>
                 <div class="pillar-title">Aware of the pool, not just the book</div>
-                <div class="pillar-body">Dynamic spreads adapt to volatility, depth, fill rate, and competitor positioning. The Arb Sniper fires probes when Dexie and TibetSwap diverge.</div>
+                <div class="pillar-body">Dynamic spreads adapt to volatility, depth, fill rate, competitor positioning, and side-aware adverse-selection pressure. The Arb Sniper fires probes when Dexie and TibetSwap diverge.</div>
             </div>
             <div class="pillar">
                 <div class="pillar-num">03</div>
@@ -1601,7 +1620,7 @@
             <div class="feature-card">
                 <div class="feature-icon">🛡️</div>
                 <div class="feature-title">Risk Controls</div>
-                <div class="feature-body">Position circuit breakers, reserve floors, mass-disappearance guard, price-shock detection, and per-side controls that keep the correcting side running.</div>
+                <div class="feature-body">Position circuit breakers, reserve floors, mass-disappearance guard, price-shock detection, and side-aware toxicity scoring that can widen or pause only the risky side.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📡</div>
