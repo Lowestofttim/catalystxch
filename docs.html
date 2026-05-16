@@ -804,13 +804,15 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows users can download the latest installer from the website's official public GitHub release link. macOS and Linux tester archives are also available from the website, but they are experimental and may not currently build or run correctly on every machine.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest Windows beta: <span data-release-name>CATalyst v1.2.31</span> (<span data-release-version>v1.2.31</span>)</div>
+                    <div class="version-name">Latest Windows beta: <span data-release-name>CATalyst v1.2.32</span> (<span data-release-version>v1.2.32</span>)</div>
                     <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Hardened public API error payloads and cleared the remaining CodeQL security alerts.</li>
-                    <li>Refreshed the app help/about content, public beta feedback prompts, and bug report links for the catalystxch/catalyst-bot repo.</li>
-                    <li>Ignored local Python virtual environments so developer workspace folders stay out of commits.</li>
+                    <li>Added the market toxicity guard so the bot can widen, pause, and recover around adverse fill pressure instead of staying exposed after sweeps.</li>
+                    <li>Improved taken-offer detection and recovery through Coinset/mempool fill attribution, Dexie stale-post repair, and startup offer requeue handling.</li>
+                    <li>Fixed Sage top-up and coin-pool recovery paths that could leave the ladder short after live fills.</li>
+                    <li>Added the in-app toxicity guard explainer so operators can see why the adverse-selection guard widened or paused offers.</li>
+                    <li>Refreshed release tooling with formatting enforcement and dependency maintenance.</li>
                 </ul>
             </div>
             <ol>

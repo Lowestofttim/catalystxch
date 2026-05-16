@@ -1425,7 +1425,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows download available - current release v1.2.31</span>
+                    <span data-release-eyebrow>Windows download available - current release v1.2.32</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -1822,7 +1822,7 @@
                         <span class="platform-name">macOS</span>
                         <span class="platform-tag experimental">Experimental</span>
                     </div>
-                    <div class="platform-note">Tester archive · <span data-release-macos-size>75.7 MB</span> · May not currently build or run correctly</div>
+                    <div class="platform-note">Tester archive · <span data-release-macos-size>75.8 MB</span> · May not currently build or run correctly</div>
                 </a>
                 <a class="platform-card is-disabled" data-download-linux aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
@@ -1830,22 +1830,24 @@
                         <span class="platform-name">Linux</span>
                         <span class="platform-tag experimental">Experimental</span>
                     </div>
-                    <div class="platform-note">Tester archive · <span data-release-linux-size>42.4 MB</span> · May not currently build or run correctly</div>
+                    <div class="platform-note">Tester archive · <span data-release-linux-size>42.5 MB</span> · May not currently build or run correctly</div>
                 </a>
             </div>
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest Windows build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.2.31</div>
-                    <div class="release-version" data-release-version>v1.2.31</div>
-                    <div class="release-meta" data-release-meta>Stable - published 14 May 2026 - windows download available</div>
+                    <div class="release-name" data-release-name>CATalyst v1.2.32</div>
+                    <div class="release-version" data-release-version>v1.2.32</div>
+                    <div class="release-meta" data-release-meta>Stable - published 16 May 2026 - windows download available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>Hardened public API error payloads and cleared the remaining CodeQL security alerts.</li>
-                        <li>Refreshed the app help/about content, public beta feedback prompts, and bug report links for the catalystxch/catalyst-bot repo.</li>
-                        <li>Ignored local Python virtual environments so developer workspace folders stay out of commits.</li>
+                        <li>Added the market toxicity guard so the bot can widen, pause, and recover around adverse fill pressure instead of staying exposed after sweeps.</li>
+                        <li>Improved taken-offer detection and recovery through Coinset/mempool fill attribution, Dexie stale-post repair, and startup offer requeue handling.</li>
+                        <li>Fixed Sage top-up and coin-pool recovery paths that could leave the ladder short after live fills.</li>
+                        <li>Added the in-app toxicity guard explainer so operators can see why the adverse-selection guard widened or paused offers.</li>
+                        <li>Refreshed release tooling with formatting enforcement and dependency maintenance.</li>
                     </ul>
                 </div>
             </div>
@@ -1871,19 +1873,19 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.31.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.32.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>cecb9a18df35951acc5ac8544712e7b6a97c5b5751fc5eb46420756e953e7eaf</div>
+                    <div class="download-detail-value" data-release-sha256>917b35dd3d6cc70f8d3b16566a0fd9ed312f31bc18e362e9ebe89f5180bfcd54</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">macOS SHA-256</div>
-                    <div class="download-detail-value" data-release-macos-sha256>e9204bf4faa955a2b695aa8bd249a5a356fed1f68eb4000e9b8874e55b13cd85</div>
+                    <div class="download-detail-value" data-release-macos-sha256>fb2dd6ff84bbfb1c36998e1d60fc2711dab28fb53a439eb8fd907016440cd0a0</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>f6fe3359b106c9b7e0e7005616f797a42f00a1bba81adb582a52824d5361f44f</div>
+                    <div class="download-detail-value" data-release-linux-sha256>7e48d86861dcab937ebdf86b9f782d52d2abd219b5c405d574a6735e46df20f7</div>
                 </div>
             </div>
             <div class="download-security">
