@@ -1,51 +1,42 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-16T19:19:22Z",
+  "generated_at": "2026-05-17T07:07:10Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.32",
-    "name": "CATalyst v1.2.32",
-    "published_at": "2026-05-16T19:15:58Z",
+    "version": "v1.2.34",
+    "name": "CATalyst v1.2.34",
+    "published_at": "2026-05-17T07:02:49Z",
     "channel": "stable",
     "release_notes": [
-      "Added the market toxicity guard so the bot can widen, pause, and recover around adverse fill pressure instead of staying exposed after sweeps.",
-      "Improved taken-offer detection and recovery through Coinset/mempool fill attribution, Dexie stale-post repair, and startup offer requeue handling.",
-      "Fixed Sage top-up and coin-pool recovery paths that could leave the ladder short after live fills.",
-      "Added the in-app toxicity guard explainer so operators can see why the adverse-selection guard widened or paused offers.",
-      "Refreshed release tooling with formatting enforcement and dependency maintenance."
+      "Fix Windows updater helper handoff"
     ],
-    "verification_notes": [
-      "python -m pytest tests -q",
-      "python -m ruff check .",
-      "Build Release workflow completed for Windows, macOS, and Linux artifacts, including packaged API, Sage RPC, and Windows installer smoke tests.",
-      "Website release metadata, release JavaScript, HTML validation, and DOM rendering checks passed for v1.2.32."
-    ],
+    "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.32.exe",
+        "name": "Catalyst-Setup-v1.2.34.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24576985,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.32/Catalyst-Setup-v1.2.32.exe",
-        "sha256": "917b35dd3d6cc70f8d3b16566a0fd9ed312f31bc18e362e9ebe89f5180bfcd54"
+        "size_bytes": 24583895,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.34/Catalyst-Setup-v1.2.34.exe",
+        "sha256": "b449b0b7da3fe451a09d0c716aa6164acb18c7f28d894d49d5b1d63b04e6753e"
       },
       {
-        "name": "Catalyst-macos-v1.2.32.zip",
+        "name": "Catalyst-macos-v1.2.34.zip",
         "platform": "macos",
         "kind": "archive",
-        "size_bytes": 79492453,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.32/Catalyst-macos-v1.2.32.zip",
-        "sha256": "fb2dd6ff84bbfb1c36998e1d60fc2711dab28fb53a439eb8fd907016440cd0a0"
+        "size_bytes": 79510059,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.34/Catalyst-macos-v1.2.34.zip",
+        "sha256": "b09a1b78258a9764d9aff4b4ae1d3a4a32ca01425c1b03e6741a799c85c3c2d2"
       },
       {
-        "name": "Catalyst-linux-v1.2.32.tar.gz",
+        "name": "Catalyst-linux-v1.2.34.tar.gz",
         "platform": "linux",
         "kind": "archive",
-        "size_bytes": 44568163,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.32/Catalyst-linux-v1.2.32.tar.gz",
-        "sha256": "7e48d86861dcab937ebdf86b9f782d52d2abd219b5c405d574a6735e46df20f7"
+        "size_bytes": 44583605,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.34/Catalyst-linux-v1.2.34.tar.gz",
+        "sha256": "4092477686c74695d1a9dc6cb0914702c40c90fc822647235194802cff1ef4e1"
       }
     ]
   }
