@@ -808,7 +808,9 @@
                     <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Fix Windows updater helper handoff</li>
+                    <li>Fixed the Windows GUI updater path that could download an update, close CATalyst, then fail to install or relaunch.</li>
+                    <li>Pinned in-app updates to the current install directory and added helper/installer diagnostics for future troubleshooting.</li>
+                    <li>Added a fallback for Windows job-object environments that reject CREATE_BREAKAWAY_FROM_JOB.</li>
                 </ul>
             </div>
             <ol>

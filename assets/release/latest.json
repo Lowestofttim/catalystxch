@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-17T07:07:10Z",
+  "generated_at": "2026-05-17T07:11:23Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
@@ -10,7 +10,9 @@
     "published_at": "2026-05-17T07:02:49Z",
     "channel": "stable",
     "release_notes": [
-      "Fix Windows updater helper handoff"
+      "Fixed the Windows GUI updater path that could download an update, close CATalyst, then fail to install or relaunch.",
+      "Pinned in-app updates to the current install directory and added helper/installer diagnostics for future troubleshooting.",
+      "Added a fallback for Windows job-object environments that reject CREATE_BREAKAWAY_FROM_JOB."
     ],
     "verification_notes": [],
     "assets": [
