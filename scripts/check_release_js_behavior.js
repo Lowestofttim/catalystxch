@@ -8,8 +8,12 @@ const RELEASE_JS = "assets/release.js";
 const metadata = JSON.parse(fs.readFileSync("assets/release/latest.json", "utf8"));
 const baseLatest = metadata.latest;
 const windowsInstaller = baseLatest.assets.find((asset) => asset.platform === "windows" && asset.kind === "installer");
-const macosArchive = baseLatest.assets.find((asset) => asset.platform === "macos" && asset.kind === "archive");
-const linuxArchive = baseLatest.assets.find((asset) => asset.platform === "linux" && asset.kind === "archive");
+const findPlatformDownload = (platform) => (
+  baseLatest.assets.find((asset) => asset.platform === platform && asset.kind === "installer") ||
+  baseLatest.assets.find((asset) => asset.platform === platform && asset.kind === "archive")
+);
+const macosDownload = findPlatformDownload("macos");
+const linuxDownload = findPlatformDownload("linux");
 
 function formatBytes(value) {
   const units = ["B", "KB", "MB", "GB"];
@@ -25,16 +29,16 @@ function formatBytes(value) {
 if (!windowsInstaller) {
   throw new Error("latest.json must contain a Windows installer asset");
 }
-if (!macosArchive || !linuxArchive) {
-  throw new Error("latest.json must contain macOS and Linux archive assets");
+if (!macosDownload || !linuxDownload) {
+  throw new Error("latest.json must contain macOS and Linux download assets");
 }
 
 const PUBLIC_URL = windowsInstaller.download_url;
 const SHA256 = windowsInstaller.sha256;
 const DOWNLOAD_NAME = windowsInstaller.name;
 const DOWNLOAD_SIZE = formatBytes(windowsInstaller.size_bytes);
-const MACOS_URL = macosArchive.download_url;
-const LINUX_URL = linuxArchive.download_url;
+const MACOS_URL = macosDownload.download_url;
+const LINUX_URL = linuxDownload.download_url;
 
 function makeTextNode(textContent = "") {
   return { textContent };
@@ -96,11 +100,11 @@ function buildDocument(link, macosLink, linuxLink) {
     ["[data-release-date]", [makeTextNode()]],
     ["[data-release-download-name]", [makeTextNode(DOWNLOAD_NAME)]],
     ["[data-release-download-size]", [makeTextNode(DOWNLOAD_SIZE)]],
-    ["[data-release-macos-size]", [makeTextNode(formatBytes(macosArchive.size_bytes))]],
-    ["[data-release-linux-size]", [makeTextNode(formatBytes(linuxArchive.size_bytes))]],
+    ["[data-release-macos-size]", [makeTextNode(formatBytes(macosDownload.size_bytes))]],
+    ["[data-release-linux-size]", [makeTextNode(formatBytes(linuxDownload.size_bytes))]],
     ["[data-release-sha256]", [makeTextNode(SHA256)]],
-    ["[data-release-macos-sha256]", [makeTextNode(macosArchive.sha256)]],
-    ["[data-release-linux-sha256]", [makeTextNode(linuxArchive.sha256)]],
+    ["[data-release-macos-sha256]", [makeTextNode(macosDownload.sha256)]],
+    ["[data-release-linux-sha256]", [makeTextNode(linuxDownload.sha256)]],
     ["[data-release-notes]", [makeListNode()]],
     ["[data-download-windows]", [link]],
     ["[data-download-macos]", [macosLink]],
@@ -171,10 +175,10 @@ async function main() {
   assert(enabled.text("[data-release-name]") === baseLatest.name, "enabled release should show the release name");
   assert(enabled.text("[data-release-version]") === baseLatest.version, "enabled release should show the release version");
   assert(enabled.text("[data-release-sha256]") === SHA256, "enabled release should show SHA-256");
-  assert(enabled.text("[data-release-macos-size]") === formatBytes(macosArchive.size_bytes), "enabled release should show macOS size");
-  assert(enabled.text("[data-release-linux-size]") === formatBytes(linuxArchive.size_bytes), "enabled release should show Linux size");
-  assert(enabled.text("[data-release-macos-sha256]") === macosArchive.sha256, "enabled release should show macOS SHA-256");
-  assert(enabled.text("[data-release-linux-sha256]") === linuxArchive.sha256, "enabled release should show Linux SHA-256");
+  assert(enabled.text("[data-release-macos-size]") === formatBytes(macosDownload.size_bytes), "enabled release should show macOS size");
+  assert(enabled.text("[data-release-linux-size]") === formatBytes(linuxDownload.size_bytes), "enabled release should show Linux size");
+  assert(enabled.text("[data-release-macos-sha256]") === macosDownload.sha256, "enabled release should show macOS SHA-256");
+  assert(enabled.text("[data-release-linux-sha256]") === linuxDownload.sha256, "enabled release should show Linux SHA-256");
 
   const disabled = await runRelease({ downloads_enabled: false, latest: baseLatest }, PUBLIC_URL);
   assert(disabled.link.href === "", "disabled release should remove stale Windows download href");

@@ -98,8 +98,15 @@ def find_windows_installer(latest: dict) -> dict | None:
     )
 
 
-def find_archive(latest: dict, platform: str) -> dict | None:
+def find_platform_download(latest: dict, platform: str) -> dict | None:
     return next(
+        (
+            asset
+            for asset in latest["assets"]
+            if asset["platform"] == platform and asset["kind"] == "installer"
+        ),
+        None,
+    ) or next(
         (
             asset
             for asset in latest["assets"]
@@ -112,8 +119,8 @@ def find_archive(latest: dict, platform: str) -> dict | None:
 def assert_release_panel(page, metadata: dict) -> None:
     latest = metadata["latest"]
     installer = find_windows_installer(latest)
-    macos = find_archive(latest, "macos")
-    linux = find_archive(latest, "linux")
+    macos = find_platform_download(latest, "macos")
+    linux = find_platform_download(latest, "linux")
     downloads_available = bool(metadata["downloads_enabled"] and installer and installer["download_url"])
 
     expect(page.locator("[data-release-eyebrow]")).to_contain_text(latest["version"])
