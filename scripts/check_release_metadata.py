@@ -166,7 +166,13 @@ def validate_metadata(data: dict) -> str:
                 fail(f"asset is missing {key}")
         platform = asset["platform"]
         kind = asset["kind"]
-        if (platform, kind) not in {("windows", "installer"), ("macos", "archive"), ("linux", "archive")}:
+        if (platform, kind) not in {
+            ("windows", "installer"),
+            ("macos", "installer"),
+            ("macos", "archive"),
+            ("linux", "installer"),
+            ("linux", "archive"),
+        }:
             fail(f"unsupported website download asset: {platform} {kind}")
         if data["downloads_enabled"]:
             expected_prefix = PUBLIC_RELEASE_URL_PREFIX if platform == "windows" else BOT_RELEASE_URL_PREFIX
@@ -193,11 +199,15 @@ def find_asset(data: dict, platform: str, kind: str) -> dict | None:
     )
 
 
+def find_platform_download(data: dict, platform: str) -> dict | None:
+    return find_asset(data, platform, "installer") or find_asset(data, platform, "archive")
+
+
 def validate_fallback_records(html_path: Path, html: str, data: dict, version: str) -> None:
     latest = data["latest"]
     asset = find_asset(data, "windows", "installer") if data["downloads_enabled"] else None
-    macos_asset = find_asset(data, "macos", "archive") if data["downloads_enabled"] else None
-    linux_asset = find_asset(data, "linux", "archive") if data["downloads_enabled"] else None
+    macos_asset = find_platform_download(data, "macos") if data["downloads_enabled"] else None
+    linux_asset = find_platform_download(data, "linux") if data["downloads_enabled"] else None
     release_date = format_date(latest.get("published_at", ""))
     status = "Windows download available" if asset else "Public links coming soon"
     channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
@@ -255,7 +265,7 @@ def validate_website_wiring(data: dict, version: str) -> None:
     if PUBLIC_RELEASE_URL_PREFIX not in release_js:
         fail("assets/release.js must allow only the public CATalyst release download host")
     if BOT_RELEASE_URL_PREFIX not in release_js:
-        fail("assets/release.js must allow only the public CATalyst bot release host for experimental archives")
+        fail("assets/release.js must allow only the public CATalyst bot release host for macOS/Linux downloads")
 
     for html_path in HTML_FILES:
         html = html_path.read_text(encoding="utf-8")

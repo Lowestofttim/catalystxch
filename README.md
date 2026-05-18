@@ -33,7 +33,7 @@ Current public Windows installers are hosted through the official CATalyst publi
 
 https://github.com/Lowestofttim/catalyst-releases/releases
 
-The website shows the current version, release notes, file size, and SHA-256 checksum next to the Windows download. Experimental macOS and Linux archives are also linked from the download panel with a clear warning that they may not currently build or run correctly. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
+The website shows the current version, release notes, file size, and SHA-256 checksum next to the download buttons. Windows uses the signed public installer channel, while macOS and Linux downloads point at the official bot release assets. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
 
 ## Report a bug
 

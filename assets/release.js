@@ -54,7 +54,10 @@
   };
 
   const findWindowsInstaller = (latest) => findAsset(latest, "windows", "installer");
-  const findExperimentalArchive = (latest, platform) => findAsset(latest, platform, "archive");
+  const findPlatformDownload = (latest, platform) => (
+    findAsset(latest, platform, "installer") ||
+    findAsset(latest, platform, "archive")
+  );
 
   const renderList = (selector, items) => {
     if (!Array.isArray(items) || !items.length) return;
@@ -109,8 +112,8 @@
     const version = latest.version;
     const releaseDate = formatDate(latest.published_at);
     const windowsInstaller = metadata.downloads_enabled ? findWindowsInstaller(latest) : null;
-    const macosArchive = metadata.downloads_enabled ? findExperimentalArchive(latest, "macos") : null;
-    const linuxArchive = metadata.downloads_enabled ? findExperimentalArchive(latest, "linux") : null;
+    const macosDownload = metadata.downloads_enabled ? findPlatformDownload(latest, "macos") : null;
+    const linuxDownload = metadata.downloads_enabled ? findPlatformDownload(latest, "linux") : null;
     const downloadsAvailable = Boolean(windowsInstaller);
     const status = downloadsAvailable ? "Windows download available" : "Public links coming soon";
     const channel = latest.channel === "prerelease" ? "Prerelease" : "Stable";
@@ -140,15 +143,15 @@
     setText("[data-release-download-name]", windowsInstaller.name);
     setText("[data-release-download-size]", size);
     setText("[data-release-sha256]", windowsInstaller.sha256);
-    setText("[data-release-macos-size]", macosArchive ? formatBytes(macosArchive.size_bytes) : "");
-    setText("[data-release-linux-size]", linuxArchive ? formatBytes(linuxArchive.size_bytes) : "");
-    setText("[data-release-macos-sha256]", macosArchive ? macosArchive.sha256 : "Not available");
-    setText("[data-release-linux-sha256]", linuxArchive ? linuxArchive.sha256 : "Not available");
+    setText("[data-release-macos-size]", macosDownload ? formatBytes(macosDownload.size_bytes) : "");
+    setText("[data-release-linux-size]", linuxDownload ? formatBytes(linuxDownload.size_bytes) : "");
+    setText("[data-release-macos-sha256]", macosDownload ? macosDownload.sha256 : "Not available");
+    setText("[data-release-linux-sha256]", linuxDownload ? linuxDownload.sha256 : "Not available");
 
     enableDownload("[data-download-windows]", windowsInstaller);
-    if (macosArchive) enableDownload("[data-download-macos]", macosArchive);
+    if (macosDownload) enableDownload("[data-download-macos]", macosDownload);
     else disableDownload("[data-download-macos]");
-    if (linuxArchive) enableDownload("[data-download-linux]", linuxArchive);
+    if (linuxDownload) enableDownload("[data-download-linux]", linuxDownload);
     else disableDownload("[data-download-linux]");
   };
 
