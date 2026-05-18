@@ -804,11 +804,15 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows, macOS, and Linux users can download the latest packaged builds from the website's official public GitHub release links.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest Windows beta: <span data-release-name>CATalyst v1.2.35</span> (<span data-release-version>v1.2.35</span>)</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.36</span> (<span data-release-version>v1.2.36</span>)</div>
                     <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Fix Smart Settings balance sizing when CAT is smaller</li>
+                    <li>Added first-class macOS and Linux desktop downloads alongside Windows.</li>
+                    <li>macOS now ships as a DMG, and Linux ships AppImage plus .deb packages.</li>
+                    <li>Packaged desktop builds seed a private user-data .env from bundled defaults, so fresh downloads do not need manual env-file setup.</li>
+                    <li>Documented the adverse-selection/toxicity guard in the README.</li>
+                    <li>Fixed ad-hoc macOS release packaging so unsigned CI builds still produce and smoke-test the DMG.</li>
                 </ul>
             </div>
             <ol>
