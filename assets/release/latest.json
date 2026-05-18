@@ -1,42 +1,57 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-17T12:58:23Z",
+  "generated_at": "2026-05-18T20:46:09Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.35",
-    "name": "CATalyst v1.2.35",
-    "published_at": "2026-05-17T12:51:10Z",
+    "version": "v1.2.36",
+    "name": "CATalyst v1.2.36",
+    "published_at": "2026-05-18T20:44:39Z",
     "channel": "stable",
     "release_notes": [
-      "Fix Smart Settings balance sizing when CAT is smaller"
+      "Added first-class macOS and Linux desktop downloads alongside Windows.",
+      "macOS now ships as a DMG, and Linux ships AppImage plus .deb packages.",
+      "Packaged desktop builds seed a private user-data .env from bundled defaults, so fresh downloads do not need manual env-file setup.",
+      "Documented the adverse-selection/toxicity guard in the README.",
+      "Fixed ad-hoc macOS release packaging so unsigned CI builds still produce and smoke-test the DMG."
     ],
-    "verification_notes": [],
+    "verification_notes": [
+      "Release workflow v1.2.36 completed successfully for Windows, macOS, and Linux.",
+      "Windows installer, macOS DMG, Linux AppImage, and Linux .deb smoke tests passed in CI."
+    ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.35.exe",
+        "name": "Catalyst-Setup-v1.2.36.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24584423,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.35/Catalyst-Setup-v1.2.35.exe",
-        "sha256": "44e383f81e99ad7c73578d52744f04237e5b9953dd5631b13b8d6313602b9159"
+        "size_bytes": 24584954,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.36/Catalyst-Setup-v1.2.36.exe",
+        "sha256": "cfd21c37eef69c9213909c03b123813a3034f261331dd4fbd4012ec1e50c0abc"
       },
       {
-        "name": "Catalyst-macos-v1.2.35.zip",
+        "name": "Catalyst-macos-v1.2.36.dmg",
         "platform": "macos",
-        "kind": "archive",
-        "size_bytes": 79510531,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.35/Catalyst-macos-v1.2.35.zip",
-        "sha256": "a2a8f3483e6b8d1784294c62fbde457daf96df783da759d002108ad1b6d7c3be"
+        "kind": "installer",
+        "size_bytes": 30229838,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.36/Catalyst-macos-v1.2.36.dmg",
+        "sha256": "a9573078f9e1f9b3252aece96885bddeabaa5ed802f6298f615addff75867e14"
       },
       {
-        "name": "Catalyst-linux-v1.2.35.tar.gz",
+        "name": "Catalyst-linux-v1.2.36-x86_64.AppImage",
         "platform": "linux",
-        "kind": "archive",
-        "size_bytes": 44587891,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.35/Catalyst-linux-v1.2.35.tar.gz",
-        "sha256": "4bf8465eeafec77c7cbfd3681908c8fb828b2e06ebb119ef1c86e452530b0f5b"
+        "kind": "installer",
+        "size_bytes": 44778688,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.36/Catalyst-linux-v1.2.36-x86_64.AppImage",
+        "sha256": "77d2b5c0a013d4c57df9b59362524ef98dcac60b2ceadabc928717717b6211c0"
+      },
+      {
+        "name": "catalyst_v1.2.36_amd64.deb",
+        "platform": "linux",
+        "kind": "installer",
+        "size_bytes": 36682146,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.36/catalyst_v1.2.36_amd64.deb",
+        "sha256": "ab647dc8c40d78f6713efeec9b22fe3142b55602989db6064ecd80350400c252"
       }
     ]
   }
