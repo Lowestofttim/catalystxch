@@ -1,57 +1,58 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-18T20:46:09Z",
+  "generated_at": "2026-05-20T18:31:21Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.36",
-    "name": "CATalyst v1.2.36",
-    "published_at": "2026-05-18T20:44:39Z",
+    "version": "v1.2.37",
+    "name": "CATalyst v1.2.37",
+    "published_at": "2026-05-20T18:27:04Z",
     "channel": "stable",
     "release_notes": [
-      "Added first-class macOS and Linux desktop downloads alongside Windows.",
-      "macOS now ships as a DMG, and Linux ships AppImage plus .deb packages.",
-      "Packaged desktop builds seed a private user-data .env from bundled defaults, so fresh downloads do not need manual env-file setup.",
-      "Documented the adverse-selection/toxicity guard in the README.",
-      "Fixed ad-hoc macOS release packaging so unsigned CI builds still produce and smoke-test the DMG."
+      "Fixed Linux desktop startup packaging by bundling the Qt WebEngine backend and exercising packaged AppImage/deb desktop startup in Ubuntu CI.",
+      "Added Linux runtime dependency coverage for Qt/XCB and desktop notifications, including notify-send detection so the app does not claim notifications are enabled when Ubuntu cannot deliver them.",
+      "Added Spacescan API-key validation diagnostics for accepted/rejected/rate-limited/server-error probes without logging the key.",
+      "Routed macOS/Linux users away from the Windows-only automatic updater and toward manual release downloads.",
+      "Made the website prefer the Ubuntu .deb package as the primary Linux download while keeping AppImage available in release assets."
     ],
     "verification_notes": [
-      "Release workflow v1.2.36 completed successfully for Windows, macOS, and Linux.",
-      "Windows installer, macOS DMG, Linux AppImage, and Linux .deb smoke tests passed in CI."
+      "PR #112 unit tests, lint/security checks, CodeQL, Semgrep, and Gitleaks passed.",
+      "Ubuntu package smoke tests cover the Linux AppImage and .deb desktop startup path.",
+      "Website release metadata and download-link behavior checks passed."
     ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.36.exe",
+        "name": "Catalyst-Setup-v1.2.37.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24584954,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.36/Catalyst-Setup-v1.2.36.exe",
-        "sha256": "cfd21c37eef69c9213909c03b123813a3034f261331dd4fbd4012ec1e50c0abc"
+        "size_bytes": 24586333,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.37/Catalyst-Setup-v1.2.37.exe",
+        "sha256": "c51f8f1d214b33b86dd64237e035bcb59d58bae8cf2d153c5beb10caa5afca6d"
       },
       {
-        "name": "Catalyst-macos-v1.2.36.dmg",
+        "name": "Catalyst-macos-v1.2.37.dmg",
         "platform": "macos",
         "kind": "installer",
-        "size_bytes": 30229838,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.36/Catalyst-macos-v1.2.36.dmg",
-        "sha256": "a9573078f9e1f9b3252aece96885bddeabaa5ed802f6298f615addff75867e14"
+        "size_bytes": 30231100,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.37/Catalyst-macos-v1.2.37.dmg",
+        "sha256": "e5472af6d4b05d7f853a71d60d1d95f6db782c737a65b2276291d648b0702ce4"
       },
       {
-        "name": "Catalyst-linux-v1.2.36-x86_64.AppImage",
+        "name": "catalyst_v1.2.37_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 44778688,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.36/Catalyst-linux-v1.2.36-x86_64.AppImage",
-        "sha256": "77d2b5c0a013d4c57df9b59362524ef98dcac60b2ceadabc928717717b6211c0"
+        "size_bytes": 194634750,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.37/catalyst_v1.2.37_amd64.deb",
+        "sha256": "4eb148b5683958f4d965af95352731b76c52d385c0b6845e16aa9b029e6233e3"
       },
       {
-        "name": "catalyst_v1.2.36_amd64.deb",
+        "name": "Catalyst-linux-v1.2.37-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 36682146,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.36/catalyst_v1.2.36_amd64.deb",
-        "sha256": "ab647dc8c40d78f6713efeec9b22fe3142b55602989db6064ecd80350400c252"
+        "size_bytes": 250422464,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.37/Catalyst-linux-v1.2.37-x86_64.AppImage",
+        "sha256": "03445adf96ae9f08b4c862ce0075c81efa2bb9c7669bdc292857bdcfddc05a9a"
       }
     ]
   }
