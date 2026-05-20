@@ -8,9 +8,25 @@ const RELEASE_JS = "assets/release.js";
 const metadata = JSON.parse(fs.readFileSync("assets/release/latest.json", "utf8"));
 const baseLatest = metadata.latest;
 const windowsInstaller = baseLatest.assets.find((asset) => asset.platform === "windows" && asset.kind === "installer");
+const platformDownloadPriority = (asset, platform) => {
+  const name = String(asset && asset.name || "").toLowerCase();
+  if (platform === "linux") {
+    if (name.endsWith(".deb")) return 0;
+    if (name.endsWith(".appimage")) return 1;
+  }
+  if (platform === "macos" && name.endsWith(".dmg")) return 0;
+  return 50;
+};
 const findPlatformDownload = (platform) => (
-  baseLatest.assets.find((asset) => asset.platform === platform && asset.kind === "installer") ||
-  baseLatest.assets.find((asset) => asset.platform === platform && asset.kind === "archive")
+  [...baseLatest.assets]
+    .filter((asset) => asset.platform === platform && asset.kind === "installer")
+    .sort((a, b) => (
+      platformDownloadPriority(a, platform) - platformDownloadPriority(b, platform) ||
+      String(a.name || "").localeCompare(String(b.name || ""))
+    ))[0] ||
+  [...baseLatest.assets]
+    .filter((asset) => asset.platform === platform && asset.kind === "archive")
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")))[0]
 );
 const macosDownload = findPlatformDownload("macos");
 const linuxDownload = findPlatformDownload("linux");
@@ -31,6 +47,9 @@ if (!windowsInstaller) {
 }
 if (!macosDownload || !linuxDownload) {
   throw new Error("latest.json must contain macOS and Linux download assets");
+}
+if (!linuxDownload.name.toLowerCase().endsWith(".deb")) {
+  throw new Error("Linux website download should prefer the .deb package");
 }
 
 const PUBLIC_URL = windowsInstaller.download_url;

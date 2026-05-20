@@ -111,7 +111,10 @@ def classify_kind(name: str) -> str:
     lower = name.lower()
     if lower.endswith((".sha256", ".sig")) or lower.endswith(".json"):
         return "asset"
-    if lower.endswith((".exe", ".msi", ".pkg", ".dmg", ".appimage", ".deb")) or "setup" in lower:
+    if (
+        lower.endswith((".exe", ".msi", ".pkg", ".dmg", ".appimage", ".deb"))
+        or "setup" in lower
+    ):
         return "installer"
     if lower.endswith((".zip", ".tar.gz", ".tgz")):
         return "archive"
@@ -127,9 +130,9 @@ def sort_asset_key(asset: dict) -> tuple[int, int, int, str]:
         format_order = 0
     elif lower.endswith(".pkg"):
         format_order = 1
-    elif lower.endswith(".appimage"):
-        format_order = 0
     elif lower.endswith(".deb"):
+        format_order = 0
+    elif lower.endswith(".appimage"):
         format_order = 1
     elif lower.endswith(".zip"):
         format_order = 10
@@ -160,7 +163,9 @@ def should_publish_asset(asset: dict, platform: str, kind: str) -> bool:
     return classify_platform(name) == platform and classify_kind(name) == kind
 
 
-def build_metadata(release: dict, repo: str, include_download_urls: bool, platform: str, kind: str) -> dict:
+def build_metadata(
+    release: dict, repo: str, include_download_urls: bool, platform: str, kind: str
+) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
         raise SystemExit("release is missing tagName")
@@ -168,7 +173,9 @@ def build_metadata(release: dict, repo: str, include_download_urls: bool, platfo
         version = f"v{version}"
 
     body = release.get("body") or ""
-    release_notes = extract_section_bullets(body, {"what s changed", "whats changed", "changes"})
+    release_notes = extract_section_bullets(
+        body, {"what s changed", "whats changed", "changes"}
+    )
     verification_notes = extract_section_bullets(body, {"verification"})
     if not release_notes:
         release_notes = fallback_notes(body)
@@ -202,7 +209,10 @@ def build_metadata(release: dict, repo: str, include_download_urls: bool, platfo
     return {
         "schema_version": 1,
         "source_repo": repo,
-        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "generated_at": datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z"),
         "downloads_enabled": downloads_enabled,
         "download_status": "available" if downloads_enabled else "coming_soon",
         "latest": {
@@ -232,9 +242,9 @@ def _platform_download_priority(item: dict) -> tuple[int, int, str]:
         format_priority = 0
     elif lower.endswith(".pkg"):
         format_priority = 1
-    elif lower.endswith(".appimage"):
-        format_priority = 0
     elif lower.endswith(".deb"):
+        format_priority = 0
+    elif lower.endswith(".appimage"):
         format_priority = 1
     elif lower.endswith(".zip"):
         format_priority = 10
@@ -243,9 +253,13 @@ def _platform_download_priority(item: dict) -> tuple[int, int, str]:
     return (kind_priority, format_priority, lower)
 
 
-def append_platform_downloads(metadata: dict, release: dict, include_download_urls: bool) -> None:
+def append_platform_downloads(
+    metadata: dict, release: dict, include_download_urls: bool
+) -> None:
     assets = metadata["latest"]["assets"]
-    assets[:] = [asset for asset in assets if asset.get("platform") not in {"macos", "linux"}]
+    assets[:] = [
+        asset for asset in assets if asset.get("platform") not in {"macos", "linux"}
+    ]
     seen = {(asset["platform"], asset["kind"], asset["name"]) for asset in assets}
     by_platform = {"macos": [], "linux": []}
     for item in release.get("assets") or []:
@@ -264,7 +278,11 @@ def append_platform_downloads(metadata: dict, release: dict, include_download_ur
             continue
         candidates.sort(key=_platform_download_priority)
         preferred_kind = classify_kind(str(candidates[0].get("name") or ""))
-        selected = [item for item in candidates if classify_kind(str(item.get("name") or "")) == preferred_kind]
+        selected = [
+            item
+            for item in candidates
+            if classify_kind(str(item.get("name") or "")) == preferred_kind
+        ]
         for item in selected:
             name = item.get("name")
             if not isinstance(name, str):
@@ -292,22 +310,42 @@ def append_platform_downloads(metadata: dict, release: dict, include_download_ur
         raise SystemExit("release is missing macOS or Linux platform download assets")
 
 
-def append_experimental_archives(metadata: dict, release: dict, include_download_urls: bool) -> None:
+def append_experimental_archives(
+    metadata: dict, release: dict, include_download_urls: bool
+) -> None:
     append_platform_downloads(metadata, release, include_download_urls)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repo", default=DEFAULT_REPO, help=f"source GitHub repo, default: {DEFAULT_REPO}")
+    parser.add_argument(
+        "--repo",
+        default=DEFAULT_REPO,
+        help=f"source GitHub repo, default: {DEFAULT_REPO}",
+    )
     parser.add_argument(
         "--experimental-repo",
         default=DEFAULT_EXPERIMENTAL_REPO,
         help=f"source GitHub repo for macOS/Linux platform downloads, default: {DEFAULT_EXPERIMENTAL_REPO}",
     )
-    parser.add_argument("--tag", default=None, help="specific release tag; omitted means latest release")
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="metadata JSON output path")
-    parser.add_argument("--platform", default="windows", choices=["windows"], help="download platform to publish")
-    parser.add_argument("--kind", default="installer", choices=["installer"], help="download asset kind to publish")
+    parser.add_argument(
+        "--tag", default=None, help="specific release tag; omitted means latest release"
+    )
+    parser.add_argument(
+        "--output", type=Path, default=DEFAULT_OUTPUT, help="metadata JSON output path"
+    )
+    parser.add_argument(
+        "--platform",
+        default="windows",
+        choices=["windows"],
+        help="download platform to publish",
+    )
+    parser.add_argument(
+        "--kind",
+        default="installer",
+        choices=["installer"],
+        help="download asset kind to publish",
+    )
     parser.add_argument(
         "--include-download-urls",
         action="store_true",
@@ -332,15 +370,23 @@ def main() -> None:
     if release.get("isDraft"):
         raise SystemExit("refusing to publish metadata for a draft release")
 
-    metadata = build_metadata(release, args.repo, args.include_download_urls, args.platform, args.kind)
+    metadata = build_metadata(
+        release, args.repo, args.include_download_urls, args.platform, args.kind
+    )
     if args.include_platform_downloads or args.include_experimental_archives:
         platform_release = run_gh(args.experimental_repo, metadata["latest"]["version"])
         if platform_release.get("isDraft"):
-            raise SystemExit("refusing to publish metadata for a draft platform release")
-        append_platform_downloads(metadata, platform_release, args.include_download_urls)
+            raise SystemExit(
+                "refusing to publish metadata for a draft platform release"
+            )
+        append_platform_downloads(
+            metadata, platform_release, args.include_download_urls
+        )
     output = args.output if args.output.is_absolute() else ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(metadata, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(metadata, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
+    )
     try:
         display_output = output.relative_to(ROOT)
     except ValueError:

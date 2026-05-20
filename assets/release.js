@@ -42,15 +42,30 @@
     return false;
   };
 
+  const platformDownloadPriority = (asset, platform) => {
+    const name = String(asset && asset.name || "").toLowerCase();
+    if (platform === "linux") {
+      if (name.endsWith(".deb")) return 0;
+      if (name.endsWith(".appimage")) return 1;
+    }
+    if (platform === "macos" && name.endsWith(".dmg")) return 0;
+    return 50;
+  };
+
   const findAsset = (latest, platform, kind) => {
     if (!Array.isArray(latest.assets)) return null;
-    return latest.assets.find((asset) => (
+    const candidates = latest.assets.filter((asset) => (
       asset &&
       asset.platform === platform &&
       asset.kind === kind &&
       isAllowedDownloadUrl(asset.download_url, platform) &&
       typeof asset.sha256 === "string"
-    )) || null;
+    ));
+    candidates.sort((a, b) => (
+      platformDownloadPriority(a, platform) - platformDownloadPriority(b, platform) ||
+      String(a.name || "").localeCompare(String(b.name || ""))
+    ));
+    return candidates[0] || null;
   };
 
   const findWindowsInstaller = (latest) => findAsset(latest, "windows", "installer");
