@@ -1425,7 +1425,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows download available - current release v1.2.36</span>
+                    <span data-release-eyebrow>Windows download available - current release v1.2.37</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -1830,24 +1830,24 @@
                         <span class="platform-name">Linux</span>
                         <span class="platform-tag tested">Package</span>
                     </div>
-                    <div class="platform-note">deb/AppImage · <span data-release-linux-size>35.0 MB</span> · opens without manual env setup</div>
+                    <div class="platform-note">deb/AppImage · <span data-release-linux-size>185.6 MB</span> · opens without manual env setup</div>
                 </a>
             </div>
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest Windows build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.2.36</div>
-                    <div class="release-version" data-release-version>v1.2.36</div>
-                    <div class="release-meta" data-release-meta>Stable - published 18 May 2026 - windows download available</div>
+                    <div class="release-name" data-release-name>CATalyst v1.2.37</div>
+                    <div class="release-version" data-release-version>v1.2.37</div>
+                    <div class="release-meta" data-release-meta>Stable - published 20 May 2026 - windows download available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>Added first-class macOS and Linux desktop downloads alongside Windows.</li>
-                        <li>macOS now ships as a DMG, and Linux ships AppImage plus .deb packages.</li>
-                        <li>Packaged desktop builds seed a private user-data .env from bundled defaults, so fresh downloads do not need manual env-file setup.</li>
-                        <li>Documented the adverse-selection/toxicity guard in the README.</li>
-                        <li>Fixed ad-hoc macOS release packaging so unsigned CI builds still produce and smoke-test the DMG.</li>
+                        <li>Fixed Linux desktop startup packaging by bundling the Qt WebEngine backend and exercising packaged AppImage/deb desktop startup in Ubuntu CI.</li>
+                        <li>Added Linux runtime dependency coverage for Qt/XCB and desktop notifications, including notify-send detection so the app does not claim notifications are enabled when Ubuntu cannot deliver them.</li>
+                        <li>Added Spacescan API-key validation diagnostics for accepted/rejected/rate-limited/server-error probes without logging the key.</li>
+                        <li>Routed macOS/Linux users away from the Windows-only automatic updater and toward manual release downloads.</li>
+                        <li>Made the website prefer the Ubuntu .deb package as the primary Linux download while keeping AppImage available in release assets.</li>
                     </ul>
                 </div>
             </div>
@@ -1873,19 +1873,19 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.36.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.37.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>cfd21c37eef69c9213909c03b123813a3034f261331dd4fbd4012ec1e50c0abc</div>
+                    <div class="download-detail-value" data-release-sha256>c51f8f1d214b33b86dd64237e035bcb59d58bae8cf2d153c5beb10caa5afca6d</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">macOS SHA-256</div>
-                    <div class="download-detail-value" data-release-macos-sha256>a9573078f9e1f9b3252aece96885bddeabaa5ed802f6298f615addff75867e14</div>
+                    <div class="download-detail-value" data-release-macos-sha256>e5472af6d4b05d7f853a71d60d1d95f6db782c737a65b2276291d648b0702ce4</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>ab647dc8c40d78f6713efeec9b22fe3142b55602989db6064ecd80350400c252</div>
+                    <div class="download-detail-value" data-release-linux-sha256>4eb148b5683958f4d965af95352731b76c52d385c0b6845e16aa9b029e6233e3</div>
                 </div>
             </div>
             <div class="download-security">
