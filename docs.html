@@ -804,10 +804,11 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows, macOS, and Linux users can download the latest packaged builds from the website's official public GitHub release links.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.37</span> (<span data-release-version>v1.2.37</span>)</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.38</span> (<span data-release-version>v1.2.38</span>)</div>
                     <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
+                    <li>Fix Linux GUI runtime sidecars.</li>
                     <li>Fixed Linux desktop startup packaging by bundling the Qt WebEngine backend and exercising packaged AppImage/deb desktop startup in Ubuntu CI.</li>
                     <li>Added Linux runtime dependency coverage for Qt/XCB and desktop notifications, including notify-send detection so the app does not claim notifications are enabled when Ubuntu cannot deliver them.</li>
                     <li>Added Spacescan API-key validation diagnostics for accepted/rejected/rate-limited/server-error probes without logging the key.</li>
