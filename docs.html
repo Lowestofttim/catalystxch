@@ -804,16 +804,13 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows, macOS, and Linux users can download the latest packaged builds from the website's official public GitHub release links.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.38</span> (<span data-release-version>v1.2.38</span>)</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.39</span> (<span data-release-version>v1.2.39</span>)</div>
                     <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Fix Linux GUI runtime sidecars.</li>
-                    <li>Fixed Linux desktop startup packaging by bundling the Qt WebEngine backend and exercising packaged AppImage/deb desktop startup in Ubuntu CI.</li>
-                    <li>Added Linux runtime dependency coverage for Qt/XCB and desktop notifications, including notify-send detection so the app does not claim notifications are enabled when Ubuntu cannot deliver them.</li>
-                    <li>Added Spacescan API-key validation diagnostics for accepted/rejected/rate-limited/server-error probes without logging the key.</li>
-                    <li>Routed macOS/Linux users away from the Windows-only automatic updater and toward manual release downloads.</li>
-                    <li>Made the website prefer the Ubuntu .deb package as the primary Linux download while keeping AppImage available in release assets.</li>
+                    <li>Fixed Ubuntu/Linux release packaging so stale build-machine runtime files are purged from release bundles before AppImage and deb packaging.</li>
+                    <li>Improved Ubuntu tray and notification startup reporting so unavailable tray/notification services are reported honestly without disabling valid D-Bus notification sessions.</li>
+                    <li>Hid Windows installer metadata from Linux/macOS update checks so non-Windows builds point users to manual release downloads.</li>
                 </ul>
             </div>
             <ol>
