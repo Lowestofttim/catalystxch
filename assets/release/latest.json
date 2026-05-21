@@ -1,50 +1,56 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-21T14:53:36Z",
+  "generated_at": "2026-05-21T18:52:28Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.38",
-    "name": "CATalyst v1.2.38",
-    "published_at": "2026-05-21T14:48:56Z",
+    "version": "v1.2.39",
+    "name": "CATalyst v1.2.39",
+    "published_at": "2026-05-21T18:48:35Z",
     "channel": "stable",
     "release_notes": [
-      "Fix Linux GUI runtime sidecars"
+      "Fixed Ubuntu/Linux release packaging so stale build-machine runtime files are purged from release bundles before AppImage and deb packaging.",
+      "Improved Ubuntu tray and notification startup reporting so unavailable tray/notification services are reported honestly without disabling valid D-Bus notification sessions.",
+      "Hid Windows installer metadata from Linux/macOS update checks so non-Windows builds point users to manual release downloads."
     ],
-    "verification_notes": [],
+    "verification_notes": [
+      "GitHub PR #114 checks passed: unit-tests, lint-and-syntax, CodeQL, Semgrep, Gitleaks, and security-scan.",
+      "Local Windows regression passed: 117 tests plus 6 subtests.",
+      "Local Windows PyInstaller build passed with python build.py --no-clean."
+    ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.38.exe",
+        "name": "Catalyst-Setup-v1.2.39.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24599463,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.38/Catalyst-Setup-v1.2.38.exe",
-        "sha256": "797a82af65223dd2d4da3b610349339f44369f634a6d93150af587a0ba76475c"
+        "size_bytes": 24597532,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.39/Catalyst-Setup-v1.2.39.exe",
+        "sha256": "2eaadc26146d0f511f4ce5bfa60bd6d58f354c9841840ca1aa0b16697bdc13df"
       },
       {
-        "name": "Catalyst-macos-v1.2.38.dmg",
+        "name": "Catalyst-macos-v1.2.39.dmg",
         "platform": "macos",
         "kind": "installer",
-        "size_bytes": 30233747,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.38/Catalyst-macos-v1.2.38.dmg",
-        "sha256": "658447bf9f397ee7c8783ba22c74ac2d192e0baa998d25ed05befd5433386305"
+        "size_bytes": 30383245,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.39/Catalyst-macos-v1.2.39.dmg",
+        "sha256": "b536b496492456daff36b6cda0570a23dd031653adc837b1295d4a6f10763ac6"
       },
       {
-        "name": "catalyst_v1.2.38_amd64.deb",
+        "name": "catalyst_v1.2.39_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 194632748,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.38/catalyst_v1.2.38_amd64.deb",
-        "sha256": "3db80bc28d6fe2005e1b3b9e69a6360ae3f4c91caa564f251daa287fe9b18429"
+        "size_bytes": 194640126,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.39/catalyst_v1.2.39_amd64.deb",
+        "sha256": "cd5307ac78aa558930f2763e41caf949a5b27dc455ffbd67877f7af1d4b32151"
       },
       {
-        "name": "Catalyst-linux-v1.2.38-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.2.39-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
         "size_bytes": 250422464,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.38/Catalyst-linux-v1.2.38-x86_64.AppImage",
-        "sha256": "86fa199894be51f4bad23983e5221122229da8e21c61098fa6a4f4c1287e3195"
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.39/Catalyst-linux-v1.2.39-x86_64.AppImage",
+        "sha256": "50b0eaa3fab0d01763e7db2817b900d265d81f1001695eb45465d122088ded5d"
       }
     ]
   }
