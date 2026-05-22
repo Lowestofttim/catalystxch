@@ -1,56 +1,57 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-21T18:52:28Z",
+  "generated_at": "2026-05-22T05:45:19Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.39",
-    "name": "CATalyst v1.2.39",
-    "published_at": "2026-05-21T18:48:35Z",
+    "version": "v1.2.40",
+    "name": "CATalyst v1.2.40",
+    "published_at": "2026-05-22T05:41:48Z",
     "channel": "stable",
     "release_notes": [
-      "Fixed Ubuntu/Linux release packaging so stale build-machine runtime files are purged from release bundles before AppImage and deb packaging.",
-      "Improved Ubuntu tray and notification startup reporting so unavailable tray/notification services are reported honestly without disabling valid D-Bus notification sessions.",
-      "Hid Windows installer metadata from Linux/macOS update checks so non-Windows builds point users to manual release downloads."
+      "Batched Dependabot dependency updates for Playwright, pytest-playwright, Ruff, and pre-commit.",
+      "Updated the Linux desktop GUI runtime to PyQt6 6.11.0.",
+      "Kept PyQt6-WebEngine aligned with PyQt6 on the same 6.11 runtime line for Linux AppImage and deb packaging."
     ],
     "verification_notes": [
-      "GitHub PR #114 checks passed: unit-tests, lint-and-syntax, CodeQL, Semgrep, Gitleaks, and security-scan.",
-      "Local Windows regression passed: 117 tests plus 6 subtests.",
-      "Local Windows PyInstaller build passed with python build.py --no-clean."
+      "Local dependency dry-runs passed for development and Linux runtime requirements.",
+      "Local Windows test/lint/compile checks passed, including the full supported tests suite.",
+      "GitHub PR checks passed for CodeQL, Semgrep, Gitleaks, lint/syntax, security scan, and unit tests.",
+      "The release workflow built and smoke-tested Windows, macOS, and Ubuntu packages, including Linux AppImage and deb desktop smoke tests."
     ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.39.exe",
+        "name": "Catalyst-Setup-v1.2.40.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24597532,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.39/Catalyst-Setup-v1.2.39.exe",
-        "sha256": "2eaadc26146d0f511f4ce5bfa60bd6d58f354c9841840ca1aa0b16697bdc13df"
+        "size_bytes": 24588999,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.40/Catalyst-Setup-v1.2.40.exe",
+        "sha256": "1d54fb387095badef34d814e9251355b7956ca887937519c8a3d96d2d15ea544"
       },
       {
-        "name": "Catalyst-macos-v1.2.39.dmg",
+        "name": "Catalyst-macos-v1.2.40.dmg",
         "platform": "macos",
         "kind": "installer",
-        "size_bytes": 30383245,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.39/Catalyst-macos-v1.2.39.dmg",
-        "sha256": "b536b496492456daff36b6cda0570a23dd031653adc837b1295d4a6f10763ac6"
+        "size_bytes": 30425077,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.40/Catalyst-macos-v1.2.40.dmg",
+        "sha256": "66c24a63b555cd42d74ab70607f8d2a5549d545a665625e8ea1327dc4cd29d73"
       },
       {
-        "name": "catalyst_v1.2.39_amd64.deb",
+        "name": "catalyst_v1.2.40_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 194640126,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.39/catalyst_v1.2.39_amd64.deb",
-        "sha256": "cd5307ac78aa558930f2763e41caf949a5b27dc455ffbd67877f7af1d4b32151"
+        "size_bytes": 194705538,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.40/catalyst_v1.2.40_amd64.deb",
+        "sha256": "34aacb5828e8fb29d7cbcaa4a9d5090173d33baba0a866e295342dae37348a57"
       },
       {
-        "name": "Catalyst-linux-v1.2.39-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.2.40-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 250422464,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.39/Catalyst-linux-v1.2.39-x86_64.AppImage",
-        "sha256": "50b0eaa3fab0d01763e7db2817b900d265d81f1001695eb45465d122088ded5d"
+        "size_bytes": 250426560,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.40/Catalyst-linux-v1.2.40-x86_64.AppImage",
+        "sha256": "d9d8c8202c65a3442b3667117be1dadac80bc4586812b5ef4608ce2c0ea5f50e"
       }
     ]
   }
