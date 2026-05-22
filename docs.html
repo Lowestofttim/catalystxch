@@ -804,13 +804,13 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows, macOS, and Linux users can download the latest packaged builds from the website's official public GitHub release links.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.39</span> (<span data-release-version>v1.2.39</span>)</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.40</span> (<span data-release-version>v1.2.40</span>)</div>
                     <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Fixed Ubuntu/Linux release packaging so stale build-machine runtime files are purged from release bundles before AppImage and deb packaging.</li>
-                    <li>Improved Ubuntu tray and notification startup reporting so unavailable tray/notification services are reported honestly without disabling valid D-Bus notification sessions.</li>
-                    <li>Hid Windows installer metadata from Linux/macOS update checks so non-Windows builds point users to manual release downloads.</li>
+                    <li>Batched Dependabot dependency updates for Playwright, pytest-playwright, Ruff, and pre-commit.</li>
+                    <li>Updated the Linux desktop GUI runtime to PyQt6 6.11.0.</li>
+                    <li>Kept PyQt6-WebEngine aligned with PyQt6 on the same 6.11 runtime line for Linux AppImage and deb packaging.</li>
                 </ul>
             </div>
             <ol>
