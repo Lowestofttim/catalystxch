@@ -1,53 +1,50 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-26T14:01:50Z",
+  "generated_at": "2026-05-26T15:38:38Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.41",
-    "name": "CATalyst v1.2.41",
-    "published_at": "2026-05-26T13:48:38Z",
+    "version": "v1.2.42",
+    "name": "CATalyst v1.2.42",
+    "published_at": "2026-05-26T15:35:22Z",
     "channel": "stable",
     "release_notes": [
-      "Smart Settings now sizes sniper probe coins from wallet balance, fill rate, daily volume, visible Dexie depth, arb gap, competitor spread, and fee-coin size instead of leaving the probe size stuck at a fixed tiny value.",
-      "Market Intel now falls back to Dexie v3 order books for low-supply or thin CAT markets where v1 filtering can hide real competitors, and the depth/slippage view now uses a more realistic 1 XCH test trade.",
-      "Low-decimal CAT handling now keeps CAT display and prep amounts above zero mojos across coin prep, sniper, fill tracking, boosts, and tier sizing.",
-      "Setup settings saved while the bot is running remain truly deferred until the next bot start; later Live setting changes no longer pull those pending Setup values into the running bot."
+      "Fix smart settings CAT budget clamp"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.41.exe",
+        "name": "Catalyst-Setup-v1.2.42.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 25016498,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.41/Catalyst-Setup-v1.2.41.exe",
-        "sha256": "4b73b6cd0e511b190e88d8858e6ba913213a0299b841c3c995aa6ced41d41e1e"
+        "size_bytes": 25017545,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.42/Catalyst-Setup-v1.2.42.exe",
+        "sha256": "8c96f097b027c5fa3458ee2d6f63280c0c4daae67cba451471e19ba156242f84"
       },
       {
-        "name": "Catalyst-macos-v1.2.41.dmg",
+        "name": "Catalyst-macos-v1.2.42.dmg",
         "platform": "macos",
         "kind": "installer",
-        "size_bytes": 30391912,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.41/Catalyst-macos-v1.2.41.dmg",
-        "sha256": "f8188ed1adc36a23a795d274872cfbcc49925860f3414d7895e262466338a75f"
+        "size_bytes": 30395348,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.42/Catalyst-macos-v1.2.42.dmg",
+        "sha256": "20a21cb4d6e97c19284915302dbbe95ed9dd3ed117bc2d66114293635ce94cad"
       },
       {
-        "name": "catalyst_v1.2.41_amd64.deb",
+        "name": "catalyst_v1.2.42_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 194666052,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.41/catalyst_v1.2.41_amd64.deb",
-        "sha256": "0d0f306be8200490b71751e2e0cdfe866d7f10e8763d01647752f1f6149ecc1f"
+        "size_bytes": 194649464,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.42/catalyst_v1.2.42_amd64.deb",
+        "sha256": "13b0dc7a970090bb5cb2fe9c79650267ce0bfcdc3ad3ca5d10a5913269eee90c"
       },
       {
-        "name": "Catalyst-linux-v1.2.41-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.2.42-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 250434752,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.41/Catalyst-linux-v1.2.41-x86_64.AppImage",
-        "sha256": "f0555b4d649b8fc25a8f9c92e348334e35114ed8441e76d193e7601c7e9e21ef"
+        "size_bytes": 250438848,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.42/Catalyst-linux-v1.2.42-x86_64.AppImage",
+        "sha256": "5115a97ac139ddcfa5924a7da03ed54cde3e4521481b27d2765e34e6416ec719"
       }
     ]
   }
