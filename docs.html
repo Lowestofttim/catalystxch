@@ -804,13 +804,14 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows, macOS, and Linux users can download the latest packaged builds from the website's official public GitHub release links.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.40</span> (<span data-release-version>v1.2.40</span>)</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.41</span> (<span data-release-version>v1.2.41</span>)</div>
                     <div class="version-state" data-release-status>Windows download available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Batched Dependabot dependency updates for Playwright, pytest-playwright, Ruff, and pre-commit.</li>
-                    <li>Updated the Linux desktop GUI runtime to PyQt6 6.11.0.</li>
-                    <li>Kept PyQt6-WebEngine aligned with PyQt6 on the same 6.11 runtime line for Linux AppImage and deb packaging.</li>
+                    <li>Smart Settings now sizes sniper probe coins from wallet balance, fill rate, daily volume, visible Dexie depth, arb gap, competitor spread, and fee-coin size instead of leaving the probe size stuck at a fixed tiny value.</li>
+                    <li>Market Intel now falls back to Dexie v3 order books for low-supply or thin CAT markets where v1 filtering can hide real competitors, and the depth/slippage view now uses a more realistic 1 XCH test trade.</li>
+                    <li>Low-decimal CAT handling now keeps CAT display and prep amounts above zero mojos across coin prep, sniper, fill tracking, boosts, and tier sizing.</li>
+                    <li>Setup settings saved while the bot is running remain truly deferred until the next bot start; later Live setting changes no longer pull those pending Setup values into the running bot.</li>
                 </ul>
             </div>
             <ol>

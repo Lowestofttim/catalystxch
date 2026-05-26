@@ -1,57 +1,53 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-22T05:45:19Z",
+  "generated_at": "2026-05-26T14:01:50Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.40",
-    "name": "CATalyst v1.2.40",
-    "published_at": "2026-05-22T05:41:48Z",
+    "version": "v1.2.41",
+    "name": "CATalyst v1.2.41",
+    "published_at": "2026-05-26T13:48:38Z",
     "channel": "stable",
     "release_notes": [
-      "Batched Dependabot dependency updates for Playwright, pytest-playwright, Ruff, and pre-commit.",
-      "Updated the Linux desktop GUI runtime to PyQt6 6.11.0.",
-      "Kept PyQt6-WebEngine aligned with PyQt6 on the same 6.11 runtime line for Linux AppImage and deb packaging."
+      "Smart Settings now sizes sniper probe coins from wallet balance, fill rate, daily volume, visible Dexie depth, arb gap, competitor spread, and fee-coin size instead of leaving the probe size stuck at a fixed tiny value.",
+      "Market Intel now falls back to Dexie v3 order books for low-supply or thin CAT markets where v1 filtering can hide real competitors, and the depth/slippage view now uses a more realistic 1 XCH test trade.",
+      "Low-decimal CAT handling now keeps CAT display and prep amounts above zero mojos across coin prep, sniper, fill tracking, boosts, and tier sizing.",
+      "Setup settings saved while the bot is running remain truly deferred until the next bot start; later Live setting changes no longer pull those pending Setup values into the running bot."
     ],
-    "verification_notes": [
-      "Local dependency dry-runs passed for development and Linux runtime requirements.",
-      "Local Windows test/lint/compile checks passed, including the full supported tests suite.",
-      "GitHub PR checks passed for CodeQL, Semgrep, Gitleaks, lint/syntax, security scan, and unit tests.",
-      "The release workflow built and smoke-tested Windows, macOS, and Ubuntu packages, including Linux AppImage and deb desktop smoke tests."
-    ],
+    "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.40.exe",
+        "name": "Catalyst-Setup-v1.2.41.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 24588999,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.40/Catalyst-Setup-v1.2.40.exe",
-        "sha256": "1d54fb387095badef34d814e9251355b7956ca887937519c8a3d96d2d15ea544"
+        "size_bytes": 25016498,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.41/Catalyst-Setup-v1.2.41.exe",
+        "sha256": "4b73b6cd0e511b190e88d8858e6ba913213a0299b841c3c995aa6ced41d41e1e"
       },
       {
-        "name": "Catalyst-macos-v1.2.40.dmg",
+        "name": "Catalyst-macos-v1.2.41.dmg",
         "platform": "macos",
         "kind": "installer",
-        "size_bytes": 30425077,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.40/Catalyst-macos-v1.2.40.dmg",
-        "sha256": "66c24a63b555cd42d74ab70607f8d2a5549d545a665625e8ea1327dc4cd29d73"
+        "size_bytes": 30391912,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.41/Catalyst-macos-v1.2.41.dmg",
+        "sha256": "f8188ed1adc36a23a795d274872cfbcc49925860f3414d7895e262466338a75f"
       },
       {
-        "name": "catalyst_v1.2.40_amd64.deb",
+        "name": "catalyst_v1.2.41_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 194705538,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.40/catalyst_v1.2.40_amd64.deb",
-        "sha256": "34aacb5828e8fb29d7cbcaa4a9d5090173d33baba0a866e295342dae37348a57"
+        "size_bytes": 194666052,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.41/catalyst_v1.2.41_amd64.deb",
+        "sha256": "0d0f306be8200490b71751e2e0cdfe866d7f10e8763d01647752f1f6149ecc1f"
       },
       {
-        "name": "Catalyst-linux-v1.2.40-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.2.41-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 250426560,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.40/Catalyst-linux-v1.2.40-x86_64.AppImage",
-        "sha256": "d9d8c8202c65a3442b3667117be1dadac80bc4586812b5ef4608ce2c0ea5f50e"
+        "size_bytes": 250434752,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.41/Catalyst-linux-v1.2.41-x86_64.AppImage",
+        "sha256": "f0555b4d649b8fc25a8f9c92e348334e35114ed8441e76d193e7601c7e9e21ef"
       }
     ]
   }
