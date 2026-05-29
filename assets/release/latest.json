@@ -1,50 +1,52 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-05-26T15:38:38Z",
+  "generated_at": "2026-05-29T21:44:49Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.42",
-    "name": "CATalyst v1.2.42",
-    "published_at": "2026-05-26T15:35:22Z",
+    "version": "v1.2.43",
+    "name": "CATalyst v1.2.43",
+    "published_at": "2026-05-29T21:42:38Z",
     "channel": "stable",
     "release_notes": [
-      "Fix smart settings CAT budget clamp"
+      "Quiet dashboard guidance noise",
+      "Update Ruff development tooling to 0.15.15",
+      "Fix Linux packaged desktop network access"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.42.exe",
+        "name": "Catalyst-Setup-v1.2.43.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 25017545,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.42/Catalyst-Setup-v1.2.42.exe",
-        "sha256": "8c96f097b027c5fa3458ee2d6f63280c0c4daae67cba451471e19ba156242f84"
+        "size_bytes": 24997424,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.43/Catalyst-Setup-v1.2.43.exe",
+        "sha256": "406f2d36b34c78d45632f1f3c4fe03e6b0d83e46564fced7a171db6a8b28cfd3"
       },
       {
-        "name": "Catalyst-macos-v1.2.42.dmg",
+        "name": "Catalyst-macos-v1.2.43.dmg",
         "platform": "macos",
         "kind": "installer",
-        "size_bytes": 30395348,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.42/Catalyst-macos-v1.2.42.dmg",
-        "sha256": "20a21cb4d6e97c19284915302dbbe95ed9dd3ed117bc2d66114293635ce94cad"
+        "size_bytes": 30342954,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.43/Catalyst-macos-v1.2.43.dmg",
+        "sha256": "7d78e860914167b3fa10ac1e0e910bd199bed1f5172dabd11708c21dcb4fb7a2"
       },
       {
-        "name": "catalyst_v1.2.42_amd64.deb",
+        "name": "catalyst_v1.2.43_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 194649464,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.42/catalyst_v1.2.42_amd64.deb",
-        "sha256": "13b0dc7a970090bb5cb2fe9c79650267ce0bfcdc3ad3ca5d10a5913269eee90c"
+        "size_bytes": 194630330,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.43/catalyst_v1.2.43_amd64.deb",
+        "sha256": "cf60c4cd9d1708d4aa92cb6a271a324bc60261dbfd0cbab876cce7de9393ac41"
       },
       {
-        "name": "Catalyst-linux-v1.2.42-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.2.43-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 250438848,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.42/Catalyst-linux-v1.2.42-x86_64.AppImage",
-        "sha256": "5115a97ac139ddcfa5924a7da03ed54cde3e4521481b27d2765e34e6416ec719"
+        "size_bytes": 250414272,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.43/Catalyst-linux-v1.2.43-x86_64.AppImage",
+        "sha256": "e3ddd939083bba5ce9dcd84d177493644cb39d3bec42bf5037eea96af401cc07"
       }
     ]
   }
