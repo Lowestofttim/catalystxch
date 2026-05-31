@@ -1596,7 +1596,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows download available - current release v1.2.43</span>
+                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.2.44</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -1977,8 +1977,8 @@
             <div class="req-item">
                 <div class="req-icon">🖥️</div>
                 <div>
-                    <div class="req-name">Windows 10 or 11</div>
-                    <div class="req-detail">64-bit packaged builds · Sage RPC enabled</div>
+                    <div class="req-name">Windows, Linux, or Mac source</div>
+                    <div class="req-detail">Packaged builds where published · Sage RPC enabled</div>
                 </div>
             </div>
             <div class="req-item">
@@ -2018,7 +2018,7 @@
         <div class="download-wrap">
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
             <div class="download-title">Download CATalyst</div>
-            <p class="download-sub">Windows uses the signed public installer channel. macOS and Linux downloads are published from the same release workflow, with checksums shown below.</p>
+            <p class="download-sub">Windows uses the signed public installer channel, Linux packages come from GitHub Releases, and Mac users can run from the source repo.</p>
             <div class="platforms">
                 <a class="platform-card is-primary is-disabled" data-download-windows aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
@@ -2028,13 +2028,13 @@
                     </div>
                     <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>23.8 MB</span></div>
                 </a>
-                <a class="platform-card is-disabled" data-download-macos aria-disabled="true" tabindex="-1">
+                <a class="platform-card" data-download-macos href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">
                     <div class="platform-row">
                         <span class="platform-icon">🍎</span>
                         <span class="platform-name">macOS</span>
-                        <span class="platform-tag tested">DMG</span>
+                        <span class="platform-tag tested">Source</span>
                     </div>
-                    <div class="platform-note">macOS app bundle · <span data-release-macos-size>28.9 MB</span> · opens without manual env setup</div>
+                    <div class="platform-note">Run from GitHub source · <span data-release-macos-size>GitHub source</span> · no signed/notarized installer yet</div>
                 </a>
                 <a class="platform-card is-disabled" data-download-linux aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
@@ -2047,22 +2047,22 @@
             </div>
             <div class="release-status">
                 <div class="release-card">
-                    <div class="release-label">Latest Windows build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.2.43</div>
-                    <div class="release-version" data-release-version>v1.2.43</div>
-                    <div class="release-meta" data-release-meta>Stable - published 29 May 2026 - windows download available</div>
+                    <div class="release-label">Latest packaged build</div>
+                    <div class="release-name" data-release-name>CATalyst v1.2.44</div>
+                    <div class="release-version" data-release-version>v1.2.44</div>
+                    <div class="release-meta" data-release-meta>Stable - published 31 May 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>Quiet dashboard guidance noise</li>
-                        <li>Update Ruff development tooling to 0.15.15</li>
-                        <li>Fix Linux packaged desktop network access</li>
+                        <li>Fix startup probes and wallet sync warning noise.</li>
+                        <li>Publish current Windows and Linux packages for v1.2.44.</li>
+                        <li>Document Mac source-only setup from the GitHub bot repo while no signed/notarized Mac installer or DMG is published.</li>
                     </ul>
                 </div>
             </div>
             <p class="download-note">
-                Use small amounts while testing any beta build. Each public download is served from GitHub Releases and includes a visible SHA-256 checksum.
+                Use small amounts while testing any beta build. Each packaged public download is served from GitHub Releases and includes a visible SHA-256 checksum.
             </p>
             <div class="download-feedback" role="note" aria-labelledby="download-feedback-title">
                 <div class="download-security-title" id="download-feedback-title">Beta testers wanted</div>
@@ -2074,7 +2074,7 @@
             </div>
             <div class="download-feedback" role="note" aria-labelledby="download-dev-title">
                 <div class="download-security-title" id="download-dev-title">Developers wanted</div>
-                <p>CATalyst is now public. Developers who want to improve wallet handling, macOS/Linux packaging, trading safety, docs, tests, or UI polish should work from the bot repository and open pull requests there.</p>
+                <p>CATalyst is now public. Developers who want to improve wallet handling, Linux packaging, Mac source setup, trading safety, docs, tests, or UI polish should work from the bot repository and open pull requests there.</p>
                 <div class="feedback-actions">
                     <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">Visit the bot repo</a>
                     <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot/pulls" target="_blank" rel="noopener">Open a pull request</a>
@@ -2083,19 +2083,19 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.43.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.2.44.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>406f2d36b34c78d45632f1f3c4fe03e6b0d83e46564fced7a171db6a8b28cfd3</div>
+                    <div class="download-detail-value" data-release-sha256>99af14968fb645189b00fb9daed01901b3833dbbb832f8972247a94ad7a469b6</div>
                 </div>
                 <div class="download-detail">
-                    <div class="download-detail-label">macOS SHA-256</div>
-                    <div class="download-detail-value" data-release-macos-sha256>7d78e860914167b3fa10ac1e0e910bd199bed1f5172dabd11708c21dcb4fb7a2</div>
+                    <div class="download-detail-label">macOS package</div>
+                    <div class="download-detail-value" data-release-macos-sha256>Source only from GitHub</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>cf60c4cd9d1708d4aa92cb6a271a324bc60261dbfd0cbab876cce7de9393ac41</div>
+                    <div class="download-detail-value" data-release-linux-sha256>edfd6c9e9ede8638a23d81d94286cb125da4aa51c50cb2aec468670909b53354</div>
                 </div>
             </div>
             <div class="download-security">

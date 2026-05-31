@@ -261,14 +261,14 @@ def append_platform_downloads(
         asset for asset in assets if asset.get("platform") not in {"macos", "linux"}
     ]
     seen = {(asset["platform"], asset["kind"], asset["name"]) for asset in assets}
-    by_platform = {"macos": [], "linux": []}
+    by_platform = {"linux": []}
     for item in release.get("assets") or []:
         name = item.get("name")
         if not isinstance(name, str):
             continue
         platform = classify_platform(name)
         kind = classify_kind(name)
-        if platform not in {"macos", "linux"} or kind not in {"installer", "archive"}:
+        if platform != "linux" or kind not in {"installer", "archive"}:
             continue
         by_platform[platform].append(item)
 
@@ -306,8 +306,8 @@ def append_platform_downloads(
             )
             appended_platforms.add(platform)
     assets.sort(key=sort_asset_key)
-    if appended_platforms != {"macos", "linux"}:
-        raise SystemExit("release is missing macOS or Linux platform download assets")
+    if appended_platforms != {"linux"}:
+        raise SystemExit("release is missing Linux platform download assets")
 
 
 def append_experimental_archives(
@@ -326,7 +326,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--experimental-repo",
         default=DEFAULT_EXPERIMENTAL_REPO,
-        help=f"source GitHub repo for macOS/Linux platform downloads, default: {DEFAULT_EXPERIMENTAL_REPO}",
+        help=f"source GitHub repo for Linux platform downloads, default: {DEFAULT_EXPERIMENTAL_REPO}",
     )
     parser.add_argument(
         "--tag", default=None, help="specific release tag; omitted means latest release"
@@ -359,7 +359,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--include-platform-downloads",
         action="store_true",
-        help="include first-class macOS/Linux platform downloads from --experimental-repo, falling back to archives when needed",
+        help="include first-class Linux platform downloads from --experimental-repo, falling back to archives when needed",
     )
     return parser.parse_args()
 
