@@ -150,17 +150,37 @@ function buildDocument(link, macosLink, linuxLink) {
 }
 
 async function runRelease(metadata, initialHref = "") {
+  return runReleaseSequence([metadata], initialHref);
+}
+
+async function runReleaseSequence(metadataResponses, initialHref = "") {
   const code = fs.readFileSync(RELEASE_JS, "utf8");
   const link = makeLinkNode(initialHref);
   const macosLink = makeLinkNode(initialHref);
   const linuxLink = makeLinkNode(initialHref);
   const { document, nodes } = buildDocument(link, macosLink, linuxLink);
+  const windowEventHandlers = new Map();
+  const documentEventHandlers = new Map();
+  let fetchCount = 0;
+  document.visibilityState = "visible";
+  document.addEventListener = (name, handler) => {
+    documentEventHandlers.set(name, handler);
+  };
   const context = {
     console,
     document,
+    window: {
+      addEventListener(name, handler) {
+        windowEventHandlers.set(name, handler);
+      }
+    },
     fetch: async (url) => ({
       ok: url === "assets/release/latest.json",
-      json: async () => metadata
+      json: async () => {
+        const index = Math.min(fetchCount, metadataResponses.length - 1);
+        fetchCount += 1;
+        return metadataResponses[index];
+      }
     })
   };
 
@@ -172,6 +192,24 @@ async function runRelease(metadata, initialHref = "") {
     macosLink,
     linuxLink,
     nodes,
+    async dispatchWindowEvent(name, event = {}) {
+      const handler = windowEventHandlers.get(name);
+      if (!handler) throw new Error(`${name} handler should be registered`);
+      handler(event);
+      await new Promise((resolve) => setImmediate(resolve));
+    },
+    async dispatchDocumentEvent(name, event = {}) {
+      const handler = documentEventHandlers.get(name);
+      if (!handler) throw new Error(`${name} handler should be registered`);
+      handler(event);
+      await new Promise((resolve) => setImmediate(resolve));
+    },
+    setVisibilityState(value) {
+      document.visibilityState = value;
+    },
+    get fetchCount() {
+      return fetchCount;
+    },
     text(selector) {
       return nodes.get(selector)[0].textContent;
     }
@@ -231,6 +269,34 @@ async function main() {
   assert(guardFailure.link.href === "", "guard failure should remove stale Windows download href");
   assert(guardFailure.link.attrs.get("aria-disabled") === "true", "guard failure should mark the link disabled");
   assert(guardFailure.text("[data-release-sha256]") === "Not available", "guard failure should reset SHA-256 detail");
+
+  const staleLatest = {
+    version: "v1.2.6",
+    name: "CATalyst v1.2.6",
+    published_at: "2026-01-01T00:00:00Z",
+    channel: "stable",
+    release_notes: ["Old cached release fallback"],
+    assets: []
+  };
+  const restored = await runReleaseSequence([
+    { downloads_enabled: false, latest: staleLatest },
+    { downloads_enabled: true, latest: baseLatest }
+  ]);
+  assert(restored.text("[data-release-version]") === "v1.2.6", "stale restored page should start on the old version");
+  await restored.dispatchWindowEvent("pageshow", { persisted: true });
+  assert(restored.fetchCount === 2, "pageshow restore should refetch release metadata");
+  assert(restored.text("[data-release-version]") === baseLatest.version, "pageshow restore should replace the stale version");
+  assert(restored.link.href === PUBLIC_URL, "pageshow restore should re-enable the current Windows download");
+
+  const visibleAgain = await runReleaseSequence([
+    { downloads_enabled: false, latest: staleLatest },
+    { downloads_enabled: true, latest: baseLatest }
+  ]);
+  assert(visibleAgain.text("[data-release-version]") === "v1.2.6", "backgrounded page should start on the old version");
+  visibleAgain.setVisibilityState("visible");
+  await visibleAgain.dispatchDocumentEvent("visibilitychange");
+  assert(visibleAgain.fetchCount === 2, "visible tab should refetch release metadata");
+  assert(visibleAgain.text("[data-release-version]") === baseLatest.version, "visible tab should replace the stale version");
 
   console.log("release.js behavior check passed");
 }

@@ -333,8 +333,8 @@ def validate_website_wiring(data: dict, version: str) -> None:
     for html_path in HTML_FILES:
         html = html_path.read_text(encoding="utf-8")
         rel = html_path.relative_to(ROOT)
-        if 'src="assets/release.js"' not in html:
-            fail(f"{rel} must load assets/release.js")
+        if not re.search(r'src="assets/release\.js\?v=[^"]+"', html):
+            fail(f"{rel} must load a cache-busted assets/release.js")
         if "data-release-version" not in html:
             fail(f"{rel} must contain data-release-version hooks")
         if html_path.name == "index.html" and "data-download-windows" not in html:
