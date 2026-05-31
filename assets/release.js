@@ -1,5 +1,6 @@
 (() => {
   const METADATA_URL = "assets/release/latest.json";
+  const MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot";
 
   const setText = (selector, value) => {
     if (value === undefined || value === null) return;
@@ -36,7 +37,7 @@
     if (platform === "windows") {
       return value.startsWith("https://github.com/Lowestofttim/catalyst-releases/releases/download/");
     }
-    if (platform === "macos" || platform === "linux") {
+    if (platform === "linux") {
       return value.startsWith("https://github.com/catalystxch/catalyst-bot/releases/download/");
     }
     return false;
@@ -48,7 +49,6 @@
       if (name.endsWith(".deb")) return 0;
       if (name.endsWith(".appimage")) return 1;
     }
-    if (platform === "macos" && name.endsWith(".dmg")) return 0;
     return 50;
   };
 
@@ -109,13 +109,24 @@
     });
   };
 
+  const enableMacSourceLink = () => {
+    setText("[data-release-macos-size]", "GitHub source");
+    setText("[data-release-macos-sha256]", "Source only from GitHub");
+    document.querySelectorAll("[data-download-macos]").forEach((link) => {
+      link.setAttribute("href", MAC_SOURCE_URL);
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener");
+      link.removeAttribute("aria-disabled");
+      link.removeAttribute("tabindex");
+      link.classList.remove("is-disabled");
+    });
+  };
+
   const disableWindowsDownload = () => {
     setText("[data-release-download-name]", "Not available");
     setText("[data-release-download-size]", "");
     setText("[data-release-sha256]", "Not available");
-    setText("[data-release-macos-size]", "");
     setText("[data-release-linux-size]", "");
-    setText("[data-release-macos-sha256]", "Not available");
     setText("[data-release-linux-sha256]", "Not available");
     disableDownload("[data-download-windows]");
   };
@@ -127,10 +138,11 @@
     const version = latest.version;
     const releaseDate = formatDate(latest.published_at);
     const windowsInstaller = metadata.downloads_enabled ? findWindowsInstaller(latest) : null;
-    const macosDownload = metadata.downloads_enabled ? findPlatformDownload(latest, "macos") : null;
     const linuxDownload = metadata.downloads_enabled ? findPlatformDownload(latest, "linux") : null;
     const downloadsAvailable = Boolean(windowsInstaller);
-    const status = downloadsAvailable ? "Windows download available" : "Public links coming soon";
+    const status = downloadsAvailable
+      ? (linuxDownload ? "Windows/Linux downloads available" : "Windows download available")
+      : "Public links coming soon";
     const channel = latest.channel === "prerelease" ? "Prerelease" : "Stable";
     const meta = releaseDate
       ? `${channel} - published ${releaseDate} - ${status.toLowerCase()}`
@@ -142,14 +154,14 @@
     setText("[data-release-meta]", meta);
     setText(
       "[data-release-eyebrow]",
-      downloadsAvailable ? `Windows download available - current release ${version}` : `Public downloads coming soon - current beta ${version}`
+      downloadsAvailable ? `${status} - current release ${version}` : `Public downloads coming soon - current beta ${version}`
     );
     setText("[data-release-date]", releaseDate ? `Released ${releaseDate}` : "");
     renderList("[data-release-notes]", latest.release_notes);
+    enableMacSourceLink();
 
     if (!downloadsAvailable) {
       disableWindowsDownload();
-      disableDownload("[data-download-macos]");
       disableDownload("[data-download-linux]");
       return;
     }
@@ -158,14 +170,10 @@
     setText("[data-release-download-name]", windowsInstaller.name);
     setText("[data-release-download-size]", size);
     setText("[data-release-sha256]", windowsInstaller.sha256);
-    setText("[data-release-macos-size]", macosDownload ? formatBytes(macosDownload.size_bytes) : "");
     setText("[data-release-linux-size]", linuxDownload ? formatBytes(linuxDownload.size_bytes) : "");
-    setText("[data-release-macos-sha256]", macosDownload ? macosDownload.sha256 : "Not available");
     setText("[data-release-linux-sha256]", linuxDownload ? linuxDownload.sha256 : "Not available");
 
     enableDownload("[data-download-windows]", windowsInstaller);
-    if (macosDownload) enableDownload("[data-download-macos]", macosDownload);
-    else disableDownload("[data-download-macos]");
     if (linuxDownload) enableDownload("[data-download-linux]", linuxDownload);
     else disableDownload("[data-download-linux]");
   };

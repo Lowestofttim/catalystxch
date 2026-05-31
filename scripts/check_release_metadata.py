@@ -22,6 +22,7 @@ PUBLIC_RELEASE_URL_PREFIX = (
 BOT_RELEASE_URL_PREFIX = (
     "https://github.com/catalystxch/catalyst-bot/releases/download/"
 )
+MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
 DATA_RELEASE_ATTRS = {
     "data-release-download-name",
     "data-release-download-size",
@@ -181,10 +182,10 @@ def validate_metadata(data: dict) -> str:
                 fail(f"asset is missing {key}")
         platform = asset["platform"]
         kind = asset["kind"]
+        if platform == "macos":
+            fail("website metadata must not expose macOS package download assets")
         if (platform, kind) not in {
             ("windows", "installer"),
-            ("macos", "installer"),
-            ("macos", "archive"),
             ("linux", "installer"),
             ("linux", "archive"),
         }:
@@ -219,8 +220,6 @@ def platform_download_priority(asset: dict, platform: str) -> tuple[int, str]:
             return (0, name)
         if name.endswith(".appimage"):
             return (1, name)
-    if platform == "macos" and name.endswith(".dmg"):
-        return (0, name)
     return (50, name)
 
 
@@ -247,14 +246,16 @@ def validate_fallback_records(
     asset = (
         find_asset(data, "windows", "installer") if data["downloads_enabled"] else None
     )
-    macos_asset = (
-        find_platform_download(data, "macos") if data["downloads_enabled"] else None
-    )
     linux_asset = (
         find_platform_download(data, "linux") if data["downloads_enabled"] else None
     )
     release_date = format_date(latest.get("published_at", ""))
-    status = "Windows download available" if asset else "Public links coming soon"
+    if asset and linux_asset:
+        status = "Windows/Linux downloads available"
+    elif asset:
+        status = "Windows download available"
+    else:
+        status = "Public links coming soon"
     channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
     meta = (
         f"{channel} - published {release_date} - {status.lower()}"
@@ -267,7 +268,7 @@ def validate_fallback_records(
         "data-release-status": status,
         "data-release-meta": meta,
         "data-release-eyebrow": (
-            f"Windows download available - current release {version}"
+            f"{status} - current release {version}"
             if asset
             else f"Public downloads coming soon - current beta {version}"
         ),
@@ -276,15 +277,11 @@ def validate_fallback_records(
         if asset
         else "",
         "data-release-sha256": asset["sha256"] if asset else "Not available",
-        "data-release-macos-size": format_bytes(macos_asset["size_bytes"])
-        if macos_asset
-        else "",
+        "data-release-macos-size": "GitHub source",
         "data-release-linux-size": format_bytes(linux_asset["size_bytes"])
         if linux_asset
         else "",
-        "data-release-macos-sha256": macos_asset["sha256"]
-        if macos_asset
-        else "Not available",
+        "data-release-macos-sha256": "Source only from GitHub",
         "data-release-linux-sha256": linux_asset["sha256"]
         if linux_asset
         else "Not available",
@@ -321,14 +318,16 @@ def validate_website_wiring(data: dict, version: str) -> None:
         "data-download-macos" not in release_js
         or "data-download-linux" not in release_js
     ):
-        fail("assets/release.js must wire macOS and Linux download buttons")
+        fail("assets/release.js must wire macOS source and Linux download buttons")
+    if MAC_SOURCE_URL not in release_js:
+        fail("assets/release.js must keep macOS pointed at the source repo")
     if PUBLIC_RELEASE_URL_PREFIX not in release_js:
         fail(
             "assets/release.js must allow only the public CATalyst release download host"
         )
     if BOT_RELEASE_URL_PREFIX not in release_js:
         fail(
-            "assets/release.js must allow only the public CATalyst bot release host for macOS/Linux downloads"
+            "assets/release.js must allow only the public CATalyst bot release host for Linux downloads"
         )
 
     for html_path in HTML_FILES:
@@ -343,12 +342,10 @@ def validate_website_wiring(data: dict, version: str) -> None:
         if html_path.name == "index.html" and (
             "data-download-macos" not in html or "data-download-linux" not in html
         ):
-            fail("index.html must contain macOS and Linux download link hooks")
-        for attr in (
-            "data-download-windows",
-            "data-download-macos",
-            "data-download-linux",
-        ):
+            fail("index.html must contain macOS source and Linux download link hooks")
+        if html_path.name == "index.html" and MAC_SOURCE_URL not in html:
+            fail("index.html must link macOS users to the source repo")
+        for attr in ("data-download-windows", "data-download-linux"):
             if html_path.name == "index.html" and re.search(
                 rf"<a\b[^>]*{attr}[^>]*\bhref=", html
             ):

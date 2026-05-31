@@ -801,20 +801,20 @@
         <section class="docs-section" id="getting-started">
             <div class="section-meta">02 · GETTING STARTED</div>
             <h2>Welcome, here's how to get started.</h2>
-            <p>The bot is designed to work out of the box once Sage is running. Windows, macOS, and Linux users can download the latest packaged builds from the website's official public GitHub release links.</p>
+            <p>The bot is designed to work out of the box once Sage is running. Windows and Linux users can download the latest packaged builds from the website's official public GitHub release links. Mac users can run from the GitHub source repo; a signed/notarized Mac installer or DMG is not currently published.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.43</span> (<span data-release-version>v1.2.43</span>)</div>
-                    <div class="version-state" data-release-status>Windows download available</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.2.44</span> (<span data-release-version>v1.2.44</span>)</div>
+                    <div class="version-state" data-release-status>Windows/Linux downloads available</div>
                 </div>
                 <ul class="version-list" data-release-notes>
-                    <li>Quiet dashboard guidance noise</li>
-                    <li>Update Ruff development tooling to 0.15.15</li>
-                    <li>Fix Linux packaged desktop network access</li>
+                    <li>Fix startup probes and wallet sync warning noise.</li>
+                    <li>Publish current Windows and Linux packages for v1.2.44.</li>
+                    <li>Document Mac source-only setup from the GitHub bot repo while no signed/notarized Mac installer or DMG is published.</li>
                 </ul>
             </div>
             <ol>
-                <li><strong>Install CATalyst</strong>. Use the website download for your operating system. Windows uses an installer, macOS uses a DMG, and Linux offers AppImage/deb packages. The files are hosted by GitHub Releases and include visible SHA-256 checksums.</li>
+                <li><strong>Install CATalyst</strong>. Use the website download for Windows or Linux. Windows uses an installer and Linux offers AppImage/deb packages. Mac users should use the GitHub source repo for now; no signed/notarized Mac installer or DMG is currently published.</li>
                 <li><strong>Make sure Sage is running</strong>. Open Sage Wallet and enable RPC in Sage Settings -&gt; Advanced. CATalyst talks to Sage on port 9257.</li>
                 <li><strong>Select a signing wallet</strong>. Use a normal signing fingerprint, not a watch-only key, so the app can create, cancel, and replace offers.</li>
                 <li><strong>Pick your trading pair</strong>. Use Quick Start on the dashboard to choose the CAT token you want to trade against XCH.</li>
@@ -829,7 +829,7 @@
             <p><strong>Live vs Setup</strong>. Settings has two sub-tabs. <em>Live</em> holds the hot-reloadable tweaks (spread slider, skew, feature toggles) and is safe to touch while the bot is running. <em>Setup</em> holds the full configuration; saved changes apply on next restart when the bot is live.</p>
             <p><strong>Guidance + Activity</strong>. Once running, the two panels below the info cards show what to act on (Guidance) and what the bot is doing right now (Activity). Anything with a button goes to Guidance; informational notes sit below the same card.</p>
             <p><strong>Command Centre</strong>. The three-panel summary further down shows your settings, market health, and wallet performance at a glance. Hover over any <strong>?</strong> icon for an explanation.</p>
-            <p><strong>Developers welcome</strong>. CATalyst is public, and improvements should go through the <a class="text-link" href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">bot repository</a>. Packaging help for macOS/Linux, wallet safety reviews, tests, docs, and UI fixes are especially useful during beta.</p>
+            <p><strong>Developers welcome</strong>. CATalyst is public, and improvements should go through the <a class="text-link" href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">bot repository</a>. Packaging help for Linux, Mac source setup, wallet safety reviews, tests, docs, and UI fixes are especially useful during beta.</p>
         </section>
 
         <!-- 3. Dashboard -->
