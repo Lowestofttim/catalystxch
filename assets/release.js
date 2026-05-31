@@ -193,4 +193,14 @@
   } else {
     loadMetadata();
   }
+  if (typeof window !== "undefined" && window.addEventListener) {
+    window.addEventListener("pageshow", (event) => {
+      if (event && event.persisted) loadMetadata();
+    });
+  }
+  if (document.addEventListener) {
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") loadMetadata();
+    });
+  }
 })();
