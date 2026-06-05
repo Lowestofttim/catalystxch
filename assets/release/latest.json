@@ -1,42 +1,42 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-06-04T12:19:01Z",
+  "generated_at": "2026-06-05T14:04:54Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.45",
-    "name": "CATalyst v1.2.45",
-    "published_at": "2026-06-04T12:12:41Z",
+    "version": "v1.2.46",
+    "name": "CATalyst v1.2.46",
+    "published_at": "2026-06-05T14:01:00Z",
     "channel": "stable",
     "release_notes": [
-      "Add PC diagnostics to debug bundle"
+      "Fix Sage mempool conflicts and market graph"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.45.exe",
+        "name": "Catalyst-Setup-v1.2.46.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 25008892,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.45/Catalyst-Setup-v1.2.45.exe",
-        "sha256": "b8422fe094711498482887d994e65d9ff599ddc5a815ef344db4de26f6bda990"
+        "size_bytes": 25015921,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.46/Catalyst-Setup-v1.2.46.exe",
+        "sha256": "b8b67e13f52ac7d8c1271b4cb855eda54652ff77ffc73e805cd0c76431b079b2"
       },
       {
-        "name": "catalyst_v1.2.45_amd64.deb",
+        "name": "catalyst_v1.2.46_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 194670832,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.45/catalyst_v1.2.45_amd64.deb",
-        "sha256": "1d7ead6e14bdf6250ae20b1d9cde91d1846f0fa96e87ec5fe046cd9b4609662d"
+        "size_bytes": 194673064,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.46/catalyst_v1.2.46_amd64.deb",
+        "sha256": "7bca7ff4d32be5e385a9a6830472e72692a5cbafdff25f74b03ae68cfa170c7e"
       },
       {
-        "name": "Catalyst-linux-v1.2.45-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.2.46-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 250426560,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.45/Catalyst-linux-v1.2.45-x86_64.AppImage",
-        "sha256": "53f3e75fb763cd0239dcbcab1465721f1344245d599654b48ed523f086752347"
+        "size_bytes": 250434752,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.46/Catalyst-linux-v1.2.46-x86_64.AppImage",
+        "sha256": "5449ec91b04e4c0f79cdf5e53c58a867a4242264e0c3224c01995c223aebebfa"
       }
     ]
   }
