@@ -1,44 +1,42 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-06-14T13:38:35Z",
+  "generated_at": "2026-06-15T22:03:12Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.2.48",
-    "name": "CATalyst v1.2.48",
-    "published_at": "2026-06-14T13:35:04Z",
+    "version": "v1.2.51",
+    "name": "CATalyst v1.2.51",
+    "published_at": "2026-06-15T22:00:10Z",
     "channel": "stable",
     "release_notes": [
-      "chore(deps-dev): update ruff requirement from <1,>=0.15.15 to >=0.15.17,<1 by @dependabot[bot]",
-      "chore(deps): update cryptography requirement from <49,>=48.0.0 to >=48.0.1,<49 by @dependabot[bot]",
-      "chore(deps-dev): update pip-audit requirement from <3,>=2.10 to >=2.10.1,<3 by @dependabot[bot]"
+      "Wait for Linux desktop smoke to paint"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.2.48.exe",
+        "name": "Catalyst-Setup-v1.2.51.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 25024226,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.48/Catalyst-Setup-v1.2.48.exe",
-        "sha256": "74df5fe22d4f85a612855609d7e1a948e55f802c714771e60e86efa1731ca0c6"
+        "size_bytes": 25038549,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.2.51/Catalyst-Setup-v1.2.51.exe",
+        "sha256": "e7fb3b83629a25b0b6a91ae466b31ba612428b37cdea80d82c69404845e04a3d"
       },
       {
-        "name": "catalyst_v1.2.48_amd64.deb",
+        "name": "catalyst_v1.2.51_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 194657460,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.48/catalyst_v1.2.48_amd64.deb",
-        "sha256": "133eccd8bd59b1f8b0200e00de4ca6372a43ae95daf8fa0c157c60dc7ce4a8ab"
+        "size_bytes": 194645504,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.51/catalyst_v1.2.51_amd64.deb",
+        "sha256": "d83d52c682628a61c1e7671657a815cdb5497066d928caf5ace41460d232186c"
       },
       {
-        "name": "Catalyst-linux-v1.2.48-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.2.51-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 250438848,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.48/Catalyst-linux-v1.2.48-x86_64.AppImage",
-        "sha256": "0363b3c20431e940eebb9dc0eac623c8dd2142836f480261b1f13b07bb7fcd5d"
+        "size_bytes": 250459328,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.2.51/Catalyst-linux-v1.2.51-x86_64.AppImage",
+        "sha256": "9dfea08abfe0bcec1ebd57010e2f7622d4cbfdf8211088e5ae6eca9a7f040961"
       }
     ]
   }
