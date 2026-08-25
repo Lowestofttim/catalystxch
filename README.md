@@ -87,6 +87,18 @@ Release metadata is stored in `assets/release/latest.json`. Maintainers can vali
 
 ```bash
 python scripts/check_release_metadata.py
+python scripts/check_sync_release_fallbacks.py
+python scripts/check_sync_workflow.py
 node scripts/check_release_js_behavior.js
+python scripts/check_release_dom_rendering.py
 npx --yes html-validate index.html docs.html
 ```
+
+The hourly and manually dispatchable `Sync release metadata` workflow reads the
+latest Windows release from `Lowestofttim/catalyst-releases`, reads the matching
+Linux packages from `catalystxch/catalyst-bot`, updates the JSON and static HTML
+fallbacks, runs the checks above, and uses a short-lived pull request to update
+protected `main` only when the public release changes. It then explicitly starts a
+GitHub Pages build so automation-authored commits are published immediately.
+The repository setting that permits GitHub Actions to create pull requests must
+remain enabled; the workflow does not approve reviews or bypass branch protection.

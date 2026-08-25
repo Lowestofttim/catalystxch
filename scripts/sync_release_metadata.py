@@ -8,6 +8,7 @@ default, it targets the Windows installer in the public update-channel repo.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import subprocess
@@ -20,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPO = "Lowestofttim/catalyst-releases"
 DEFAULT_EXPERIMENTAL_REPO = "catalystxch/catalyst-bot"
 DEFAULT_OUTPUT = ROOT / "assets" / "release" / "latest.json"
+DEFAULT_HTML_FILES = (ROOT / "index.html", ROOT / "docs.html")
 GH_FIELDS = "tagName,name,isDraft,isPrerelease,publishedAt,body,assets"
 
 
@@ -316,6 +318,165 @@ def append_experimental_archives(
     append_platform_downloads(metadata, release, include_download_urls)
 
 
+def _format_date(value: str) -> str:
+    if not value:
+        return ""
+    try:
+        date = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return ""
+    return f"{date.day} {date.strftime('%b')} {date.year}"
+
+
+def _format_bytes(value: int) -> str:
+    if not isinstance(value, int) or value <= 0:
+        return ""
+    units = ["B", "KB", "MB", "GB"]
+    size = float(value)
+    unit = 0
+    while size >= 1024 and unit < len(units) - 1:
+        size /= 1024
+        unit += 1
+    precision = 0 if unit == 0 else 1
+    return f"{size:.{precision}f} {units[unit]}"
+
+
+def _find_platform_download(metadata: dict, platform: str) -> dict | None:
+    candidates = [
+        asset
+        for asset in metadata["latest"]["assets"]
+        if asset.get("platform") == platform
+        and asset.get("kind") in {"installer", "archive"}
+    ]
+    candidates.sort(key=_platform_download_priority)
+    return candidates[0] if candidates else None
+
+
+def _replace_release_text(html_text: str, attribute: str, value: str) -> str:
+    pattern = re.compile(
+        rf"(?P<open><(?P<tag>[A-Za-z][\w:-]*)\b"
+        rf"(?=[^>]*\b{re.escape(attribute)}(?:\s|=|/?>))[^>]*>)"
+        rf"(?P<content>.*?)"
+        rf"(?P<close></(?P=tag)\s*>)",
+        re.DOTALL,
+    )
+    escaped = html.escape(value, quote=False)
+    return pattern.sub(
+        lambda match: f"{match.group('open')}{escaped}{match.group('close')}",
+        html_text,
+    )
+
+
+def _replace_release_notes(html_text: str, notes: list[str]) -> str:
+    pattern = re.compile(
+        r"(?P<open><(?P<tag>[A-Za-z][\w:-]*)\b"
+        r"(?=[^>]*\bdata-release-notes(?:\s|=|/?>))[^>]*>)"
+        r"(?P<content>.*?)"
+        r"(?P<close></(?P=tag)\s*>)",
+        re.DOTALL,
+    )
+
+    def replace(match: re.Match) -> str:
+        current = match.group("content")
+        item_indent_match = re.search(r"\n([ \t]*)<", current)
+        closing_indent_match = re.search(r"\n([ \t]*)\Z", current)
+        if item_indent_match:
+            item_indent = item_indent_match.group(1)
+            closing_indent = (
+                closing_indent_match.group(1) if closing_indent_match else ""
+            )
+            items = "\n".join(
+                f"{item_indent}<li>{html.escape(note, quote=False)}</li>"
+                for note in notes
+            )
+            content = f"\n{items}\n{closing_indent}"
+        else:
+            content = "".join(
+                f"<li>{html.escape(note, quote=False)}</li>" for note in notes
+            )
+        return f"{match.group('open')}{content}{match.group('close')}"
+
+    return pattern.sub(replace, html_text)
+
+
+def render_release_fallbacks(html_text: str, metadata: dict) -> str:
+    """Render safe static fallbacks matching the synchronized release metadata."""
+
+    latest = metadata["latest"]
+    windows = (
+        _find_platform_download(metadata, "windows")
+        if metadata["downloads_enabled"]
+        else None
+    )
+    linux = (
+        _find_platform_download(metadata, "linux")
+        if metadata["downloads_enabled"]
+        else None
+    )
+    if windows and linux:
+        status = "Windows/Linux downloads available"
+    elif windows:
+        status = "Windows download available"
+    else:
+        status = "Public links coming soon"
+    channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
+    release_date = _format_date(latest.get("published_at", ""))
+    meta = (
+        f"{channel} - published {release_date} - {status.lower()}"
+        if release_date
+        else f"{channel} - {status.lower()}"
+    )
+    values = {
+        "data-release-version": latest["version"],
+        "data-release-name": latest["name"],
+        "data-release-status": status,
+        "data-release-meta": meta,
+        "data-release-eyebrow": (
+            f"{status} - current release {latest['version']}"
+            if windows
+            else f"Public downloads coming soon - current beta {latest['version']}"
+        ),
+        "data-release-download-name": windows["name"] if windows else "Not available",
+        "data-release-download-size": _format_bytes(windows["size_bytes"])
+        if windows
+        else "",
+        "data-release-sha256": windows["sha256"] if windows else "Not available",
+        "data-release-macos-size": "GitHub source",
+        "data-release-macos-sha256": "Source only from GitHub",
+        "data-release-linux-size": _format_bytes(linux["size_bytes"])
+        if linux
+        else "",
+        "data-release-linux-sha256": linux["sha256"] if linux else "Not available",
+    }
+    rendered = html_text
+    for attribute, value in values.items():
+        rendered = _replace_release_text(rendered, attribute, value)
+    return _replace_release_notes(rendered, latest["release_notes"])
+
+
+def sync_html_fallbacks(metadata: dict) -> None:
+    for path in DEFAULT_HTML_FILES:
+        current = path.read_text(encoding="utf-8")
+        rendered = render_release_fallbacks(current, metadata)
+        if rendered != current:
+            path.write_text(rendered, encoding="utf-8")
+            print(f"updated {path.relative_to(ROOT)} release fallbacks")
+
+
+def preserve_generated_at_if_unchanged(metadata: dict, existing: dict) -> None:
+    """Avoid no-op commits when a scheduled sync sees the same release again."""
+
+    if not isinstance(existing, dict):
+        return
+    current_without_time = {key: value for key, value in metadata.items() if key != "generated_at"}
+    existing_without_time = {
+        key: value for key, value in existing.items() if key != "generated_at"
+    }
+    existing_time = existing.get("generated_at")
+    if current_without_time == existing_without_time and isinstance(existing_time, str):
+        metadata["generated_at"] = existing_time
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -361,6 +522,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="include first-class Linux platform downloads from --experimental-repo, falling back to archives when needed",
     )
+    parser.add_argument(
+        "--update-html-fallbacks",
+        action="store_true",
+        help="update index.html and docs.html static fallbacks to match the metadata",
+    )
     return parser.parse_args()
 
 
@@ -384,9 +550,17 @@ def main() -> None:
         )
     output = args.output if args.output.is_absolute() else ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        try:
+            existing = json.loads(output.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            existing = None
+        preserve_generated_at_if_unchanged(metadata, existing)
     output.write_text(
         json.dumps(metadata, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
     )
+    if args.update_html_fallbacks:
+        sync_html_fallbacks(metadata)
     try:
         display_output = output.relative_to(ROOT)
     except ValueError:
