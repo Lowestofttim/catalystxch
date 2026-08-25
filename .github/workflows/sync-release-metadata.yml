@@ -1,0 +1,109 @@
+name: Sync release metadata
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: write
+  pages: write
+  pull-requests: write
+
+concurrency:
+  group: sync-release-metadata
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+
+      - name: Install the pinned browser-test dependency
+        run: |
+          python -m pip install playwright==1.60.0
+          python -m playwright install --with-deps chromium
+
+      - name: Sync the latest public release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python scripts/sync_release_metadata.py
+          --include-download-urls
+          --include-platform-downloads
+          --update-html-fallbacks
+
+      - name: Verify release metadata and website rendering
+        run: |
+          python scripts/check_release_metadata.py
+          python scripts/check_sync_release_fallbacks.py
+          python scripts/check_sync_workflow.py
+          node scripts/check_release_js_behavior.js
+          python scripts/check_release_dom_rendering.py
+          npx --yes html-validate@11.4.0 index.html docs.html
+
+      - name: Commit a changed release to the automation branch
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh auth setup-git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/release/latest.json index.html docs.html
+          if git diff --cached --quiet; then
+            echo "Website already matches the latest public release."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            version="$(python -c 'import json; print(json.load(open("assets/release/latest.json"))["latest"]["version"])')"
+            git commit -m "chore: publish ${version} website release"
+            git fetch origin refs/heads/automation/sync-release-metadata:refs/remotes/origin/automation/sync-release-metadata || true
+            git push --force-with-lease=refs/heads/automation/sync-release-metadata origin HEAD:refs/heads/automation/sync-release-metadata
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Merge through protected main and rebuild Pages
+        if: steps.release.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr_number="$(gh pr list --repo "${{ github.repository }}" --base main --head automation/sync-release-metadata --state open --json number --jq '.[0].number')"
+          if [ -z "$pr_number" ]; then
+            pr_url="$(gh pr create --repo "${{ github.repository }}" --base main --head automation/sync-release-metadata --title "chore: sync latest CATalyst release" --body "Automated release metadata and static fallback sync. All website release checks passed before this PR was opened.")"
+            pr_number="${pr_url##*/}"
+          fi
+          gh pr merge --squash --delete-branch "$pr_number" --repo "${{ github.repository }}"
+
+      - name: Rebuild Pages when the public release is stale
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          local_version="$(python -c 'import json; print(json.load(open("assets/release/latest.json"))["latest"]["version"])')"
+          public_version="$(curl --fail --silent --show-error --retry 3 --retry-all-errors "https://catalystxch.com/assets/release/latest.json?run=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" | python -c 'import json, sys; print(json.load(sys.stdin)["latest"]["version"])')" || public_version=""
+          if [ "$public_version" = "$local_version" ]; then
+            echo "Public website already serves ${local_version}."
+            exit 0
+          fi
+          for attempt in 1 2 3; do
+            if gh api --method POST "repos/${{ github.repository }}/pages/builds"; then
+              echo "Started GitHub Pages build for ${local_version}."
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Unable to start the GitHub Pages build after ${attempt} attempts." >&2
+              exit 1
+            fi
+            sleep $((attempt * 5))
+          done
