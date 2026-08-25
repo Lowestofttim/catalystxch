@@ -1,42 +1,42 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-08-25T21:44:51Z",
+  "generated_at": "2026-08-25T23:39:34Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.5",
-    "name": "CATalyst v1.3.5",
-    "published_at": "2026-08-25T21:38:29Z",
+    "version": "v1.3.6",
+    "name": "CATalyst v1.3.6",
+    "published_at": "2026-08-25T23:25:32Z",
     "channel": "stable",
     "release_notes": [
-      "Fix Windows clean first launch and gate installer releases"
+      "Fix Windows installed launch and diagnostics fallback"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.5.exe",
+        "name": "Catalyst-Setup-v1.3.6.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 28184003,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.5/Catalyst-Setup-v1.3.5.exe",
-        "sha256": "dfa0e91404d6ff7a776d972e5c8b6dceaabe5ce299bfdb88f7ad89bd1fd7269a"
+        "size_bytes": 28187945,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.6/Catalyst-Setup-v1.3.6.exe",
+        "sha256": "72d7372da471ba8d402fafbbc7ccfc85b84d203cdbcc34e6b937fd714f650482"
       },
       {
-        "name": "catalyst_v1.3.5_amd64.deb",
+        "name": "catalyst_v1.3.6_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 199053118,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.5/catalyst_v1.3.5_amd64.deb",
-        "sha256": "3e7873b23555a819d33b1a459ff577d794d550222d3557715641068a966bb433"
+        "size_bytes": 199099434,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.6/catalyst_v1.3.6_amd64.deb",
+        "sha256": "35660b2301b0dc78fafd1b0f652a248cf6f275b8151043da34d61687a925d2b8"
       },
       {
-        "name": "Catalyst-linux-v1.3.5-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.3.6-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 256468160,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.5/Catalyst-linux-v1.3.5-x86_64.AppImage",
-        "sha256": "d772c05974273e561a6dcabf40fd2e56097592d8b06c708a22172e033cbe8d9f"
+        "size_bytes": 256476352,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.6/Catalyst-linux-v1.3.6-x86_64.AppImage",
+        "sha256": "0fc02e3d226455edbd13b333d21b3dcc995bb1c01bc159cbcf7aabd19add98be"
       }
     ]
   }
