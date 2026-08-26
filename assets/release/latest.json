@@ -1,42 +1,42 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-08-26T07:27:26Z",
+  "generated_at": "2026-08-26T09:17:50Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.8",
-    "name": "CATalyst v1.3.8",
-    "published_at": "2026-08-26T07:01:56Z",
+    "version": "v1.3.9",
+    "name": "CATalyst v1.3.9",
+    "published_at": "2026-08-26T09:12:58Z",
     "channel": "stable",
     "release_notes": [
-      "Fix v1.3.7 legacy database startup migration"
+      "Fix Sage-upgrade startup reservation recovery"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.8.exe",
+        "name": "Catalyst-Setup-v1.3.9.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 28205060,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.8/Catalyst-Setup-v1.3.8.exe",
-        "sha256": "c588735ffaeabb0afe3dc53a7b910ac59b0cbb192a9cf0cf265ba65382c93ce4"
+        "size_bytes": 28203442,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.9/Catalyst-Setup-v1.3.9.exe",
+        "sha256": "f780d97efc5532492a3543b076f141691fbb56d85b60b348180759e19cfe8b70"
       },
       {
-        "name": "catalyst_v1.3.8_amd64.deb",
+        "name": "catalyst_v1.3.9_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 199103288,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.8/catalyst_v1.3.8_amd64.deb",
-        "sha256": "ffbfdeb829e1eb4c40e858b83851105958ab538ebaef368fafdbaca75a66f0a6"
+        "size_bytes": 199104970,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.9/catalyst_v1.3.9_amd64.deb",
+        "sha256": "dab358e82e65c9b827550d65f1563c45b13161075d387996a115d693ad79487a"
       },
       {
-        "name": "Catalyst-linux-v1.3.8-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.3.9-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
         "size_bytes": 256488640,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.8/Catalyst-linux-v1.3.8-x86_64.AppImage",
-        "sha256": "91e6391c954a56ac7d6e5609a14b4dc98961da8483b0bbbb9d2549310b276e0a"
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.9/Catalyst-linux-v1.3.9-x86_64.AppImage",
+        "sha256": "fc0b3dcd6ccbf1c31f5a34bc45ad1c3a2d3d96fee2dabf343cdf783191a23dd9"
       }
     ]
   }
