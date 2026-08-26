@@ -1,42 +1,42 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-08-25T23:39:34Z",
+  "generated_at": "2026-08-26T07:27:26Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.6",
-    "name": "CATalyst v1.3.6",
-    "published_at": "2026-08-25T23:25:32Z",
+    "version": "v1.3.8",
+    "name": "CATalyst v1.3.8",
+    "published_at": "2026-08-26T07:01:56Z",
     "channel": "stable",
     "release_notes": [
-      "Fix Windows installed launch and diagnostics fallback"
+      "Fix v1.3.7 legacy database startup migration"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.6.exe",
+        "name": "Catalyst-Setup-v1.3.8.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 28187945,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.6/Catalyst-Setup-v1.3.6.exe",
-        "sha256": "72d7372da471ba8d402fafbbc7ccfc85b84d203cdbcc34e6b937fd714f650482"
+        "size_bytes": 28205060,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.8/Catalyst-Setup-v1.3.8.exe",
+        "sha256": "c588735ffaeabb0afe3dc53a7b910ac59b0cbb192a9cf0cf265ba65382c93ce4"
       },
       {
-        "name": "catalyst_v1.3.6_amd64.deb",
+        "name": "catalyst_v1.3.8_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 199099434,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.6/catalyst_v1.3.6_amd64.deb",
-        "sha256": "35660b2301b0dc78fafd1b0f652a248cf6f275b8151043da34d61687a925d2b8"
+        "size_bytes": 199103288,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.8/catalyst_v1.3.8_amd64.deb",
+        "sha256": "ffbfdeb829e1eb4c40e858b83851105958ab538ebaef368fafdbaca75a66f0a6"
       },
       {
-        "name": "Catalyst-linux-v1.3.6-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.3.8-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 256476352,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.6/Catalyst-linux-v1.3.6-x86_64.AppImage",
-        "sha256": "0fc02e3d226455edbd13b333d21b3dcc995bb1c01bc159cbcf7aabd19add98be"
+        "size_bytes": 256488640,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.8/Catalyst-linux-v1.3.8-x86_64.AppImage",
+        "sha256": "91e6391c954a56ac7d6e5609a14b4dc98961da8483b0bbbb9d2549310b276e0a"
       }
     ]
   }

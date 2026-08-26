@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from check_release_metadata import find_stale_literal_versions
 from sync_release_metadata import (
     preserve_generated_at_if_unchanged,
     render_release_fallbacks,
@@ -76,6 +77,66 @@ def main() -> None:
     for stale in ("v1.0.0", "old note", "old-sha", "old-linux-sha"):
         if stale in rendered:
             raise SystemExit(f"stale fallback remains: {stale}")
+
+    release_note_history = """<main>
+  <span data-release-version>v9.8.7</span>
+  <ul data-release-notes><li>Fix v9.8.6 startup migration</li></ul>
+</main>
+"""
+    if find_stale_literal_versions(
+        release_note_history, "v9.8.7", {"v9.8.6"}
+    ):
+        raise SystemExit("historical versions in release notes must not be stale")
+
+    stale_page_copy = """<main>
+  <span data-release-version>v9.8.7</span>
+  <p>Download CATalyst v9.8.6 today.</p>
+</main>
+"""
+    if find_stale_literal_versions(stale_page_copy, "v9.8.7") != ["v9.8.6"]:
+        raise SystemExit("stale versions outside release notes must still be rejected")
+
+    stale_after_void_note_element = """<main>
+  <span data-release-version>v9.8.7</span>
+  <ul data-release-notes><li>Fix v9.8.6<br>startup migration</li></ul>
+  <p>Download CATalyst v9.8.5 today.</p>
+</main>
+"""
+    if find_stale_literal_versions(
+        stale_after_void_note_element, "v9.8.7", {"v9.8.6"}
+    ) != ["v9.8.5"]:
+        raise SystemExit(
+            "void elements in release notes must not hide later stale versions"
+        )
+
+    stale_note_container_attribute = """<main>
+  <span data-release-version>v9.8.7</span>
+  <ul data-release-notes aria-label="Release v9.8.6 notes">
+    <li>Fix v9.8.6 startup migration</li>
+  </ul>
+</main>
+"""
+    if find_stale_literal_versions(
+        stale_note_container_attribute, "v9.8.7", {"v9.8.6"}
+    ) != ["v9.8.6"]:
+        raise SystemExit(
+            "stale attributes on release-note containers must still be rejected"
+        )
+
+    extra_stale_release_note = """<main>
+  <span data-release-version>v9.8.7</span>
+  <ul data-release-notes>
+    <li>Fix v9.8.6 startup migration</li>
+    <li>Obsolete v9.8.5 fallback text</li>
+  </ul>
+</main>
+"""
+    if find_stale_literal_versions(
+        extra_stale_release_note, "v9.8.7", {"v9.8.6"}
+    ) != ["v9.8.5"]:
+        raise SystemExit(
+            "only historical versions in the configured release notes may be exempt"
+        )
 
     existing = deepcopy(metadata)
     existing["generated_at"] = "2026-08-25T18:00:00Z"

@@ -16,6 +16,22 @@ LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
 HTML_FILES = [ROOT / "index.html", ROOT / "docs.html"]
 VERSION_RE = re.compile(r"\bv\d+\.\d+\.\d+\b")
+HTML_VOID_ELEMENTS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+}
 PUBLIC_RELEASE_URL_PREFIX = (
     "https://github.com/Lowestofttim/catalyst-releases/releases/download/"
 )
@@ -86,6 +102,80 @@ def parse_release_fallbacks(html: str) -> dict[str, list[str]]:
     parser = ReleaseFallbackParser()
     parser.feed(html)
     return parser.records
+
+
+class VersionLiteralParser(HTMLParser):
+    """Collect version literals while ignoring generated release-note content."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.versions: set[str] = set()
+        self.release_note_versions: set[str] = set()
+        self._release_notes_depth = 0
+
+    def _collect(self, value: str | None) -> None:
+        if not value:
+            return
+        target = (
+            self.release_note_versions
+            if self._release_notes_depth
+            else self.versions
+        )
+        target.update(VERSION_RE.findall(value))
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if self._release_notes_depth:
+            if tag not in HTML_VOID_ELEMENTS:
+                self._release_notes_depth += 1
+            return
+        is_release_notes = any(name == "data-release-notes" for name, _ in attrs)
+        for name, value in attrs:
+            if name != "data-release-notes":
+                self._collect(value)
+        if is_release_notes:
+            if tag not in HTML_VOID_ELEMENTS:
+                self._release_notes_depth = 1
+            return
+
+    def handle_startendtag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        del tag
+        if self._release_notes_depth:
+            return
+        for name, value in attrs:
+            if name != "data-release-notes":
+                self._collect(value)
+
+    def handle_endtag(self, tag: str) -> None:
+        del tag
+        if self._release_notes_depth:
+            self._release_notes_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        self._collect(data)
+
+    def handle_comment(self, data: str) -> None:
+        self._collect(data)
+
+
+def find_stale_literal_versions(
+    html: str,
+    current_version: str,
+    allowed_release_note_versions: set[str] | None = None,
+) -> list[str]:
+    parser = VersionLiteralParser()
+    parser.feed(html)
+    allowed_notes = allowed_release_note_versions or set()
+    stale_versions = {
+        version for version in parser.versions if version != current_version
+    }
+    stale_versions.update(
+        version
+        for version in parser.release_note_versions
+        if version != current_version and version not in allowed_notes
+    )
+    return sorted(stale_versions)
 
 
 def format_date(value: str) -> str:
@@ -330,6 +420,12 @@ def validate_website_wiring(data: dict, version: str) -> None:
             "assets/release.js must allow only the public CATalyst bot release host for Linux downloads"
         )
 
+    allowed_release_note_versions = {
+        release_version
+        for note in data["latest"]["release_notes"]
+        for release_version in VERSION_RE.findall(note)
+    }
+
     for html_path in HTML_FILES:
         html = html_path.read_text(encoding="utf-8")
         rel = html_path.relative_to(ROOT)
@@ -351,8 +447,9 @@ def validate_website_wiring(data: dict, version: str) -> None:
             ):
                 fail(f"index.html must not hard-code the {attr} href")
 
-        literal_versions = sorted(set(VERSION_RE.findall(html)))
-        stale_versions = [item for item in literal_versions if item != version]
+        stale_versions = find_stale_literal_versions(
+            html, version, allowed_release_note_versions
+        )
         if stale_versions:
             fail(f"{rel} contains stale literal versions: {', '.join(stale_versions)}")
         validate_fallback_records(html_path, html, data, version)
