@@ -88,6 +88,58 @@ def parse_release_fallbacks(html: str) -> dict[str, list[str]]:
     return parser.records
 
 
+class VersionLiteralParser(HTMLParser):
+    """Collect version literals while ignoring generated release-note content."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.versions: set[str] = set()
+        self._release_notes_depth = 0
+
+    def _collect(self, value: str | None) -> None:
+        if self._release_notes_depth == 0 and value:
+            self.versions.update(VERSION_RE.findall(value))
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        del tag
+        if self._release_notes_depth:
+            self._release_notes_depth += 1
+            return
+        if any(name == "data-release-notes" for name, _ in attrs):
+            self._release_notes_depth = 1
+            return
+        for _, value in attrs:
+            self._collect(value)
+
+    def handle_startendtag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        del tag
+        if self._release_notes_depth or any(
+            name == "data-release-notes" for name, _ in attrs
+        ):
+            return
+        for _, value in attrs:
+            self._collect(value)
+
+    def handle_endtag(self, tag: str) -> None:
+        del tag
+        if self._release_notes_depth:
+            self._release_notes_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        self._collect(data)
+
+    def handle_comment(self, data: str) -> None:
+        self._collect(data)
+
+
+def find_stale_literal_versions(html: str, current_version: str) -> list[str]:
+    parser = VersionLiteralParser()
+    parser.feed(html)
+    return sorted(version for version in parser.versions if version != current_version)
+
+
 def format_date(value: str) -> str:
     if not value:
         return ""
@@ -351,8 +403,7 @@ def validate_website_wiring(data: dict, version: str) -> None:
             ):
                 fail(f"index.html must not hard-code the {attr} href")
 
-        literal_versions = sorted(set(VERSION_RE.findall(html)))
-        stale_versions = [item for item in literal_versions if item != version]
+        stale_versions = find_stale_literal_versions(html, version)
         if stale_versions:
             fail(f"{rel} contains stale literal versions: {', '.join(stale_versions)}")
         validate_fallback_records(html_path, html, data, version)
