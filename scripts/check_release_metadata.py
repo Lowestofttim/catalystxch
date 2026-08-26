@@ -110,11 +110,18 @@ class VersionLiteralParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.versions: set[str] = set()
+        self.release_note_versions: set[str] = set()
         self._release_notes_depth = 0
 
     def _collect(self, value: str | None) -> None:
-        if self._release_notes_depth == 0 and value:
-            self.versions.update(VERSION_RE.findall(value))
+        if not value:
+            return
+        target = (
+            self.release_note_versions
+            if self._release_notes_depth
+            else self.versions
+        )
+        target.update(VERSION_RE.findall(value))
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if self._release_notes_depth:
@@ -152,10 +159,23 @@ class VersionLiteralParser(HTMLParser):
         self._collect(data)
 
 
-def find_stale_literal_versions(html: str, current_version: str) -> list[str]:
+def find_stale_literal_versions(
+    html: str,
+    current_version: str,
+    allowed_release_note_versions: set[str] | None = None,
+) -> list[str]:
     parser = VersionLiteralParser()
     parser.feed(html)
-    return sorted(version for version in parser.versions if version != current_version)
+    allowed_notes = allowed_release_note_versions or set()
+    stale_versions = {
+        version for version in parser.versions if version != current_version
+    }
+    stale_versions.update(
+        version
+        for version in parser.release_note_versions
+        if version != current_version and version not in allowed_notes
+    )
+    return sorted(stale_versions)
 
 
 def format_date(value: str) -> str:
@@ -400,6 +420,12 @@ def validate_website_wiring(data: dict, version: str) -> None:
             "assets/release.js must allow only the public CATalyst bot release host for Linux downloads"
         )
 
+    allowed_release_note_versions = {
+        release_version
+        for note in data["latest"]["release_notes"]
+        for release_version in VERSION_RE.findall(note)
+    }
+
     for html_path in HTML_FILES:
         html = html_path.read_text(encoding="utf-8")
         rel = html_path.relative_to(ROOT)
@@ -421,7 +447,9 @@ def validate_website_wiring(data: dict, version: str) -> None:
             ):
                 fail(f"index.html must not hard-code the {attr} href")
 
-        stale_versions = find_stale_literal_versions(html, version)
+        stale_versions = find_stale_literal_versions(
+            html, version, allowed_release_note_versions
+        )
         if stale_versions:
             fail(f"{rel} contains stale literal versions: {', '.join(stale_versions)}")
         validate_fallback_records(html_path, html, data, version)

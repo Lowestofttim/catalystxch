@@ -83,7 +83,9 @@ def main() -> None:
   <ul data-release-notes><li>Fix v9.8.6 startup migration</li></ul>
 </main>
 """
-    if find_stale_literal_versions(release_note_history, "v9.8.7"):
+    if find_stale_literal_versions(
+        release_note_history, "v9.8.7", {"v9.8.6"}
+    ):
         raise SystemExit("historical versions in release notes must not be stale")
 
     stale_page_copy = """<main>
@@ -101,7 +103,7 @@ def main() -> None:
 </main>
 """
     if find_stale_literal_versions(
-        stale_after_void_note_element, "v9.8.7"
+        stale_after_void_note_element, "v9.8.7", {"v9.8.6"}
     ) != ["v9.8.5"]:
         raise SystemExit(
             "void elements in release notes must not hide later stale versions"
@@ -115,10 +117,25 @@ def main() -> None:
 </main>
 """
     if find_stale_literal_versions(
-        stale_note_container_attribute, "v9.8.7"
+        stale_note_container_attribute, "v9.8.7", {"v9.8.6"}
     ) != ["v9.8.6"]:
         raise SystemExit(
             "stale attributes on release-note containers must still be rejected"
+        )
+
+    extra_stale_release_note = """<main>
+  <span data-release-version>v9.8.7</span>
+  <ul data-release-notes>
+    <li>Fix v9.8.6 startup migration</li>
+    <li>Obsolete v9.8.5 fallback text</li>
+  </ul>
+</main>
+"""
+    if find_stale_literal_versions(
+        extra_stale_release_note, "v9.8.7", {"v9.8.6"}
+    ) != ["v9.8.5"]:
+        raise SystemExit(
+            "only historical versions in the configured release notes may be exempt"
         )
 
     existing = deepcopy(metadata)
