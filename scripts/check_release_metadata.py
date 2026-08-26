@@ -16,6 +16,22 @@ LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
 HTML_FILES = [ROOT / "index.html", ROOT / "docs.html"]
 VERSION_RE = re.compile(r"\bv\d+\.\d+\.\d+\b")
+HTML_VOID_ELEMENTS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+}
 PUBLIC_RELEASE_URL_PREFIX = (
     "https://github.com/Lowestofttim/catalyst-releases/releases/download/"
 )
@@ -101,12 +117,13 @@ class VersionLiteralParser(HTMLParser):
             self.versions.update(VERSION_RE.findall(value))
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        del tag
         if self._release_notes_depth:
-            self._release_notes_depth += 1
+            if tag not in HTML_VOID_ELEMENTS:
+                self._release_notes_depth += 1
             return
         if any(name == "data-release-notes" for name, _ in attrs):
-            self._release_notes_depth = 1
+            if tag not in HTML_VOID_ELEMENTS:
+                self._release_notes_depth = 1
             return
         for _, value in attrs:
             self._collect(value)

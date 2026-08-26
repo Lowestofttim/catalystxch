@@ -94,6 +94,19 @@ def main() -> None:
     if find_stale_literal_versions(stale_page_copy, "v9.8.7") != ["v9.8.6"]:
         raise SystemExit("stale versions outside release notes must still be rejected")
 
+    stale_after_void_note_element = """<main>
+  <span data-release-version>v9.8.7</span>
+  <ul data-release-notes><li>Fix v9.8.6<br>startup migration</li></ul>
+  <p>Download CATalyst v9.8.5 today.</p>
+</main>
+"""
+    if find_stale_literal_versions(
+        stale_after_void_note_element, "v9.8.7"
+    ) != ["v9.8.5"]:
+        raise SystemExit(
+            "void elements in release notes must not hide later stale versions"
+        )
+
     existing = deepcopy(metadata)
     existing["generated_at"] = "2026-08-25T18:00:00Z"
     refreshed = deepcopy(metadata)
