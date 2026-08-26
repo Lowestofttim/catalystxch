@@ -121,23 +121,24 @@ class VersionLiteralParser(HTMLParser):
             if tag not in HTML_VOID_ELEMENTS:
                 self._release_notes_depth += 1
             return
-        if any(name == "data-release-notes" for name, _ in attrs):
+        is_release_notes = any(name == "data-release-notes" for name, _ in attrs)
+        for name, value in attrs:
+            if name != "data-release-notes":
+                self._collect(value)
+        if is_release_notes:
             if tag not in HTML_VOID_ELEMENTS:
                 self._release_notes_depth = 1
             return
-        for _, value in attrs:
-            self._collect(value)
 
     def handle_startendtag(
         self, tag: str, attrs: list[tuple[str, str | None]]
     ) -> None:
         del tag
-        if self._release_notes_depth or any(
-            name == "data-release-notes" for name, _ in attrs
-        ):
+        if self._release_notes_depth:
             return
-        for _, value in attrs:
-            self._collect(value)
+        for name, value in attrs:
+            if name != "data-release-notes":
+                self._collect(value)
 
     def handle_endtag(self, tag: str) -> None:
         del tag

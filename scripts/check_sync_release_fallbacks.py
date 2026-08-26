@@ -107,6 +107,20 @@ def main() -> None:
             "void elements in release notes must not hide later stale versions"
         )
 
+    stale_note_container_attribute = """<main>
+  <span data-release-version>v9.8.7</span>
+  <ul data-release-notes aria-label="Release v9.8.6 notes">
+    <li>Fix v9.8.6 startup migration</li>
+  </ul>
+</main>
+"""
+    if find_stale_literal_versions(
+        stale_note_container_attribute, "v9.8.7"
+    ) != ["v9.8.6"]:
+        raise SystemExit(
+            "stale attributes on release-note containers must still be rejected"
+        )
+
     existing = deepcopy(metadata)
     existing["generated_at"] = "2026-08-25T18:00:00Z"
     refreshed = deepcopy(metadata)
