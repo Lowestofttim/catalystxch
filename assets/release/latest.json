@@ -1,42 +1,42 @@
 {
   "schema_version": 1,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-08-27T07:32:41Z",
+  "generated_at": "2026-08-27T12:18:28Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.13",
-    "name": "CATalyst v1.3.13",
-    "published_at": "2026-08-27T07:29:53Z",
+    "version": "v1.3.14",
+    "name": "CATalyst v1.3.14",
+    "published_at": "2026-08-27T12:11:49Z",
     "channel": "stable",
     "release_notes": [
-      "fix: harden Sage coin prep and restart recovery"
+      "Fix post-prep price polling flood"
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.13.exe",
+        "name": "Catalyst-Setup-v1.3.14.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 28224012,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.13/Catalyst-Setup-v1.3.13.exe",
-        "sha256": "83c6a5ab5cd809f690ff1d94cb06921378b0aa50b52a12f2156e5bed87ff7cc2"
+        "size_bytes": 28222671,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.14/Catalyst-Setup-v1.3.14.exe",
+        "sha256": "51bd5fcdd3d892df768d21f31ec98aeab598313945d2bdbb1e406c9abfa792a6"
       },
       {
-        "name": "catalyst_v1.3.13_amd64.deb",
+        "name": "catalyst_v1.3.14_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 199248058,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.13/catalyst_v1.3.13_amd64.deb",
-        "sha256": "28a46d0b6c412ce6c6743af2b2d63e3d91d0ce8c36bbbf9652de68a558d07895"
+        "size_bytes": 199246916,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.14/catalyst_v1.3.14_amd64.deb",
+        "sha256": "cae587c71f4dcaee36c8c4c90215f0e634dacc0feb44abf6eddd6bad4a46b7e5"
       },
       {
-        "name": "Catalyst-linux-v1.3.13-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.3.14-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 256513216,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.13/Catalyst-linux-v1.3.13-x86_64.AppImage",
-        "sha256": "40d1d57342f907fc14c8646299fda6d8ebf0c3f3dca957f323b11227fcffba72"
+        "size_bytes": 256517312,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.14/Catalyst-linux-v1.3.14-x86_64.AppImage",
+        "sha256": "cefabee88e7828fa7aa16a6fd395685f7b506e8451552d8ad884252b7664868b"
       }
     ]
   }
