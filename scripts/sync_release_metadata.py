@@ -459,6 +459,27 @@ def _replace_release_notes(html_text: str, notes: list[str]) -> str:
     return pattern.sub(replace, html_text)
 
 
+def _set_release_hook_hidden(html_text: str, hook: str, hidden: bool) -> str:
+    pattern = re.compile(
+        rf"<(?P<tag>[A-Za-z][\w:-]*)(?P<attrs>[^<>]*\b{re.escape(hook)}"
+        rf"(?=(?:\s|=|/?>))[^<>]*)>",
+        re.IGNORECASE,
+    )
+
+    def replace(match: re.Match) -> str:
+        attrs = re.sub(
+            r"\s+hidden(?:\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]+))?",
+            "",
+            match.group("attrs"),
+            flags=re.IGNORECASE,
+        )
+        if hidden:
+            attrs = f"{attrs} hidden"
+        return f"<{match.group('tag')}{attrs}>"
+
+    return pattern.sub(replace, html_text)
+
+
 def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     """Render safe static fallbacks matching the synchronized release metadata."""
 
@@ -508,7 +529,12 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     rendered = html_text
     for attribute, value in values.items():
         rendered = _replace_release_text(rendered, attribute, value)
-    return _replace_release_notes(rendered, latest["release_notes"])
+    rendered = _replace_release_notes(rendered, latest["release_notes"])
+    return _set_release_hook_hidden(
+        rendered,
+        "data-windows-download-notice",
+        hidden=windows is not None,
+    )
 
 
 def sync_html_fallbacks(metadata: dict) -> None:

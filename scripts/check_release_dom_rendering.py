@@ -8,11 +8,13 @@ import re
 import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urljoin
 
 from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
+RELEASE_JS_ASSET = "assets/release.js?v=20260828-windows-pause"
 
 
 def serve_site() -> tuple[ThreadingHTTPServer, str]:
@@ -94,7 +96,12 @@ def main() -> None:
             try:
                 page = browser.new_page(viewport={"width": 390, "height": 900})
                 page.goto(url, wait_until="networkidle")
+                assert_release_script_cache_key(page)
                 assert_release_panel(page, metadata)
+
+                docs_page = browser.new_page(viewport={"width": 390, "height": 900})
+                docs_page.goto(urljoin(url, "docs.html"), wait_until="networkidle")
+                assert_release_script_cache_key(docs_page)
 
                 verified_page = browser.new_page(viewport={"width": 390, "height": 900})
                 verified_page.route(
@@ -115,6 +122,12 @@ def main() -> None:
             server.shutdown()
 
     print(f"release DOM rendering check passed for {enabled_latest['version']}")
+
+
+def assert_release_script_cache_key(page) -> None:
+    expect(page.locator('script[src^="assets/release.js"]')).to_have_attribute(
+        "src", RELEASE_JS_ASSET
+    )
 
 
 def find_windows_installer(latest: dict) -> dict | None:
@@ -180,7 +193,10 @@ def assert_release_panel(page, metadata: dict) -> None:
     download_link = page.locator("[data-download-windows]")
     macos_link = page.locator("[data-download-macos]")
     linux_link = page.locator("[data-download-linux]")
+    windows_notice = page.locator("[data-windows-download-notice]")
+    expect(windows_notice).to_have_count(1)
     if downloads_available:
+        expect(windows_notice).to_be_hidden()
         expect(download_link).not_to_have_attribute("aria-disabled", "true")
         expect(macos_link).not_to_have_attribute("aria-disabled", "true")
         if linux_available:
@@ -188,6 +204,7 @@ def assert_release_panel(page, metadata: dict) -> None:
         else:
             expect(linux_link).to_have_attribute("aria-disabled", "true")
     else:
+        expect(windows_notice).to_be_visible()
         expect(download_link).to_have_attribute("aria-disabled", "true")
         expect(macos_link).not_to_have_attribute("aria-disabled", "true")
         if linux_available:

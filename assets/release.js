@@ -9,6 +9,12 @@
     });
   };
 
+  const setHidden = (selector, hidden) => {
+    document.querySelectorAll(selector).forEach((node) => {
+      node.hidden = hidden;
+    });
+  };
+
   const formatDate = (value) => {
     if (!value) return "";
     const date = new Date(value);
@@ -147,6 +153,7 @@
   };
 
   const disableWindowsDownload = () => {
+    setHidden("[data-windows-download-notice]", false);
     setText("[data-release-download-name]", "Not available");
     setText("[data-release-download-size]", "");
     setText("[data-release-sha256]", "Not available");
@@ -206,6 +213,7 @@
       "[data-release-windows-signature]",
       "Verified publisher: SignPath Foundation"
     );
+    setHidden("[data-windows-download-notice]", true);
     enableDownload("[data-download-windows]", windowsInstaller);
   };
 

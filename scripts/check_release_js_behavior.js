@@ -87,6 +87,10 @@ function makeTextNode(textContent = "") {
   return { textContent };
 }
 
+function makeVisibilityNode(hidden = false) {
+  return { hidden };
+}
+
 function makeListNode() {
   return {
     textContent: "",
@@ -150,6 +154,7 @@ function buildDocument(link, macosLink, linuxLink) {
     ["[data-release-macos-sha256]", [makeTextNode("Source only from GitHub")]],
     ["[data-release-linux-sha256]", [makeTextNode(linuxDownload.sha256)]],
     ["[data-release-notes]", [makeListNode()]],
+    ["[data-windows-download-notice]", [makeVisibilityNode(false)]],
     ["[data-download-windows]", [link]],
     ["[data-download-macos]", [macosLink]],
     ["[data-download-linux]", [linuxLink]]
@@ -235,6 +240,9 @@ async function runReleaseSequence(metadataResponses, initialHref = "") {
     },
     text(selector) {
       return nodes.get(selector)[0].textContent;
+    },
+    hidden(selector) {
+      return nodes.get(selector)[0].hidden;
     }
   };
 }
@@ -259,6 +267,7 @@ async function main() {
   assert(enabled.text("[data-release-version]") === baseLatest.version, "enabled release should show the release version");
   assert(enabled.text("[data-release-sha256]") === SHA256, "enabled release should show SHA-256");
   assert(enabled.text("[data-release-windows-signature]") === "Verified publisher: SignPath Foundation", "enabled release should show verified publisher");
+  assert(enabled.hidden("[data-windows-download-notice]") === true, "verified Windows release should hide the temporary pause notice");
   assert(enabled.text("[data-release-macos-size]") === "GitHub source", "enabled release should show macOS source status");
   assert(enabled.text("[data-release-linux-size]") === formatBytes(linuxDownload.size_bytes), "enabled release should show Linux size");
   assert(enabled.text("[data-release-macos-sha256]") === "Source only from GitHub", "enabled release should show macOS source-only detail");
@@ -277,6 +286,7 @@ async function main() {
   assert(disabled.text("[data-release-download-size]") === "", "disabled release should reset file size");
   assert(disabled.text("[data-release-sha256]") === "Not available", "disabled release should reset SHA-256 detail");
   assert(disabled.text("[data-release-windows-signature]") === "Windows installer unavailable - signature verification required", "disabled release should show signature requirement");
+  assert(disabled.hidden("[data-windows-download-notice]") === false, "disabled Windows release should show the temporary pause notice");
   assert(disabled.text("[data-release-macos-sha256]") === "Source only from GitHub", "disabled release should keep macOS source-only detail");
   assert(disabled.text("[data-release-linux-sha256]") === linuxDownload.sha256, "disabled Windows should preserve Linux SHA-256 detail");
 
@@ -315,6 +325,7 @@ async function main() {
     assert(guardFailure.link.href === "", `${testCase.name} should remove stale Windows href`);
     assert(guardFailure.link.attrs.get("aria-disabled") === "true", `${testCase.name} should mark Windows disabled`);
     assert(guardFailure.linuxLink.href === LINUX_URL, `${testCase.name} should preserve Linux`);
+    assert(guardFailure.hidden("[data-windows-download-notice]") === false, `${testCase.name} should show the temporary pause notice`);
   }
 
   const staleLatest = {
@@ -334,6 +345,7 @@ async function main() {
   assert(restored.fetchCount === 2, "pageshow restore should refetch release metadata");
   assert(restored.text("[data-release-version]") === baseLatest.version, "pageshow restore should replace the stale version");
   assert(restored.link.href === PUBLIC_URL, "pageshow restore should re-enable the current Windows download");
+  assert(restored.hidden("[data-windows-download-notice]") === true, "pageshow restore should hide the temporary pause notice for a verified release");
 
   const visibleAgain = await runReleaseSequence([
     { downloads_enabled: false, latest: staleLatest },
@@ -344,6 +356,7 @@ async function main() {
   await visibleAgain.dispatchDocumentEvent("visibilitychange");
   assert(visibleAgain.fetchCount === 2, "visible tab should refetch release metadata");
   assert(visibleAgain.text("[data-release-version]") === baseLatest.version, "visible tab should replace the stale version");
+  assert(visibleAgain.hidden("[data-windows-download-notice]") === true, "visible tab refresh should hide the temporary pause notice for a verified release");
 
   console.log("release.js behavior check passed");
 }
