@@ -4,7 +4,12 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
+import subprocess
+import tempfile
+import urllib.error
+import urllib.request
 from collections.abc import Mapping
 from pathlib import Path
 from urllib.parse import urlparse
@@ -68,7 +73,7 @@ def _mapping(value: object, field: str) -> Mapping[str, object]:
 def _has_publisher_component(subject: str) -> bool:
     return bool(
         re.search(
-            r"(?:^|,\s*)(?:CN|O)=SignPath Foundation(?:,|$)",
+            r"(?:^|[,/]\s*)(?:CN|O)\s*=\s*SignPath Foundation(?:[,/]|$)",
             subject,
             re.IGNORECASE,
         )
@@ -160,10 +165,154 @@ def parse_osslsigncode_output(output: str) -> str:
         raise ReleaseVerificationError(
             "osslsigncode did not prove a timestamped signature"
         )
-    subjects = re.findall(r"(?m)^Subject:\s*(.+?)\s*$", output)
+    subjects = re.findall(r"(?m)^\s*Subject:\s*(.+?)\s*$", output)
     matching = [subject for subject in subjects if _has_publisher_component(subject)]
     if len(matching) != 1:
         raise ReleaseVerificationError(
             "osslsigncode publisher is not SignPath Foundation"
         )
     return matching[0].strip()
+
+
+def _asset_url(asset: Mapping[str, object], expected: str) -> str:
+    url = str(asset.get("url") or "")
+    if url != expected:
+        raise ReleaseVerificationError("release asset URL is not canonical")
+    return url
+
+
+def _download(
+    url: str,
+    destination: Path,
+    *,
+    urlopen,
+) -> None:
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "CATalyst-website-release-verifier/1"},
+    )
+    with urlopen(request, timeout=60) as response:
+        final = urlparse(str(response.geturl()))
+        if (
+            final.scheme != "https"
+            or final.hostname
+            not in {"github.com", "release-assets.githubusercontent.com"}
+        ):
+            raise ReleaseVerificationError("release asset redirect is not trusted")
+        with destination.open("wb") as handle:
+            while True:
+                chunk = response.read(1024 * 1024)
+                if not chunk:
+                    break
+                handle.write(chunk)
+
+
+def verify_windows_release(
+    release: Mapping[str, object],
+    temp_root: Path | None = None,
+    urlopen=urllib.request.urlopen,
+    runner=subprocess.run,
+) -> dict[str, object]:
+    """Download and independently verify one public Windows installer."""
+
+    try:
+        tag = str(release.get("tagName") or "")
+        match = re.fullmatch(r"v(\d+\.\d+\.\d+)", tag)
+        if not match:
+            raise ReleaseVerificationError("release tag is not semantic")
+        version = match.group(1)
+        installer_name = f"Catalyst-Setup-{tag}.exe"
+        sidecar_name = f"{installer_name}.sha256"
+        evidence_name = f"windows-signature-{tag}.json"
+        release_prefix = (
+            "https://github.com/Lowestofttim/catalyst-releases/"
+            f"releases/download/{tag}"
+        )
+
+        installer_asset = find_release_asset(release, installer_name)
+        sidecar_asset = find_release_asset(release, sidecar_name)
+        evidence_asset = find_release_asset(release, evidence_name)
+        installer_url = _asset_url(
+            installer_asset, f"{release_prefix}/{installer_name}"
+        )
+        sidecar_url = _asset_url(sidecar_asset, f"{release_prefix}/{sidecar_name}")
+        evidence_url = _asset_url(
+            evidence_asset, f"{release_prefix}/{evidence_name}"
+        )
+
+        root = None if temp_root is None else str(temp_root)
+        with tempfile.TemporaryDirectory(dir=root) as directory:
+            temporary = Path(directory)
+            installer_path = temporary / installer_name
+            sidecar_path = temporary / sidecar_name
+            evidence_path = temporary / evidence_name
+            _download(installer_url, installer_path, urlopen=urlopen)
+            _download(sidecar_url, sidecar_path, urlopen=urlopen)
+            _download(evidence_url, evidence_path, urlopen=urlopen)
+
+            expected_size = installer_asset.get("size")
+            if (
+                not isinstance(expected_size, int)
+                or expected_size <= 0
+                or installer_path.stat().st_size != expected_size
+            ):
+                raise ReleaseVerificationError("installer size does not match")
+            installer_sha256 = sha256_file(installer_path)
+            github_digest = str(installer_asset.get("digest") or "")
+            if github_digest != f"sha256:{installer_sha256}":
+                raise ReleaseVerificationError("GitHub installer digest does not match")
+            sidecar_digest = parse_sha256_sidecar(
+                sidecar_path.read_text(encoding="utf-8"),
+                installer_name,
+                expected_sha256=installer_sha256,
+            )
+            if sidecar_digest != installer_sha256:
+                raise ReleaseVerificationError("sidecar digest does not match")
+
+            evidence_bytes = evidence_path.read_bytes()
+            evidence = json.loads(evidence_bytes)
+            if not isinstance(evidence, Mapping):
+                raise ReleaseVerificationError("signature evidence is not an object")
+            validated = validate_evidence(
+                evidence,
+                installer_name,
+                installer_sha256,
+                expected_size,
+                version,
+            )
+
+            command = ["osslsigncode", "verify", "-in", str(installer_path)]
+            completed = runner(
+                command,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+            )
+            if completed.returncode != 0:
+                raise ReleaseVerificationError("osslsigncode returned failure")
+            signer_subject = parse_osslsigncode_output(completed.stdout)
+            signature = validated["signature"]
+            return {
+                "download_enabled": True,
+                "verification": {
+                    "authenticode_status": "valid",
+                    "publisher": "SignPath Foundation",
+                    "signer_subject": signer_subject,
+                    "signer_thumbprint": signature["signer_thumbprint"],
+                    "timestamp_status": "valid",
+                    "evidence_url": evidence_url,
+                    "evidence_sha256": hashlib.sha256(evidence_bytes).hexdigest(),
+                },
+            }
+    except (
+        FileNotFoundError,
+        OSError,
+        subprocess.CalledProcessError,
+        urllib.error.URLError,
+        UnicodeError,
+        json.JSONDecodeError,
+        ReleaseVerificationError,
+    ) as exc:
+        raise ReleaseVerificationError("Windows release verification failed") from exc
