@@ -33,8 +33,18 @@ jobs:
 
       - name: Install the pinned browser-test dependency
         run: |
-          python -m pip install playwright==1.60.0
+          python -m pip install playwright==1.60.0 cryptography==50.0.1
           python -m playwright install --with-deps chromium
+
+      - name: Install independent Authenticode verifier
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y osslsigncode
+
+      - name: Check Windows release verifier
+        run: |
+          # Every enabled Windows release requires windows-signature-vX.Y.Z.json.
+          python scripts/check_windows_release_verification.py
 
       - name: Sync the latest public release
         env:

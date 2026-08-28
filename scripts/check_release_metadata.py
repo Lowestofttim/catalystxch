@@ -10,7 +10,6 @@ from datetime import datetime
 from html.parser import HTMLParser
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
@@ -39,6 +38,12 @@ BOT_RELEASE_URL_PREFIX = (
     "https://github.com/catalystxch/catalyst-bot/releases/download/"
 )
 MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
+CODE_SIGNING_POLICY_URL = (
+    "https://github.com/catalystxch/catalyst-bot/blob/main/docs/CODE_SIGNING_POLICY.md"
+)
+PRIVACY_POLICY_URL = (
+    "https://github.com/catalystxch/catalyst-bot/blob/main/docs/PRIVACY.md"
+)
 DATA_RELEASE_ATTRS = {
     "data-release-download-name",
     "data-release-download-size",
@@ -53,6 +58,7 @@ DATA_RELEASE_ATTRS = {
     "data-release-sha256",
     "data-release-status",
     "data-release-version",
+    "data-release-windows-signature",
 }
 
 
@@ -117,9 +123,7 @@ class VersionLiteralParser(HTMLParser):
         if not value:
             return
         target = (
-            self.release_note_versions
-            if self._release_notes_depth
-            else self.versions
+            self.release_note_versions if self._release_notes_depth else self.versions
         )
         target.update(VERSION_RE.findall(value))
 
@@ -137,9 +141,7 @@ class VersionLiteralParser(HTMLParser):
                 self._release_notes_depth = 1
             return
 
-    def handle_startendtag(
-        self, tag: str, attrs: list[tuple[str, str | None]]
-    ) -> None:
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         del tag
         if self._release_notes_depth:
             return
@@ -227,6 +229,8 @@ def validate_metadata(data: dict) -> str:
 
     if data["source_repo"] != "Lowestofttim/catalyst-releases":
         fail("source_repo must be Lowestofttim/catalyst-releases")
+    if data["schema_version"] != 2:
+        fail("schema_version must be 2")
 
     if not isinstance(data["downloads_enabled"], bool):
         fail("downloads_enabled must be a boolean")
@@ -259,15 +263,21 @@ def validate_metadata(data: dict) -> str:
         and asset.get("platform") == "windows"
         and asset.get("kind") == "installer"
     ]
-    if data["downloads_enabled"] and len(windows_assets) != 1:
-        fail(
-            "enabled website downloads must expose exactly one Windows installer asset"
-        )
+    if len(windows_assets) != 1:
+        fail("website metadata must expose exactly one Windows installer record")
 
     for asset in assets:
         if not isinstance(asset, dict):
             fail("each asset must be an object")
-        for key in ["name", "platform", "kind", "size_bytes", "download_url", "sha256"]:
+        for key in [
+            "name",
+            "platform",
+            "kind",
+            "size_bytes",
+            "download_url",
+            "sha256",
+            "download_enabled",
+        ]:
             if key not in asset:
                 fail(f"asset is missing {key}")
         platform = asset["platform"]
@@ -280,7 +290,9 @@ def validate_metadata(data: dict) -> str:
             ("linux", "archive"),
         }:
             fail(f"unsupported website download asset: {platform} {kind}")
-        if data["downloads_enabled"]:
+        if not isinstance(asset["download_enabled"], bool):
+            fail("asset download_enabled must be a boolean")
+        if asset["download_enabled"]:
             expected_prefix = (
                 PUBLIC_RELEASE_URL_PREFIX
                 if platform == "windows"
@@ -294,11 +306,68 @@ def validate_metadata(data: dict) -> str:
                 r"[0-9a-f]{64}", asset["sha256"]
             ):
                 fail("enabled downloads must include a lowercase SHA-256 checksum")
+            if platform == "windows":
+                verification = asset.get("verification")
+                if not isinstance(verification, dict):
+                    fail("enabled Windows download requires signature verification")
+                expected_verification = {
+                    "authenticode_status": "valid",
+                    "publisher": "SignPath Foundation",
+                    "timestamp_status": "valid",
+                    "update_manifest_status": "valid",
+                }
+                for field, expected_value in expected_verification.items():
+                    if verification.get(field) != expected_value:
+                        fail(f"enabled Windows {field} is not verified")
+                if not re.fullmatch(
+                    r"[A-F0-9]{40}",
+                    str(verification.get("signer_thumbprint") or ""),
+                ):
+                    fail("enabled Windows signer thumbprint is invalid")
+                if not re.fullmatch(
+                    r"[a-f0-9]{64}",
+                    str(verification.get("evidence_sha256") or ""),
+                ):
+                    fail("enabled Windows evidence hash is invalid")
+                release_prefix = f"{PUBLIC_RELEASE_URL_PREFIX}{version}/"
+                if verification.get("update_manifest_url") != (
+                    f"{release_prefix}latest.json"
+                ):
+                    fail("enabled Windows update manifest URL is invalid")
+                if verification.get("update_manifest_signature_url") != (
+                    f"{release_prefix}latest.json.sig"
+                ):
+                    fail("enabled Windows update manifest signature URL is invalid")
         else:
             if asset["download_url"] is not None:
                 fail("download_url must be null while downloads_enabled is false")
             if asset["sha256"] is not None:
-                fail("sha256 must be null while downloads_enabled is false")
+                fail("sha256 must be null while asset download is disabled")
+            if platform == "windows":
+                verification = asset.get("verification")
+                if not isinstance(verification, dict):
+                    fail("disabled Windows asset requires unavailable verification")
+                if verification.get("authenticode_status") != "unavailable":
+                    fail("disabled Windows Authenticode status must be unavailable")
+                if verification.get("timestamp_status") != "unavailable":
+                    fail("disabled Windows timestamp status must be unavailable")
+                if verification.get("update_manifest_status") != "unavailable":
+                    fail("disabled Windows update manifest status must be unavailable")
+                for field in (
+                    "publisher",
+                    "signer_subject",
+                    "signer_thumbprint",
+                    "update_manifest_url",
+                    "update_manifest_signature_url",
+                    "evidence_url",
+                    "evidence_sha256",
+                ):
+                    if verification.get(field) is not None:
+                        fail(f"disabled Windows {field} must be null")
+
+    any_enabled = any(asset["download_enabled"] is True for asset in assets)
+    if data["downloads_enabled"] is not any_enabled:
+        fail("downloads_enabled must match per-asset availability")
 
     return version
 
@@ -317,7 +386,9 @@ def find_asset(data: dict, platform: str, kind: str) -> dict | None:
     candidates = [
         asset
         for asset in data["latest"]["assets"]
-        if asset.get("platform") == platform and asset.get("kind") == kind
+        if asset.get("platform") == platform
+        and asset.get("kind") == kind
+        and asset.get("download_enabled") is True
     ]
     candidates.sort(key=lambda asset: platform_download_priority(asset, platform))
     return candidates[0] if candidates else None
@@ -333,17 +404,15 @@ def validate_fallback_records(
     html_path: Path, html: str, data: dict, version: str
 ) -> None:
     latest = data["latest"]
-    asset = (
-        find_asset(data, "windows", "installer") if data["downloads_enabled"] else None
-    )
-    linux_asset = (
-        find_platform_download(data, "linux") if data["downloads_enabled"] else None
-    )
+    asset = find_asset(data, "windows", "installer")
+    linux_asset = find_platform_download(data, "linux")
     release_date = format_date(latest.get("published_at", ""))
     if asset and linux_asset:
         status = "Windows/Linux downloads available"
     elif asset:
         status = "Windows download available"
+    elif linux_asset:
+        status = "Linux download available"
     else:
         status = "Public links coming soon"
     channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
@@ -359,7 +428,7 @@ def validate_fallback_records(
         "data-release-meta": meta,
         "data-release-eyebrow": (
             f"{status} - current release {version}"
-            if asset
+            if asset or linux_asset
             else f"Public downloads coming soon - current beta {version}"
         ),
         "data-release-download-name": asset["name"] if asset else "Not available",
@@ -367,6 +436,11 @@ def validate_fallback_records(
         if asset
         else "",
         "data-release-sha256": asset["sha256"] if asset else "Not available",
+        "data-release-windows-signature": (
+            "Verified publisher: SignPath Foundation"
+            if asset
+            else "Windows installer unavailable - signature verification required"
+        ),
         "data-release-macos-size": "GitHub source",
         "data-release-linux-size": format_bytes(linux_asset["size_bytes"])
         if linux_asset
@@ -419,6 +493,18 @@ def validate_website_wiring(data: dict, version: str) -> None:
         fail(
             "assets/release.js must allow only the public CATalyst bot release host for Linux downloads"
         )
+    for marker in (
+        "isVerifiedWindowsInstaller",
+        "SignPath Foundation",
+        "download_enabled",
+        "timestamp_status",
+        "update_manifest_status",
+        "update_manifest_url",
+        "update_manifest_signature_url",
+        "evidence_sha256",
+    ):
+        if marker not in release_js:
+            fail(f"assets/release.js is missing Windows verification marker {marker}")
 
     allowed_release_note_versions = {
         release_version
@@ -433,6 +519,16 @@ def validate_website_wiring(data: dict, version: str) -> None:
             fail(f"{rel} must load a cache-busted assets/release.js")
         if "data-release-version" not in html:
             fail(f"{rel} must contain data-release-version hooks")
+        if "data-release-windows-signature" not in html:
+            fail(f"{rel} must contain data-release-windows-signature hooks")
+        if CODE_SIGNING_POLICY_URL not in html or not re.search(
+            r">\s*Code signing policy\s*<", html, re.IGNORECASE
+        ):
+            fail(f"{rel} must link the Code signing policy")
+        if PRIVACY_POLICY_URL not in html or not re.search(
+            r">\s*Privacy(?: policy)?\s*<", html, re.IGNORECASE
+        ):
+            fail(f"{rel} must link the Privacy policy")
         if html_path.name == "index.html" and "data-download-windows" not in html:
             fail("index.html must contain a Windows download link hook")
         if html_path.name == "index.html" and (
