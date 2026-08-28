@@ -18,8 +18,10 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from windows_release_verification import verify_windows_release
-
+from windows_release_verification import (
+    ReleaseVerificationError,
+    verify_windows_release,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPO = "Lowestofttim/catalyst-releases"
@@ -115,7 +117,7 @@ def classify_platform(name: str) -> str:
 
 def classify_kind(name: str) -> str:
     lower = name.lower()
-    if lower.endswith((".sha256", ".sig")) or lower.endswith(".json"):
+    if lower.endswith((".sha256", ".sig", ".json")):
         return "asset"
     if (
         lower.endswith((".exe", ".msi", ".pkg", ".dmg", ".appimage", ".deb"))
@@ -140,9 +142,7 @@ def sort_asset_key(asset: dict) -> tuple[int, int, int, str]:
         format_order = 0
     elif lower.endswith(".appimage"):
         format_order = 1
-    elif lower.endswith(".zip"):
-        format_order = 10
-    elif lower.endswith((".tar.gz", ".tgz")):
+    elif lower.endswith((".zip", ".tar.gz", ".tgz")):
         format_order = 10
     return (
         platform_order.get(asset["platform"], 99),
@@ -176,6 +176,9 @@ def _unavailable_windows_verification() -> dict[str, object]:
         "signer_subject": None,
         "signer_thumbprint": None,
         "timestamp_status": "unavailable",
+        "update_manifest_status": "unavailable",
+        "update_manifest_url": None,
+        "update_manifest_signature_url": None,
         "evidence_url": None,
         "evidence_sha256": None,
     }
@@ -219,7 +222,10 @@ def build_metadata(
 
     windows_result = None
     if platform == "windows" and include_download_urls:
-        windows_result = windows_verifier(release)
+        try:
+            windows_result = windows_verifier(release)
+        except ReleaseVerificationError:
+            windows_result = None
 
     expected_windows_name = f"Catalyst-Setup-{version}.exe"
     assets = []
@@ -245,6 +251,9 @@ def build_metadata(
         }
         if platform == "windows":
             if windows_result is None:
+                asset["download_url"] = None
+                asset["sha256"] = None
+                asset["download_enabled"] = False
                 asset["verification"] = _unavailable_windows_verification()
             else:
                 asset["download_enabled"] = (
@@ -298,9 +307,7 @@ def _platform_download_priority(item: dict) -> tuple[int, int, str]:
         format_priority = 0
     elif lower.endswith(".appimage"):
         format_priority = 1
-    elif lower.endswith(".zip"):
-        format_priority = 10
-    elif lower.endswith((".tar.gz", ".tgz")):
+    elif lower.endswith((".zip", ".tar.gz", ".tgz")):
         format_priority = 10
     return (kind_priority, format_priority, lower)
 
@@ -495,9 +502,7 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         ),
         "data-release-macos-size": "GitHub source",
         "data-release-macos-sha256": "Source only from GitHub",
-        "data-release-linux-size": _format_bytes(linux["size_bytes"])
-        if linux
-        else "",
+        "data-release-linux-size": _format_bytes(linux["size_bytes"]) if linux else "",
         "data-release-linux-sha256": linux["sha256"] if linux else "Not available",
     }
     rendered = html_text
@@ -520,7 +525,9 @@ def preserve_generated_at_if_unchanged(metadata: dict, existing: dict) -> None:
 
     if not isinstance(existing, dict):
         return
-    current_without_time = {key: value for key, value in metadata.items() if key != "generated_at"}
+    current_without_time = {
+        key: value for key, value in metadata.items() if key != "generated_at"
+    }
     existing_without_time = {
         key: value for key, value in existing.items() if key != "generated_at"
     }

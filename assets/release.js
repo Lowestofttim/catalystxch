@@ -52,16 +52,25 @@
     return 50;
   };
 
-  const isVerifiedWindowsInstaller = (asset) => (
-    asset &&
-    asset.download_enabled === true &&
-    asset.verification &&
-    asset.verification.authenticode_status === "valid" &&
-    asset.verification.publisher === "SignPath Foundation" &&
-    asset.verification.timestamp_status === "valid" &&
-    /^[A-F0-9]{40}$/.test(asset.verification.signer_thumbprint || "") &&
-    /^[a-f0-9]{64}$/.test(asset.verification.evidence_sha256 || "")
-  );
+  const isVerifiedWindowsInstaller = (asset) => {
+    if (!asset || asset.download_enabled !== true || !asset.verification) return false;
+    const nameMatch = /^Catalyst-Setup-(v\d+\.\d+\.\d+)\.exe$/.exec(asset.name || "");
+    if (!nameMatch) return false;
+    const tag = nameMatch[1];
+    const releaseBase = `https://github.com/Lowestofttim/catalyst-releases/releases/download/${tag}/`;
+    return (
+      asset.download_url === `${releaseBase}${asset.name}` &&
+      asset.verification.authenticode_status === "valid" &&
+      asset.verification.publisher === "SignPath Foundation" &&
+      asset.verification.timestamp_status === "valid" &&
+      asset.verification.update_manifest_status === "valid" &&
+      asset.verification.update_manifest_url === `${releaseBase}latest.json` &&
+      asset.verification.update_manifest_signature_url === `${releaseBase}latest.json.sig` &&
+      asset.verification.evidence_url === `${releaseBase}windows-signature-${tag}.json` &&
+      /^[A-F0-9]{40}$/.test(asset.verification.signer_thumbprint || "") &&
+      /^[a-f0-9]{64}$/.test(asset.verification.evidence_sha256 || "")
+    );
+  };
 
   const findAsset = (latest, platform, kind) => {
     if (!Array.isArray(latest.assets)) return null;

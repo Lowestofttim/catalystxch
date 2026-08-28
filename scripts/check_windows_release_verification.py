@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import base64
 import copy
 import hashlib
 import io
@@ -12,6 +13,8 @@ import tempfile
 import urllib.error
 from pathlib import Path
 
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from windows_release_verification import (
     ReleaseVerificationError,
     find_release_asset,
@@ -19,9 +22,9 @@ from windows_release_verification import (
     parse_sha256_sidecar,
     sha256_file,
     validate_evidence,
+    validate_signed_update_manifest,
     verify_windows_release,
 )
-
 
 INSTALLER_NAME = "Catalyst-Setup-v1.3.17.exe"
 VALID_HASH = "c" * 64
@@ -66,7 +69,9 @@ def expect_failure(action, expected: str) -> None:
         if expected not in str(exc):
             raise AssertionError(f"expected {expected!r} in {str(exc)!r}") from exc
     else:
-        raise AssertionError(f"expected ReleaseVerificationError containing {expected!r}")
+        raise AssertionError(
+            f"expected ReleaseVerificationError containing {expected!r}"
+        )
 
 
 def check_pure_validation() -> None:
@@ -95,8 +100,16 @@ def check_pure_validation() -> None:
         (("source", "tag"), "v1.3.16", "source tag"),
         (("source", "commit"), "a" * 39, "source commit"),
         (("source", "workflow_run_url"), "https://example.com/run/1", "workflow URL"),
-        (("signpath", "application_signing_request_id"), "", "application_signing_request_id"),
-        (("signpath", "installer_signing_request_id"), "", "installer_signing_request_id"),
+        (
+            ("signpath", "application_signing_request_id"),
+            "",
+            "application_signing_request_id",
+        ),
+        (
+            ("signpath", "installer_signing_request_id"),
+            "",
+            "installer_signing_request_id",
+        ),
     ]
     for path, value, message in mutations:
         evidence = copy.deepcopy(VALID_EVIDENCE)
@@ -111,13 +124,17 @@ def check_pure_validation() -> None:
             message,
         )
 
-    assert parse_sha256_sidecar(
-        f"{VALID_HASH}  {INSTALLER_NAME}\n", INSTALLER_NAME
-    ) == VALID_HASH
+    assert (
+        parse_sha256_sidecar(f"{VALID_HASH}  {INSTALLER_NAME}\n", INSTALLER_NAME)
+        == VALID_HASH
+    )
     for text, message in [
         (f"{VALID_HASH}  other.exe\n", "filename"),
         (f"{'d' * 64}  {INSTALLER_NAME}\n", "checksum"),
-        (f"{VALID_HASH}  {INSTALLER_NAME}\n{VALID_HASH}  {INSTALLER_NAME}\n", "one record"),
+        (
+            f"{VALID_HASH}  {INSTALLER_NAME}\n{VALID_HASH}  {INSTALLER_NAME}\n",
+            "one record",
+        ),
         (f"not-a-hash  {INSTALLER_NAME}\n", "filename"),
     ]:
         expect_failure(
@@ -143,7 +160,10 @@ The signature is timestamped: Aug 28 2026
     assert "/O=SignPath Foundation/" in parse_osslsigncode_output(slash_output)
     for bad_output, message in [
         (output.replace("Succeeded", "Failed"), "timestamped signature"),
-        (output.replace("The signature is timestamped", "No timestamp"), "timestamped signature"),
+        (
+            output.replace("The signature is timestamped", "No timestamp"),
+            "timestamped signature",
+        ),
         (
             output.replace(
                 "Subject: CN=SignPath Foundation, O=SignPath Foundation",
@@ -152,7 +172,9 @@ The signature is timestamped: Aug 28 2026
             "publisher",
         ),
     ]:
-        expect_failure(lambda value=bad_output: parse_osslsigncode_output(value), message)
+        expect_failure(
+            lambda value=bad_output: parse_osslsigncode_output(value), message
+        )
 
     with tempfile.TemporaryDirectory() as directory:
         artifact = Path(directory) / "artifact.bin"
@@ -182,20 +204,53 @@ def build_release_fixture():
     installer_bytes = b"signed-installer"
     installer_hash = hashlib.sha256(installer_bytes).hexdigest()
     base_url = (
-        "https://github.com/Lowestofttim/catalyst-releases/"
-        "releases/download/v1.3.17"
+        "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.17"
     )
     evidence = copy.deepcopy(VALID_EVIDENCE)
     evidence["artifact"]["sha256"] = installer_hash
     evidence_bytes = (json.dumps(evidence, sort_keys=True) + "\n").encode()
     sidecar_name = f"{INSTALLER_NAME}.sha256"
     evidence_name = "windows-signature-v1.3.17.json"
+    manifest_name = "latest.json"
+    manifest_signature_name = "latest.json.sig"
+    manifest = {
+        "schema": 1,
+        "app": "CATalyst",
+        "channel": "stable",
+        "version": "1.3.17",
+        "tag": "v1.3.17",
+        "published_at": "2026-08-28T08:00:00Z",
+        "expires_at": "2026-11-26T08:00:00Z",
+        "release_url": (
+            "https://github.com/Lowestofttim/catalyst-releases/releases/tag/v1.3.17"
+        ),
+        "release_notes": "Signed release",
+        "platforms": {
+            "windows-x64": {
+                "installer": {
+                    "name": INSTALLER_NAME,
+                    "url": f"{base_url}/{INSTALLER_NAME}",
+                    "size": len(installer_bytes),
+                    "sha256": installer_hash,
+                }
+            }
+        },
+    }
+    manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
+    signing_key = Ed25519PrivateKey.from_private_bytes(bytes(range(32)))
+    public_key_b64 = base64.b64encode(
+        signing_key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+    ).decode("ascii")
+    canonical_manifest = json.dumps(
+        manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    manifest_signature = base64.b64encode(signing_key.sign(canonical_manifest)) + b"\n"
     payloads = {
         f"{base_url}/{INSTALLER_NAME}": installer_bytes,
-        f"{base_url}/{sidecar_name}": (
-            f"{installer_hash}  {INSTALLER_NAME}".encode()
-        ),
+        f"{base_url}/{sidecar_name}": (f"{installer_hash}  {INSTALLER_NAME}".encode()),
         f"{base_url}/{evidence_name}": evidence_bytes,
+        f"{base_url}/{manifest_name}": manifest_bytes,
+        f"{base_url}/{manifest_signature_name}": manifest_signature,
     }
     release = {
         "tagName": "v1.3.17",
@@ -216,13 +271,39 @@ def build_release_fixture():
                 "url": f"{base_url}/{evidence_name}",
                 "size": len(evidence_bytes),
             },
+            {
+                "name": manifest_name,
+                "url": f"{base_url}/{manifest_name}",
+                "size": len(manifest_bytes),
+            },
+            {
+                "name": manifest_signature_name,
+                "url": f"{base_url}/{manifest_signature_name}",
+                "size": len(manifest_signature),
+            },
         ],
     }
-    return release, payloads, evidence_bytes, installer_hash
+    return release, payloads, evidence_bytes, installer_hash, public_key_b64
 
 
 def check_end_to_end_verification() -> None:
-    release, payloads, evidence_bytes, _installer_hash = build_release_fixture()
+    release, payloads, evidence_bytes, installer_hash, public_key_b64 = (
+        build_release_fixture()
+    )
+
+    manifest = json.loads(payloads[release["assets"][3]["url"]])
+    signature = payloads[release["assets"][4]["url"]]
+    validated_manifest = validate_signed_update_manifest(
+        manifest,
+        signature,
+        public_key_b64=public_key_b64,
+        installer_name=INSTALLER_NAME,
+        installer_url=release["assets"][0]["url"],
+        installer_size=len(payloads[release["assets"][0]["url"]]),
+        installer_sha256=installer_hash,
+        expected_tag="v1.3.17",
+    )
+    assert validated_manifest["tag"] == "v1.3.17"
 
     def opener(request, timeout):
         assert timeout > 0
@@ -230,8 +311,14 @@ def check_end_to_end_verification() -> None:
         return FakeResponse(payloads[url], url)
 
     def runner(command, **options):
-        assert command[0:3] == ["osslsigncode", "verify", "-in"]
-        assert Path(command[3]).read_bytes() == b"signed-installer"
+        assert command[0:4] == [
+            "osslsigncode",
+            "verify",
+            "-require-leaf-hash",
+            "sha1:" + "A" * 40,
+        ]
+        assert command[4] == "-in"
+        assert Path(command[5]).read_bytes() == b"signed-installer"
         assert options["check"] is False
         return subprocess.CompletedProcess(
             command,
@@ -247,6 +334,8 @@ The signature is timestamped: Aug 28 2026
         release,
         urlopen=opener,
         runner=runner,
+        trusted_signer_thumbprints=frozenset({"A" * 40}),
+        manifest_public_key_b64=public_key_b64,
     )
     assert result == {
         "download_enabled": True,
@@ -256,6 +345,15 @@ The signature is timestamped: Aug 28 2026
             "signer_subject": "CN=SignPath Foundation, O=SignPath Foundation",
             "signer_thumbprint": "A" * 40,
             "timestamp_status": "valid",
+            "update_manifest_status": "valid",
+            "update_manifest_url": (
+                "https://github.com/Lowestofttim/catalyst-releases/"
+                "releases/download/v1.3.17/latest.json"
+            ),
+            "update_manifest_signature_url": (
+                "https://github.com/Lowestofttim/catalyst-releases/"
+                "releases/download/v1.3.17/latest.json.sig"
+            ),
             "evidence_url": (
                 "https://github.com/Lowestofttim/catalyst-releases/"
                 "releases/download/v1.3.17/windows-signature-v1.3.17.json"
@@ -274,6 +372,8 @@ The signature is timestamped: Aug 28 2026
                 release_value,
                 urlopen=test_opener,
                 runner=runner_value,
+                trusted_signer_thumbprints=frozenset({"A" * 40}),
+                manifest_public_key_b64=public_key_b64,
             ),
             "Windows release verification failed",
         )
@@ -285,6 +385,8 @@ The signature is timestamped: Aug 28 2026
                 urllib.error.URLError("offline")
             ),
             runner=runner,
+            trusted_signer_thumbprints=frozenset({"A" * 40}),
+            manifest_public_key_b64=public_key_b64,
         ),
         "Windows release verification failed",
     )
@@ -294,7 +396,11 @@ The signature is timestamped: Aug 28 2026
 
     expect_failure(
         lambda: verify_windows_release(
-            release, urlopen=redirected_opener, runner=runner
+            release,
+            urlopen=redirected_opener,
+            runner=runner,
+            trusted_signer_thumbprints=frozenset({"A" * 40}),
+            manifest_public_key_b64=public_key_b64,
         ),
         "Windows release verification failed",
     )
@@ -318,6 +424,35 @@ The signature is timestamped: Aug 28 2026
     bad_evidence["signature"]["publisher"] = "Unknown"
     bad_evidence_payloads[evidence_url] = json.dumps(bad_evidence).encode()
     expect_verification_failure(release, bad_evidence_payloads)
+
+    untrusted_evidence_payloads = dict(payloads)
+    untrusted_evidence = copy.deepcopy(VALID_EVIDENCE)
+    untrusted_evidence["artifact"]["sha256"] = installer_hash
+    untrusted_evidence["signature"]["signer_thumbprint"] = "C" * 40
+    untrusted_evidence_payloads[evidence_url] = json.dumps(untrusted_evidence).encode()
+    expect_verification_failure(release, untrusted_evidence_payloads)
+
+    manifest_url = release["assets"][3]["url"]
+    bad_manifest_payloads = dict(payloads)
+    bad_manifest = json.loads(bad_manifest_payloads[manifest_url])
+    bad_manifest["platforms"]["windows-x64"]["installer"]["sha256"] = "d" * 64
+    bad_manifest_payloads[manifest_url] = json.dumps(bad_manifest).encode()
+    expect_verification_failure(release, bad_manifest_payloads)
+
+    bad_signature_payloads = dict(payloads)
+    bad_signature_payloads[release["assets"][4]["url"]] = base64.b64encode(b"x" * 64)
+    expect_verification_failure(release, bad_signature_payloads)
+
+    expect_failure(
+        lambda: verify_windows_release(
+            release,
+            urlopen=opener,
+            runner=runner,
+            trusted_signer_thumbprints=frozenset(),
+            manifest_public_key_b64=public_key_b64,
+        ),
+        "Windows release verification failed",
+    )
 
     expect_verification_failure(
         release,

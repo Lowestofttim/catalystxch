@@ -28,6 +28,9 @@
           "signer_subject": null,
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
+          "update_manifest_status": "unavailable",
+          "update_manifest_url": null,
+          "update_manifest_signature_url": null,
           "evidence_url": null,
           "evidence_sha256": null
         }

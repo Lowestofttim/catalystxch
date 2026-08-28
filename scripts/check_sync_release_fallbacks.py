@@ -48,6 +48,11 @@ def main() -> None:
                         ),
                         "signer_thumbprint": "A" * 40,
                         "timestamp_status": "valid",
+                        "update_manifest_status": "valid",
+                        "update_manifest_url": "https://github.com/example/latest.json",
+                        "update_manifest_signature_url": (
+                            "https://github.com/example/latest.json.sig"
+                        ),
                         "evidence_url": "https://github.com/example/evidence.json",
                         "evidence_sha256": "c" * 64,
                     },
@@ -110,9 +115,7 @@ def main() -> None:
   <ul data-release-notes><li>Fix v9.8.6 startup migration</li></ul>
 </main>
 """
-    if find_stale_literal_versions(
-        release_note_history, "v9.8.7", {"v9.8.6"}
-    ):
+    if find_stale_literal_versions(release_note_history, "v9.8.7", {"v9.8.6"}):
         raise SystemExit("historical versions in release notes must not be stale")
 
     stale_page_copy = """<main>
@@ -158,9 +161,9 @@ def main() -> None:
   </ul>
 </main>
 """
-    if find_stale_literal_versions(
-        extra_stale_release_note, "v9.8.7", {"v9.8.6"}
-    ) != ["v9.8.5"]:
+    if find_stale_literal_versions(extra_stale_release_note, "v9.8.7", {"v9.8.6"}) != [
+        "v9.8.5"
+    ]:
         raise SystemExit(
             "only historical versions in the configured release notes may be exempt"
         )
@@ -237,9 +240,7 @@ def main() -> None:
     }
     append_platform_downloads(verified, linux_release, True)
     linux = next(
-        asset
-        for asset in verified["latest"]["assets"]
-        if asset["platform"] == "linux"
+        asset for asset in verified["latest"]["assets"] if asset["platform"] == "linux"
     )
     if linux.get("download_enabled") is not True or "verification" in linux:
         raise SystemExit("Linux availability must be independent of Windows signing")
@@ -261,6 +262,9 @@ def main() -> None:
                 "signer_subject": None,
                 "signer_thumbprint": None,
                 "timestamp_status": "unavailable",
+                "update_manifest_status": "unavailable",
+                "update_manifest_url": None,
+                "update_manifest_signature_url": None,
                 "evidence_url": None,
                 "evidence_sha256": None,
             },
@@ -271,7 +275,10 @@ def main() -> None:
     disabled_html = render_release_fallbacks(source, disabled)
     if "Linux download available" not in disabled_html:
         raise SystemExit("disabled Windows must not disable Linux")
-    if "Windows installer unavailable - signature verification required" not in disabled_html:
+    if (
+        "Windows installer unavailable - signature verification required"
+        not in disabled_html
+    ):
         raise SystemExit("disabled Windows signature status must be visible")
 
     with tempfile.TemporaryDirectory() as directory:
@@ -281,23 +288,46 @@ def main() -> None:
         def fail_verification(_release):
             raise ReleaseVerificationError("expected verifier failure")
 
-        try:
-            failed_metadata = build_metadata(
-                release,
-                "Lowestofttim/catalyst-releases",
-                True,
-                "windows",
-                "installer",
-                windows_verifier=fail_verification,
+        failed_metadata = build_metadata(
+            release,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            windows_verifier=fail_verification,
+        )
+        failed_windows = failed_metadata["latest"]["assets"][0]
+        if failed_windows["download_enabled"] is not False:
+            raise SystemExit("failed Windows verification must disable Windows")
+        if failed_windows["verification"] != {
+            "authenticode_status": "unavailable",
+            "publisher": None,
+            "signer_subject": None,
+            "signer_thumbprint": None,
+            "timestamp_status": "unavailable",
+            "update_manifest_status": "unavailable",
+            "update_manifest_url": None,
+            "update_manifest_signature_url": None,
+            "evidence_url": None,
+            "evidence_sha256": None,
+        }:
+            raise SystemExit(
+                "failed Windows verification used trusted-looking metadata"
             )
-            write_metadata_atomic(output, failed_metadata)
-        except ReleaseVerificationError:
-            pass
-        else:
-            raise SystemExit("a failed verifier must stop metadata generation")
-        if output.read_bytes() != b'{"trusted": true}\n':
-            raise SystemExit("failed verification changed existing metadata")
+        append_platform_downloads(failed_metadata, linux_release, True)
+        if failed_metadata["download_status"] != "partial":
+            raise SystemExit(
+                "Linux must remain available when Windows verification fails"
+            )
+        write_metadata_atomic(output, failed_metadata)
+        written = json.loads(output.read_text(encoding="utf-8"))
+        if not any(
+            asset.get("platform") == "linux" and asset.get("download_enabled") is True
+            for asset in written["latest"]["assets"]
+        ):
+            raise SystemExit("failed Windows verification removed the Linux release")
 
+        before_replace_failure = output.read_bytes()
         with patch.object(Path, "replace", side_effect=OSError("replace failed")):
             try:
                 write_metadata_atomic(output, {"value": "new"})
@@ -305,7 +335,7 @@ def main() -> None:
                 pass
             else:
                 raise SystemExit("atomic replace failure must propagate")
-        if output.read_bytes() != b'{"trusted": true}\n':
+        if output.read_bytes() != before_replace_failure:
             raise SystemExit("failed atomic replace changed existing metadata")
         leftovers = list(output.parent.glob(f".{output.name}.*.tmp"))
         if leftovers:

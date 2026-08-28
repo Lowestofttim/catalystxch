@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import re
@@ -14,9 +15,21 @@ from collections.abc import Mapping
 from pathlib import Path
 from urllib.parse import urlparse
 
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
 
 class ReleaseVerificationError(RuntimeError):
     """Raised when a public Windows release cannot be independently verified."""
+
+
+UPDATE_MANIFEST_PUBLIC_KEY_B64 = "cyjvFTb0quqOQdl2c0TMwzwF8PBb74qwGztqxLSazBQ="
+
+# SignPath Foundation assigns the production leaf certificate after accepting
+# the project. The first signed release must add its independently observed
+# SHA-1 thumbprint here through a reviewed website change. An empty allowlist
+# deliberately keeps Windows downloads disabled until that has happened.
+TRUSTED_SIGNER_THUMBPRINTS: frozenset[str] = frozenset()
 
 
 def sha256_file(path: Path) -> str:
@@ -122,9 +135,7 @@ def validate_evidence(
         raise ReleaseVerificationError("evidence signer subject is invalid")
     if not str(signature.get("timestamp_subject") or "").strip():
         raise ReleaseVerificationError("evidence timestamp subject is missing")
-    if not re.fullmatch(
-        r"[A-F0-9]{40}", str(signature.get("signer_thumbprint") or "")
-    ):
+    if not re.fullmatch(r"[A-F0-9]{40}", str(signature.get("signer_thumbprint") or "")):
         raise ReleaseVerificationError("evidence signer thumbprint is invalid")
     if not re.fullmatch(
         r"[A-F0-9]{40}", str(signature.get("timestamp_thumbprint") or "")
@@ -156,6 +167,64 @@ def validate_evidence(
         "source": dict(source),
         "signpath": dict(signpath),
     }
+
+
+def _canonical_manifest_bytes(manifest: Mapping[str, object]) -> bytes:
+    return json.dumps(
+        manifest,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def validate_signed_update_manifest(
+    manifest: Mapping[str, object],
+    signature_bytes: bytes,
+    *,
+    public_key_b64: str,
+    installer_name: str,
+    installer_url: str,
+    installer_size: int,
+    installer_sha256: str,
+    expected_tag: str,
+) -> dict[str, object]:
+    """Verify CATalyst's project key and bind it to exact installer bytes."""
+
+    try:
+        public_key = Ed25519PublicKey.from_public_bytes(
+            base64.b64decode(public_key_b64, validate=True)
+        )
+        signature = base64.b64decode(signature_bytes.strip(), validate=True)
+        public_key.verify(signature, _canonical_manifest_bytes(manifest))
+    except (InvalidSignature, ValueError, UnicodeError) as exc:
+        raise ReleaseVerificationError(
+            "CATalyst update manifest signature is invalid"
+        ) from exc
+
+    version = expected_tag.removeprefix("v")
+    platforms = _mapping(manifest.get("platforms"), "manifest platforms")
+    windows = _mapping(platforms.get("windows-x64"), "manifest windows-x64")
+    installer = _mapping(windows.get("installer"), "manifest installer")
+    expected = {
+        "schema": (manifest.get("schema"), 1),
+        "app": (manifest.get("app"), "CATalyst"),
+        "channel": (manifest.get("channel"), "stable"),
+        "version": (manifest.get("version"), version),
+        "tag": (manifest.get("tag"), expected_tag),
+        "release URL": (
+            manifest.get("release_url"),
+            f"https://github.com/Lowestofttim/catalyst-releases/releases/tag/{expected_tag}",
+        ),
+        "installer name": (installer.get("name"), installer_name),
+        "installer URL": (installer.get("url"), installer_url),
+        "installer size": (installer.get("size"), installer_size),
+        "installer hash": (installer.get("sha256"), installer_sha256),
+    }
+    for field, (actual, wanted) in expected.items():
+        if actual != wanted:
+            raise ReleaseVerificationError(f"signed manifest {field} does not match")
+    return dict(manifest)
 
 
 def parse_osslsigncode_output(output: str) -> str:
@@ -193,11 +262,10 @@ def _download(
     )
     with urlopen(request, timeout=60) as response:
         final = urlparse(str(response.geturl()))
-        if (
-            final.scheme != "https"
-            or final.hostname
-            not in {"github.com", "release-assets.githubusercontent.com"}
-        ):
+        if final.scheme != "https" or final.hostname not in {
+            "github.com",
+            "release-assets.githubusercontent.com",
+        }:
             raise ReleaseVerificationError("release asset redirect is not trusted")
         with destination.open("wb") as handle:
             while True:
@@ -212,6 +280,8 @@ def verify_windows_release(
     temp_root: Path | None = None,
     urlopen=urllib.request.urlopen,
     runner=subprocess.run,
+    trusted_signer_thumbprints: frozenset[str] = TRUSTED_SIGNER_THUMBPRINTS,
+    manifest_public_key_b64: str = UPDATE_MANIFEST_PUBLIC_KEY_B64,
 ) -> dict[str, object]:
     """Download and independently verify one public Windows installer."""
 
@@ -224,20 +294,26 @@ def verify_windows_release(
         installer_name = f"Catalyst-Setup-{tag}.exe"
         sidecar_name = f"{installer_name}.sha256"
         evidence_name = f"windows-signature-{tag}.json"
+        manifest_name = "latest.json"
+        manifest_signature_name = "latest.json.sig"
         release_prefix = (
-            "https://github.com/Lowestofttim/catalyst-releases/"
-            f"releases/download/{tag}"
+            f"https://github.com/Lowestofttim/catalyst-releases/releases/download/{tag}"
         )
 
         installer_asset = find_release_asset(release, installer_name)
         sidecar_asset = find_release_asset(release, sidecar_name)
         evidence_asset = find_release_asset(release, evidence_name)
+        manifest_asset = find_release_asset(release, manifest_name)
+        manifest_signature_asset = find_release_asset(release, manifest_signature_name)
         installer_url = _asset_url(
             installer_asset, f"{release_prefix}/{installer_name}"
         )
         sidecar_url = _asset_url(sidecar_asset, f"{release_prefix}/{sidecar_name}")
-        evidence_url = _asset_url(
-            evidence_asset, f"{release_prefix}/{evidence_name}"
+        evidence_url = _asset_url(evidence_asset, f"{release_prefix}/{evidence_name}")
+        manifest_url = _asset_url(manifest_asset, f"{release_prefix}/{manifest_name}")
+        manifest_signature_url = _asset_url(
+            manifest_signature_asset,
+            f"{release_prefix}/{manifest_signature_name}",
         )
 
         root = None if temp_root is None else str(temp_root)
@@ -246,9 +322,17 @@ def verify_windows_release(
             installer_path = temporary / installer_name
             sidecar_path = temporary / sidecar_name
             evidence_path = temporary / evidence_name
+            manifest_path = temporary / manifest_name
+            manifest_signature_path = temporary / manifest_signature_name
             _download(installer_url, installer_path, urlopen=urlopen)
             _download(sidecar_url, sidecar_path, urlopen=urlopen)
             _download(evidence_url, evidence_path, urlopen=urlopen)
+            _download(manifest_url, manifest_path, urlopen=urlopen)
+            _download(
+                manifest_signature_url,
+                manifest_signature_path,
+                urlopen=urlopen,
+            )
 
             expected_size = installer_asset.get("size")
             if (
@@ -281,7 +365,39 @@ def verify_windows_release(
                 version,
             )
 
-            command = ["osslsigncode", "verify", "-in", str(installer_path)]
+            manifest = json.loads(manifest_path.read_bytes())
+            if not isinstance(manifest, Mapping):
+                raise ReleaseVerificationError("update manifest is not an object")
+            validate_signed_update_manifest(
+                manifest,
+                manifest_signature_path.read_bytes(),
+                public_key_b64=manifest_public_key_b64,
+                installer_name=installer_name,
+                installer_url=installer_url,
+                installer_size=expected_size,
+                installer_sha256=installer_sha256,
+                expected_tag=tag,
+            )
+
+            signature = validated["signature"]
+            signer_thumbprint = str(signature["signer_thumbprint"])
+            trusted = {
+                str(value).strip().upper()
+                for value in trusted_signer_thumbprints
+                if re.fullmatch(r"[A-Fa-f0-9]{40}", str(value).strip())
+            }
+            if signer_thumbprint not in trusted:
+                raise ReleaseVerificationError(
+                    "signer thumbprint is not trusted for CATalyst"
+                )
+            command = [
+                "osslsigncode",
+                "verify",
+                "-require-leaf-hash",
+                f"sha1:{signer_thumbprint}",
+                "-in",
+                str(installer_path),
+            ]
             completed = runner(
                 command,
                 check=False,
@@ -293,7 +409,6 @@ def verify_windows_release(
             if completed.returncode != 0:
                 raise ReleaseVerificationError("osslsigncode returned failure")
             signer_subject = parse_osslsigncode_output(completed.stdout)
-            signature = validated["signature"]
             return {
                 "download_enabled": True,
                 "verification": {
@@ -302,6 +417,9 @@ def verify_windows_release(
                     "signer_subject": signer_subject,
                     "signer_thumbprint": signature["signer_thumbprint"],
                     "timestamp_status": "valid",
+                    "update_manifest_status": "valid",
+                    "update_manifest_url": manifest_url,
+                    "update_manifest_signature_url": manifest_signature_url,
                     "evidence_url": evidence_url,
                     "evidence_sha256": hashlib.sha256(evidence_bytes).hexdigest(),
                 },

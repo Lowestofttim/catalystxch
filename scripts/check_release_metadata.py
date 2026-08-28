@@ -10,7 +10,6 @@ from datetime import datetime
 from html.parser import HTMLParser
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
@@ -40,8 +39,7 @@ BOT_RELEASE_URL_PREFIX = (
 )
 MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
 CODE_SIGNING_POLICY_URL = (
-    "https://github.com/catalystxch/catalyst-bot/blob/main/"
-    "docs/CODE_SIGNING_POLICY.md"
+    "https://github.com/catalystxch/catalyst-bot/blob/main/docs/CODE_SIGNING_POLICY.md"
 )
 PRIVACY_POLICY_URL = (
     "https://github.com/catalystxch/catalyst-bot/blob/main/docs/PRIVACY.md"
@@ -125,9 +123,7 @@ class VersionLiteralParser(HTMLParser):
         if not value:
             return
         target = (
-            self.release_note_versions
-            if self._release_notes_depth
-            else self.versions
+            self.release_note_versions if self._release_notes_depth else self.versions
         )
         target.update(VERSION_RE.findall(value))
 
@@ -145,9 +141,7 @@ class VersionLiteralParser(HTMLParser):
                 self._release_notes_depth = 1
             return
 
-    def handle_startendtag(
-        self, tag: str, attrs: list[tuple[str, str | None]]
-    ) -> None:
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         del tag
         if self._release_notes_depth:
             return
@@ -320,6 +314,7 @@ def validate_metadata(data: dict) -> str:
                     "authenticode_status": "valid",
                     "publisher": "SignPath Foundation",
                     "timestamp_status": "valid",
+                    "update_manifest_status": "valid",
                 }
                 for field, expected_value in expected_verification.items():
                     if verification.get(field) != expected_value:
@@ -334,6 +329,15 @@ def validate_metadata(data: dict) -> str:
                     str(verification.get("evidence_sha256") or ""),
                 ):
                     fail("enabled Windows evidence hash is invalid")
+                release_prefix = f"{PUBLIC_RELEASE_URL_PREFIX}{version}/"
+                if verification.get("update_manifest_url") != (
+                    f"{release_prefix}latest.json"
+                ):
+                    fail("enabled Windows update manifest URL is invalid")
+                if verification.get("update_manifest_signature_url") != (
+                    f"{release_prefix}latest.json.sig"
+                ):
+                    fail("enabled Windows update manifest signature URL is invalid")
         else:
             if asset["download_url"] is not None:
                 fail("download_url must be null while downloads_enabled is false")
@@ -347,10 +351,14 @@ def validate_metadata(data: dict) -> str:
                     fail("disabled Windows Authenticode status must be unavailable")
                 if verification.get("timestamp_status") != "unavailable":
                     fail("disabled Windows timestamp status must be unavailable")
+                if verification.get("update_manifest_status") != "unavailable":
+                    fail("disabled Windows update manifest status must be unavailable")
                 for field in (
                     "publisher",
                     "signer_subject",
                     "signer_thumbprint",
+                    "update_manifest_url",
+                    "update_manifest_signature_url",
                     "evidence_url",
                     "evidence_sha256",
                 ):
@@ -490,6 +498,9 @@ def validate_website_wiring(data: dict, version: str) -> None:
         "SignPath Foundation",
         "download_enabled",
         "timestamp_status",
+        "update_manifest_status",
+        "update_manifest_url",
+        "update_manifest_signature_url",
         "evidence_sha256",
     ):
         if marker not in release_js:

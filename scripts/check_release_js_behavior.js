@@ -20,6 +20,9 @@ const verifiedWindows = {
     signer_subject: "CN=SignPath Foundation, O=SignPath Foundation",
     signer_thumbprint: "A".repeat(40),
     timestamp_status: "valid",
+    update_manifest_status: "valid",
+    update_manifest_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/latest.json`,
+    update_manifest_signature_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/latest.json.sig`,
     evidence_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/windows-signature-${baseLatest.version}.json`,
     evidence_sha256: "c".repeat(64)
   }
@@ -289,6 +292,14 @@ async function main() {
     {
       name: "missing timestamp",
       asset: { ...verifiedWindows, verification: { ...verifiedWindows.verification, timestamp_status: "unavailable" } }
+    },
+    {
+      name: "missing CATalyst manifest signature",
+      asset: { ...verifiedWindows, verification: { ...verifiedWindows.verification, update_manifest_status: "unavailable" } }
+    },
+    {
+      name: "untrusted manifest URL",
+      asset: { ...verifiedWindows, verification: { ...verifiedWindows.verification, update_manifest_url: "https://example.com/latest.json" } }
     },
     {
       name: "wrong host",
