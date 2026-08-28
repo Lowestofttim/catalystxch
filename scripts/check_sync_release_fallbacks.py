@@ -81,6 +81,7 @@ def main() -> None:
   <span data-release-windows-signature>old-signature</span>
   <span data-release-linux-size>2 MB</span>
   <span data-release-linux-sha256>old-linux-sha</span>
+  <aside data-windows-download-notice>Windows downloads paused</aside>
   <ul data-release-notes>
     <li>old note</li>
   </ul>
@@ -109,6 +110,8 @@ def main() -> None:
     for stale in ("v1.0.0", "old note", "old-sha", "old-linux-sha"):
         if stale in rendered:
             raise SystemExit(f"stale fallback remains: {stale}")
+    if "<aside data-windows-download-notice hidden>" not in rendered:
+        raise SystemExit("verified Windows fallback must hide the temporary pause notice")
 
     release_note_history = """<main>
   <span data-release-version>v9.8.7</span>
@@ -282,6 +285,8 @@ def main() -> None:
         not in disabled_html
     ):
         raise SystemExit("disabled Windows signature status must be visible")
+    if "<aside data-windows-download-notice hidden>" in disabled_html:
+        raise SystemExit("disabled Windows fallback must show the temporary pause notice")
 
     with tempfile.TemporaryDirectory() as directory:
         output = Path(directory) / "latest.json"

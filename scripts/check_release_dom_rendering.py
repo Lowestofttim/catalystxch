@@ -180,7 +180,10 @@ def assert_release_panel(page, metadata: dict) -> None:
     download_link = page.locator("[data-download-windows]")
     macos_link = page.locator("[data-download-macos]")
     linux_link = page.locator("[data-download-linux]")
+    windows_notice = page.locator("[data-windows-download-notice]")
+    expect(windows_notice).to_have_count(1)
     if downloads_available:
+        expect(windows_notice).to_be_hidden()
         expect(download_link).not_to_have_attribute("aria-disabled", "true")
         expect(macos_link).not_to_have_attribute("aria-disabled", "true")
         if linux_available:
@@ -188,6 +191,7 @@ def assert_release_panel(page, metadata: dict) -> None:
         else:
             expect(linux_link).to_have_attribute("aria-disabled", "true")
     else:
+        expect(windows_notice).to_be_visible()
         expect(download_link).to_have_attribute("aria-disabled", "true")
         expect(macos_link).not_to_have_attribute("aria-disabled", "true")
         if linux_available:

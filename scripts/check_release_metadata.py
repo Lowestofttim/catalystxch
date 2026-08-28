@@ -59,6 +59,7 @@ DATA_RELEASE_ATTRS = {
     "data-release-status",
     "data-release-version",
     "data-release-windows-signature",
+    "data-windows-download-notice",
 }
 
 

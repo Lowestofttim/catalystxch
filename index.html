@@ -1032,6 +1032,41 @@
             margin-right: auto;
         }
 
+        .windows-download-notice {
+            max-width: 720px;
+            margin: 0 auto 24px;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 14px;
+            padding: 17px 18px;
+            border: 1px solid rgba(212,168,75,0.42);
+            border-radius: var(--radius);
+            background: rgba(212,168,75,0.09);
+            color: var(--text-secondary);
+            text-align: left;
+        }
+
+        .windows-download-notice[hidden] { display: none; }
+
+        .windows-download-notice-icon {
+            color: var(--cat-gold);
+            font-size: 20px;
+            line-height: 1.2;
+        }
+
+        .windows-download-notice-title {
+            color: var(--text-primary);
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .windows-download-notice p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
         .platforms {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -2019,6 +2054,13 @@
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
             <div class="download-title">Download CATalyst</div>
             <p class="download-sub">Windows downloads are enabled only after independent Authenticode verification. Linux packages come from GitHub Releases, and Mac users can run from the source repo.</p>
+            <aside class="windows-download-notice" data-windows-download-notice role="status">
+                <span class="windows-download-notice-icon" aria-hidden="true">⚠</span>
+                <div>
+                    <strong class="windows-download-notice-title">Windows download temporarily unavailable</strong>
+                    <p>We are waiting for SignPath Foundation to approve CATalyst's trusted code signing. Unsigned Windows installers are being withheld because Windows may block or flag them. Linux packages and the source code remain available, and this notice will clear automatically after a verified signed installer is published.</p>
+                </div>
+            </aside>
             <div class="platforms">
                 <a class="platform-card is-primary is-disabled" data-download-windows aria-disabled="true" tabindex="-1">
                     <div class="platform-row">
