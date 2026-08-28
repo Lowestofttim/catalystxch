@@ -9,6 +9,25 @@ const MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot";
 const metadata = JSON.parse(fs.readFileSync("assets/release/latest.json", "utf8"));
 const baseLatest = metadata.latest;
 const windowsInstaller = baseLatest.assets.find((asset) => asset.platform === "windows" && asset.kind === "installer");
+const verifiedWindows = {
+  ...windowsInstaller,
+  download_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/${windowsInstaller.name}`,
+  sha256: "a".repeat(64),
+  download_enabled: true,
+  verification: {
+    authenticode_status: "valid",
+    publisher: "SignPath Foundation",
+    signer_subject: "CN=SignPath Foundation, O=SignPath Foundation",
+    signer_thumbprint: "A".repeat(40),
+    timestamp_status: "valid",
+    evidence_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/windows-signature-${baseLatest.version}.json`,
+    evidence_sha256: "c".repeat(64)
+  }
+};
+const verifiedLatest = {
+  ...baseLatest,
+  assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? verifiedWindows : asset)
+};
 const platformDownloadPriority = (asset, platform) => {
   const name = String(asset && asset.name || "").toLowerCase();
   if (platform === "linux") {
@@ -55,8 +74,8 @@ if (!linuxDownload.name.toLowerCase().endsWith(".deb")) {
   throw new Error("Linux website download should prefer the .deb package");
 }
 
-const PUBLIC_URL = windowsInstaller.download_url;
-const SHA256 = windowsInstaller.sha256;
+const PUBLIC_URL = verifiedWindows.download_url;
+const SHA256 = verifiedWindows.sha256;
 const DOWNLOAD_NAME = windowsInstaller.name;
 const DOWNLOAD_SIZE = formatBytes(windowsInstaller.size_bytes);
 const LINUX_URL = linuxDownload.download_url;
@@ -124,6 +143,7 @@ function buildDocument(link, macosLink, linuxLink) {
     ["[data-release-macos-size]", [makeTextNode("GitHub source")]],
     ["[data-release-linux-size]", [makeTextNode(formatBytes(linuxDownload.size_bytes))]],
     ["[data-release-sha256]", [makeTextNode(SHA256)]],
+    ["[data-release-windows-signature]", [makeTextNode()]],
     ["[data-release-macos-sha256]", [makeTextNode("Source only from GitHub")]],
     ["[data-release-linux-sha256]", [makeTextNode(linuxDownload.sha256)]],
     ["[data-release-notes]", [makeListNode()]],
@@ -223,7 +243,7 @@ function assert(condition, message) {
 }
 
 async function main() {
-  const enabled = await runRelease({ downloads_enabled: true, latest: baseLatest });
+  const enabled = await runRelease({ downloads_enabled: true, latest: verifiedLatest });
   assert(enabled.link.href === PUBLIC_URL, "enabled release should set the Windows download href");
   assert(enabled.macosLink.href === MAC_SOURCE_URL, "enabled release should keep macOS on the source repo href");
   assert(enabled.linuxLink.href === LINUX_URL, "enabled release should set the Linux download href");
@@ -235,15 +255,16 @@ async function main() {
   assert(enabled.text("[data-release-name]") === baseLatest.name, "enabled release should show the release name");
   assert(enabled.text("[data-release-version]") === baseLatest.version, "enabled release should show the release version");
   assert(enabled.text("[data-release-sha256]") === SHA256, "enabled release should show SHA-256");
+  assert(enabled.text("[data-release-windows-signature]") === "Verified publisher: SignPath Foundation", "enabled release should show verified publisher");
   assert(enabled.text("[data-release-macos-size]") === "GitHub source", "enabled release should show macOS source status");
   assert(enabled.text("[data-release-linux-size]") === formatBytes(linuxDownload.size_bytes), "enabled release should show Linux size");
   assert(enabled.text("[data-release-macos-sha256]") === "Source only from GitHub", "enabled release should show macOS source-only detail");
   assert(enabled.text("[data-release-linux-sha256]") === linuxDownload.sha256, "enabled release should show Linux SHA-256");
 
-  const disabled = await runRelease({ downloads_enabled: false, latest: baseLatest }, PUBLIC_URL);
+  const disabled = await runRelease(metadata, PUBLIC_URL);
   assert(disabled.link.href === "", "disabled release should remove stale Windows download href");
   assert(disabled.macosLink.href === MAC_SOURCE_URL, "disabled release should preserve macOS source href");
-  assert(disabled.linuxLink.href === "", "disabled release should remove stale Linux download href");
+  assert(disabled.linuxLink.href === LINUX_URL, "disabled Windows should preserve Linux download href");
   assert(!disabled.link.attrs.has("target"), "disabled release should remove target");
   assert(!disabled.link.attrs.has("rel"), "disabled release should remove rel");
   assert(disabled.link.attrs.get("aria-disabled") === "true", "disabled release should mark the link disabled");
@@ -252,23 +273,38 @@ async function main() {
   assert(disabled.text("[data-release-download-name]") === "Not available", "disabled release should reset installer detail");
   assert(disabled.text("[data-release-download-size]") === "", "disabled release should reset file size");
   assert(disabled.text("[data-release-sha256]") === "Not available", "disabled release should reset SHA-256 detail");
+  assert(disabled.text("[data-release-windows-signature]") === "Windows installer unavailable - signature verification required", "disabled release should show signature requirement");
   assert(disabled.text("[data-release-macos-sha256]") === "Source only from GitHub", "disabled release should keep macOS source-only detail");
-  assert(disabled.text("[data-release-linux-sha256]") === "Not available", "disabled release should reset Linux SHA-256 detail");
+  assert(disabled.text("[data-release-linux-sha256]") === linuxDownload.sha256, "disabled Windows should preserve Linux SHA-256 detail");
 
-  const guardedLatest = {
-    ...baseLatest,
-    assets: [
-      {
-        ...baseLatest.assets[0],
-        download_url: `https://example.com/${DOWNLOAD_NAME}`
-      },
-      ...baseLatest.assets.slice(1)
-    ]
-  };
-  const guardFailure = await runRelease({ downloads_enabled: true, latest: guardedLatest }, PUBLIC_URL);
-  assert(guardFailure.link.href === "", "guard failure should remove stale Windows download href");
-  assert(guardFailure.link.attrs.get("aria-disabled") === "true", "guard failure should mark the link disabled");
-  assert(guardFailure.text("[data-release-sha256]") === "Not available", "guard failure should reset SHA-256 detail");
+  const guardedCases = [
+    {
+      name: "URL and hash only",
+      asset: { ...verifiedWindows, verification: undefined }
+    },
+    {
+      name: "wrong publisher",
+      asset: { ...verifiedWindows, verification: { ...verifiedWindows.verification, publisher: "Unknown" } }
+    },
+    {
+      name: "missing timestamp",
+      asset: { ...verifiedWindows, verification: { ...verifiedWindows.verification, timestamp_status: "unavailable" } }
+    },
+    {
+      name: "wrong host",
+      asset: { ...verifiedWindows, download_url: `https://example.com/${DOWNLOAD_NAME}` }
+    }
+  ];
+  for (const testCase of guardedCases) {
+    const guardedLatest = {
+      ...baseLatest,
+      assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? testCase.asset : asset)
+    };
+    const guardFailure = await runRelease({ downloads_enabled: true, latest: guardedLatest }, PUBLIC_URL);
+    assert(guardFailure.link.href === "", `${testCase.name} should remove stale Windows href`);
+    assert(guardFailure.link.attrs.get("aria-disabled") === "true", `${testCase.name} should mark Windows disabled`);
+    assert(guardFailure.linuxLink.href === LINUX_URL, `${testCase.name} should preserve Linux`);
+  }
 
   const staleLatest = {
     version: "v1.2.6",
@@ -280,7 +316,7 @@ async function main() {
   };
   const restored = await runReleaseSequence([
     { downloads_enabled: false, latest: staleLatest },
-    { downloads_enabled: true, latest: baseLatest }
+    { downloads_enabled: true, latest: verifiedLatest }
   ]);
   assert(restored.text("[data-release-version]") === "v1.2.6", "stale restored page should start on the old version");
   await restored.dispatchWindowEvent("pageshow", { persisted: true });
@@ -290,7 +326,7 @@ async function main() {
 
   const visibleAgain = await runReleaseSequence([
     { downloads_enabled: false, latest: staleLatest },
-    { downloads_enabled: true, latest: baseLatest }
+    { downloads_enabled: true, latest: verifiedLatest }
   ]);
   assert(visibleAgain.text("[data-release-version]") === "v1.2.6", "backgrounded page should start on the old version");
   visibleAgain.setVisibilityState("visible");

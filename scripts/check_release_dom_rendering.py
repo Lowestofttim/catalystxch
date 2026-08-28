@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
@@ -38,18 +39,35 @@ def main() -> None:
         for asset in enabled_latest["assets"]
         if asset["platform"] == "windows" and asset["kind"] == "installer"
     )
-    disabled_metadata = {
+    verified_installer = {
+        **enabled_installer,
+        "download_url": (
+            "https://github.com/Lowestofttim/catalyst-releases/releases/"
+            "download/v1.3.16/Catalyst-Setup-v1.3.16.exe"
+        ),
+        "sha256": "a" * 64,
+        "download_enabled": True,
+        "verification": {
+            "authenticode_status": "valid",
+            "publisher": "SignPath Foundation",
+            "signer_subject": "CN=SignPath Foundation, O=SignPath Foundation",
+            "signer_thumbprint": "A" * 40,
+            "timestamp_status": "valid",
+            "evidence_url": "https://github.com/example/evidence.json",
+            "evidence_sha256": "c" * 64,
+        },
+    }
+    verified_metadata = {
         **metadata,
-        "downloads_enabled": False,
-        "download_status": "coming_soon",
+        "downloads_enabled": True,
+        "download_status": "available",
         "latest": {
             **enabled_latest,
             "assets": [
-                {
-                    **enabled_installer,
-                    "download_url": None,
-                    "sha256": None,
-                }
+                verified_installer
+                if asset is enabled_installer
+                else asset
+                for asset in enabled_latest["assets"]
             ],
         },
     }
@@ -67,17 +85,17 @@ def main() -> None:
                 page.goto(url, wait_until="networkidle")
                 assert_release_panel(page, metadata)
 
-                disabled_page = browser.new_page(viewport={"width": 390, "height": 900})
-                disabled_page.route(
+                verified_page = browser.new_page(viewport={"width": 390, "height": 900})
+                verified_page.route(
                     "**/assets/release/latest.json",
                     lambda route: route.fulfill(
                         status=200,
                         content_type="application/json",
-                        body=json.dumps(disabled_metadata),
+                        body=json.dumps(verified_metadata),
                     ),
                 )
-                disabled_page.goto(url, wait_until="networkidle")
-                assert_release_panel(disabled_page, disabled_metadata)
+                verified_page.goto(url, wait_until="networkidle")
+                assert_release_panel(verified_page, verified_metadata)
 
             finally:
                 browser.close()
@@ -93,7 +111,13 @@ def find_windows_installer(latest: dict) -> dict | None:
         (
             asset
             for asset in latest["assets"]
-            if asset["platform"] == "windows" and asset["kind"] == "installer"
+            if asset["platform"] == "windows"
+            and asset["kind"] == "installer"
+            and asset.get("download_enabled") is True
+            and asset.get("verification", {}).get("authenticode_status") == "valid"
+            and asset.get("verification", {}).get("publisher")
+            == "SignPath Foundation"
+            and asset.get("verification", {}).get("timestamp_status") == "valid"
         ),
         None,
     )
@@ -104,14 +128,18 @@ def find_platform_download(latest: dict, platform: str) -> dict | None:
         (
             asset
             for asset in latest["assets"]
-            if asset["platform"] == platform and asset["kind"] == "installer"
+            if asset["platform"] == platform
+            and asset["kind"] == "installer"
+            and asset.get("download_enabled") is True
         ),
         None,
     ) or next(
         (
             asset
             for asset in latest["assets"]
-            if asset["platform"] == platform and asset["kind"] == "archive"
+            if asset["platform"] == platform
+            and asset["kind"] == "archive"
+            and asset.get("download_enabled") is True
         ),
         None,
     )
@@ -121,8 +149,8 @@ def assert_release_panel(page, metadata: dict) -> None:
     latest = metadata["latest"]
     installer = find_windows_installer(latest)
     linux = find_platform_download(latest, "linux")
-    downloads_available = bool(metadata["downloads_enabled"] and installer and installer["download_url"])
-    linux_available = bool(metadata["downloads_enabled"] and linux and linux["download_url"])
+    downloads_available = bool(installer and installer["download_url"])
+    linux_available = bool(linux and linux["download_url"])
 
     expect(page.locator("[data-release-eyebrow]")).to_contain_text(latest["version"])
     expect(page.locator("#download [data-release-version]")).to_have_text(latest["version"])
@@ -132,6 +160,8 @@ def assert_release_panel(page, metadata: dict) -> None:
         if downloads_available and linux_available
         else "windows download available"
         if downloads_available
+        else "linux download available"
+        if linux_available
         else "public links coming soon"
     )
     download_link = page.locator("[data-download-windows]")
@@ -147,7 +177,10 @@ def assert_release_panel(page, metadata: dict) -> None:
     else:
         expect(download_link).to_have_attribute("aria-disabled", "true")
         expect(macos_link).not_to_have_attribute("aria-disabled", "true")
-        expect(linux_link).to_have_attribute("aria-disabled", "true")
+        if linux_available:
+            expect(linux_link).not_to_have_attribute("aria-disabled", "true")
+        else:
+            expect(linux_link).to_have_attribute("aria-disabled", "true")
     expect(macos_link).to_have_attribute("href", MAC_SOURCE_URL)
 
     if downloads_available:
@@ -158,6 +191,15 @@ def assert_release_panel(page, metadata: dict) -> None:
     else:
         expect(page.locator("#download [data-release-download-name]")).to_have_text("Not available")
         expect(page.locator("#download [data-release-sha256]")).to_have_text("Not available")
+        expect(download_link).not_to_have_attribute("href", re.compile(r".+"))
+
+    expect(page.locator("[data-release-windows-signature]")).to_have_text(
+        "Verified publisher: SignPath Foundation"
+        if downloads_available
+        else "Windows installer unavailable - signature verification required"
+    )
+    if linux_available:
+        expect(linux_link).to_have_attribute("href", linux["download_url"])
 
     notes = page.locator("#download [data-release-notes] li")
     expect(notes).to_have_count(len(latest["release_notes"]))

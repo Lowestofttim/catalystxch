@@ -52,12 +52,24 @@
     return 50;
   };
 
+  const isVerifiedWindowsInstaller = (asset) => (
+    asset &&
+    asset.download_enabled === true &&
+    asset.verification &&
+    asset.verification.authenticode_status === "valid" &&
+    asset.verification.publisher === "SignPath Foundation" &&
+    asset.verification.timestamp_status === "valid" &&
+    /^[A-F0-9]{40}$/.test(asset.verification.signer_thumbprint || "") &&
+    /^[a-f0-9]{64}$/.test(asset.verification.evidence_sha256 || "")
+  );
+
   const findAsset = (latest, platform, kind) => {
     if (!Array.isArray(latest.assets)) return null;
     const candidates = latest.assets.filter((asset) => (
       asset &&
       asset.platform === platform &&
       asset.kind === kind &&
+      asset.download_enabled === true &&
       isAllowedDownloadUrl(asset.download_url, platform) &&
       typeof asset.sha256 === "string"
     ));
@@ -68,7 +80,10 @@
     return candidates[0] || null;
   };
 
-  const findWindowsInstaller = (latest) => findAsset(latest, "windows", "installer");
+  const findWindowsInstaller = (latest) => {
+    const asset = findAsset(latest, "windows", "installer");
+    return isVerifiedWindowsInstaller(asset) ? asset : null;
+  };
   const findPlatformDownload = (latest, platform) => (
     findAsset(latest, platform, "installer") ||
     findAsset(latest, platform, "archive")
@@ -126,8 +141,10 @@
     setText("[data-release-download-name]", "Not available");
     setText("[data-release-download-size]", "");
     setText("[data-release-sha256]", "Not available");
-    setText("[data-release-linux-size]", "");
-    setText("[data-release-linux-sha256]", "Not available");
+    setText(
+      "[data-release-windows-signature]",
+      "Windows installer unavailable - signature verification required"
+    );
     disableDownload("[data-download-windows]");
   };
 
@@ -137,12 +154,12 @@
 
     const version = latest.version;
     const releaseDate = formatDate(latest.published_at);
-    const windowsInstaller = metadata.downloads_enabled ? findWindowsInstaller(latest) : null;
-    const linuxDownload = metadata.downloads_enabled ? findPlatformDownload(latest, "linux") : null;
+    const windowsInstaller = findWindowsInstaller(latest);
+    const linuxDownload = findPlatformDownload(latest, "linux");
     const downloadsAvailable = Boolean(windowsInstaller);
     const status = downloadsAvailable
       ? (linuxDownload ? "Windows/Linux downloads available" : "Windows download available")
-      : "Public links coming soon";
+      : (linuxDownload ? "Linux download available" : "Public links coming soon");
     const channel = latest.channel === "prerelease" ? "Prerelease" : "Stable";
     const meta = releaseDate
       ? `${channel} - published ${releaseDate} - ${status.toLowerCase()}`
@@ -154,15 +171,21 @@
     setText("[data-release-meta]", meta);
     setText(
       "[data-release-eyebrow]",
-      downloadsAvailable ? `${status} - current release ${version}` : `Public downloads coming soon - current beta ${version}`
+      (downloadsAvailable || linuxDownload)
+        ? `${status} - current release ${version}`
+        : `Public downloads coming soon - current beta ${version}`
     );
     setText("[data-release-date]", releaseDate ? `Released ${releaseDate}` : "");
     renderList("[data-release-notes]", latest.release_notes);
     enableMacSourceLink();
 
+    setText("[data-release-linux-size]", linuxDownload ? formatBytes(linuxDownload.size_bytes) : "");
+    setText("[data-release-linux-sha256]", linuxDownload ? linuxDownload.sha256 : "Not available");
+    if (linuxDownload) enableDownload("[data-download-linux]", linuxDownload);
+    else disableDownload("[data-download-linux]");
+
     if (!downloadsAvailable) {
       disableWindowsDownload();
-      disableDownload("[data-download-linux]");
       return;
     }
 
@@ -170,12 +193,11 @@
     setText("[data-release-download-name]", windowsInstaller.name);
     setText("[data-release-download-size]", size);
     setText("[data-release-sha256]", windowsInstaller.sha256);
-    setText("[data-release-linux-size]", linuxDownload ? formatBytes(linuxDownload.size_bytes) : "");
-    setText("[data-release-linux-sha256]", linuxDownload ? linuxDownload.sha256 : "Not available");
-
+    setText(
+      "[data-release-windows-signature]",
+      "Verified publisher: SignPath Foundation"
+    );
     enableDownload("[data-download-windows]", windowsInstaller);
-    if (linuxDownload) enableDownload("[data-download-linux]", linuxDownload);
-    else disableDownload("[data-download-linux]");
   };
 
   const loadMetadata = async () => {
