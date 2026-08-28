@@ -39,6 +39,13 @@ BOT_RELEASE_URL_PREFIX = (
     "https://github.com/catalystxch/catalyst-bot/releases/download/"
 )
 MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
+CODE_SIGNING_POLICY_URL = (
+    "https://github.com/catalystxch/catalyst-bot/blob/main/"
+    "docs/CODE_SIGNING_POLICY.md"
+)
+PRIVACY_POLICY_URL = (
+    "https://github.com/catalystxch/catalyst-bot/blob/main/docs/PRIVACY.md"
+)
 DATA_RELEASE_ATTRS = {
     "data-release-download-name",
     "data-release-download-size",
@@ -503,6 +510,14 @@ def validate_website_wiring(data: dict, version: str) -> None:
             fail(f"{rel} must contain data-release-version hooks")
         if "data-release-windows-signature" not in html:
             fail(f"{rel} must contain data-release-windows-signature hooks")
+        if CODE_SIGNING_POLICY_URL not in html or not re.search(
+            r">\s*Code signing policy\s*<", html, re.IGNORECASE
+        ):
+            fail(f"{rel} must link the Code signing policy")
+        if PRIVACY_POLICY_URL not in html or not re.search(
+            r">\s*Privacy(?: policy)?\s*<", html, re.IGNORECASE
+        ):
+            fail(f"{rel} must link the Privacy policy")
         if html_path.name == "index.html" and "data-download-windows" not in html:
             fail("index.html must contain a Windows download link hook")
         if html_path.name == "index.html" and (
