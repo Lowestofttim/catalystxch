@@ -10,11 +10,15 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+
+from windows_release_verification import verify_windows_release
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -165,8 +169,39 @@ def should_publish_asset(asset: dict, platform: str, kind: str) -> bool:
     return classify_platform(name) == platform and classify_kind(name) == kind
 
 
+def _unavailable_windows_verification() -> dict[str, object]:
+    return {
+        "authenticode_status": "unavailable",
+        "publisher": None,
+        "signer_subject": None,
+        "signer_thumbprint": None,
+        "timestamp_status": "unavailable",
+        "evidence_url": None,
+        "evidence_sha256": None,
+    }
+
+
+def _refresh_download_status(metadata: dict) -> None:
+    assets = metadata["latest"]["assets"]
+    enabled = sum(asset.get("download_enabled") is True for asset in assets)
+    disabled = len(assets) - enabled
+    metadata["downloads_enabled"] = enabled > 0
+    if enabled and not disabled:
+        metadata["download_status"] = "available"
+    elif enabled:
+        metadata["download_status"] = "partial"
+    else:
+        metadata["download_status"] = "coming_soon"
+
+
 def build_metadata(
-    release: dict, repo: str, include_download_urls: bool, platform: str, kind: str
+    release: dict,
+    repo: str,
+    include_download_urls: bool,
+    platform: str,
+    kind: str,
+    *,
+    windows_verifier=verify_windows_release,
 ) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
@@ -182,6 +217,11 @@ def build_metadata(
     if not release_notes:
         release_notes = fallback_notes(body)
 
+    windows_result = None
+    if platform == "windows" and include_download_urls:
+        windows_result = windows_verifier(release)
+
+    expected_windows_name = f"Catalyst-Setup-{version}.exe"
     assets = []
     for item in release.get("assets") or []:
         if not should_publish_asset(item, platform, kind):
@@ -189,34 +229,42 @@ def build_metadata(
         name = item.get("name")
         if not name:
             continue
+        if platform == "windows" and name != expected_windows_name:
+            continue
         sha256 = extract_sha256(item)
         if include_download_urls and not sha256:
             raise SystemExit(f"release asset {name!r} is missing a SHA-256 digest")
-        assets.append(
-            {
-                "name": name,
-                "platform": classify_platform(name),
-                "kind": classify_kind(name),
-                "size_bytes": item.get("size") or 0,
-                "download_url": item.get("url") if include_download_urls else None,
-                "sha256": sha256 if include_download_urls else None,
-            }
-        )
+        asset = {
+            "name": name,
+            "platform": classify_platform(name),
+            "kind": classify_kind(name),
+            "size_bytes": item.get("size") or 0,
+            "download_url": item.get("url") if include_download_urls else None,
+            "sha256": sha256 if include_download_urls else None,
+            "download_enabled": bool(include_download_urls),
+        }
+        if platform == "windows":
+            if windows_result is None:
+                asset["verification"] = _unavailable_windows_verification()
+            else:
+                asset["download_enabled"] = (
+                    windows_result.get("download_enabled") is True
+                )
+                asset["verification"] = windows_result["verification"]
+        assets.append(asset)
     assets.sort(key=sort_asset_key)
     if not assets:
         raise SystemExit(f"release has no {platform} {kind} asset to publish")
 
-    downloads_enabled = bool(include_download_urls)
-
-    return {
-        "schema_version": 1,
+    metadata = {
+        "schema_version": 2,
         "source_repo": repo,
         "generated_at": datetime.now(timezone.utc)
         .replace(microsecond=0)
         .isoformat()
         .replace("+00:00", "Z"),
-        "downloads_enabled": downloads_enabled,
-        "download_status": "available" if downloads_enabled else "coming_soon",
+        "downloads_enabled": False,
+        "download_status": "coming_soon",
         "latest": {
             "version": version,
             "name": release.get("name") or version,
@@ -227,6 +275,8 @@ def build_metadata(
             "assets": assets,
         },
     }
+    _refresh_download_status(metadata)
+    return metadata
 
 
 def _platform_download_priority(item: dict) -> tuple[int, int, str]:
@@ -304,12 +354,14 @@ def append_platform_downloads(
                     "size_bytes": item.get("size") or 0,
                     "download_url": item.get("url") if include_download_urls else None,
                     "sha256": sha256 if include_download_urls else None,
+                    "download_enabled": bool(include_download_urls),
                 }
             )
             appended_platforms.add(platform)
     assets.sort(key=sort_asset_key)
     if appended_platforms != {"linux"}:
         raise SystemExit("release is missing Linux platform download assets")
+    _refresh_download_status(metadata)
 
 
 def append_experimental_archives(
@@ -347,6 +399,7 @@ def _find_platform_download(metadata: dict, platform: str) -> dict | None:
         for asset in metadata["latest"]["assets"]
         if asset.get("platform") == platform
         and asset.get("kind") in {"installer", "archive"}
+        and asset.get("download_enabled") is True
     ]
     candidates.sort(key=_platform_download_priority)
     return candidates[0] if candidates else None
@@ -403,20 +456,14 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     """Render safe static fallbacks matching the synchronized release metadata."""
 
     latest = metadata["latest"]
-    windows = (
-        _find_platform_download(metadata, "windows")
-        if metadata["downloads_enabled"]
-        else None
-    )
-    linux = (
-        _find_platform_download(metadata, "linux")
-        if metadata["downloads_enabled"]
-        else None
-    )
+    windows = _find_platform_download(metadata, "windows")
+    linux = _find_platform_download(metadata, "linux")
     if windows and linux:
         status = "Windows/Linux downloads available"
     elif windows:
         status = "Windows download available"
+    elif linux:
+        status = "Linux download available"
     else:
         status = "Public links coming soon"
     channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
@@ -441,6 +488,11 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         if windows
         else "",
         "data-release-sha256": windows["sha256"] if windows else "Not available",
+        "data-release-windows-signature": (
+            "Verified publisher: SignPath Foundation"
+            if windows
+            else "Windows installer unavailable - signature verification required"
+        ),
         "data-release-macos-size": "GitHub source",
         "data-release-macos-sha256": "Source only from GitHub",
         "data-release-linux-size": _format_bytes(linux["size_bytes"])
@@ -475,6 +527,32 @@ def preserve_generated_at_if_unchanged(metadata: dict, existing: dict) -> None:
     existing_time = existing.get("generated_at")
     if current_without_time == existing_without_time and isinstance(existing_time, str):
         metadata["generated_at"] = existing_time
+
+
+def write_metadata_atomic(output: Path, metadata: dict) -> None:
+    """Atomically replace release metadata without leaving trusted-looking debris."""
+
+    temporary_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            newline="\n",
+            prefix=f".{output.name}.",
+            suffix=".tmp",
+            dir=output.parent,
+            delete=False,
+        ) as handle:
+            temporary_path = Path(handle.name)
+            json.dump(metadata, handle, indent=2, ensure_ascii=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary_path.replace(output)
+    except Exception:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+        raise
 
 
 def parse_args() -> argparse.Namespace:
@@ -556,9 +634,7 @@ def main() -> None:
         except (json.JSONDecodeError, OSError):
             existing = None
         preserve_generated_at_if_unchanged(metadata, existing)
-    output.write_text(
-        json.dumps(metadata, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
-    )
+    write_metadata_atomic(output, metadata)
     if args.update_html_fallbacks:
         sync_html_fallbacks(metadata)
     try:
