@@ -30,6 +30,9 @@ def main() -> None:
         "--retry 3": "transient public-site request retrying",
         "Rebuild Pages when the public release is stale": "independently retryable Pages deployment",
         "repos/${{ github.repository }}/pages/builds": "explicit Pages rebuild",
+        "sudo apt-get install -y osslsigncode": "the independent Authenticode verifier",
+        "python scripts/check_windows_release_verification.py": "pure Windows release verifier regression checks",
+        "windows-signature-": "the signed evidence companion asset",
     }
     for marker, purpose in required.items():
         if marker not in workflow:
@@ -38,6 +41,11 @@ def main() -> None:
         raise SystemExit("sync workflow must not push directly to protected main")
     if re.search(r"uses:\s*actions/[^@\s]+@v\d+", workflow):
         raise SystemExit("first-party actions must use immutable commit SHAs")
+    install_index = workflow.index("Install independent Authenticode verifier")
+    sync_index = workflow.index("Sync the latest public release")
+    metadata_index = workflow.index("Verify release metadata and website rendering")
+    if not install_index < sync_index < metadata_index:
+        raise SystemExit("Authenticode tooling, sync, and metadata checks are misordered")
     print("protected-branch release sync workflow check passed")
 
 
