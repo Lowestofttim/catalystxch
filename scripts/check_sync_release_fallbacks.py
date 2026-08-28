@@ -275,6 +275,8 @@ def main() -> None:
     disabled_html = render_release_fallbacks(source, disabled)
     if "Linux download available" not in disabled_html:
         raise SystemExit("disabled Windows must not disable Linux")
+    if "Linux download available - current release v9.8.7" not in disabled_html:
+        raise SystemExit("Linux-only eyebrow must report the available release")
     if (
         "Windows installer unavailable - signature verification required"
         not in disabled_html

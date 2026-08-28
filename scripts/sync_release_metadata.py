@@ -487,7 +487,7 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         "data-release-meta": meta,
         "data-release-eyebrow": (
             f"{status} - current release {latest['version']}"
-            if windows
+            if windows or linux
             else f"Public downloads coming soon - current beta {latest['version']}"
         ),
         "data-release-download-name": windows["name"] if windows else "Not available",
