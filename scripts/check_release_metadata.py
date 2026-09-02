@@ -59,7 +59,10 @@ DATA_RELEASE_ATTRS = {
     "data-release-status",
     "data-release-version",
     "data-release-windows-signature",
+    "data-release-windows-tag",
     "data-windows-download-notice",
+    "data-windows-download-notice-body",
+    "data-windows-download-notice-title",
 }
 
 
@@ -216,6 +219,24 @@ def load_metadata() -> dict:
     return data
 
 
+def is_unsigned_windows_beta(asset: dict) -> bool:
+    verification = asset.get("verification")
+    return bool(
+        asset.get("distribution_status") == "unsigned_beta"
+        and isinstance(verification, dict)
+        and verification.get("authenticode_status") == "unsigned"
+        and verification.get("publisher") is None
+        and verification.get("signer_subject") is None
+        and verification.get("signer_thumbprint") is None
+        and verification.get("timestamp_status") == "unavailable"
+        and verification.get("update_manifest_status") == "valid"
+        and isinstance(verification.get("update_manifest_url"), str)
+        and isinstance(verification.get("update_manifest_signature_url"), str)
+        and verification.get("evidence_url") is None
+        and verification.get("evidence_sha256") is None
+    )
+
+
 def validate_metadata(data: dict) -> str:
     required_top = [
         "schema_version",
@@ -311,34 +332,51 @@ def validate_metadata(data: dict) -> str:
                 verification = asset.get("verification")
                 if not isinstance(verification, dict):
                     fail("enabled Windows download requires signature verification")
-                expected_verification = {
-                    "authenticode_status": "valid",
-                    "publisher": "SignPath Foundation",
-                    "timestamp_status": "valid",
-                    "update_manifest_status": "valid",
-                }
-                for field, expected_value in expected_verification.items():
-                    if verification.get(field) != expected_value:
-                        fail(f"enabled Windows {field} is not verified")
-                if not re.fullmatch(
-                    r"[A-F0-9]{40}",
-                    str(verification.get("signer_thumbprint") or ""),
-                ):
-                    fail("enabled Windows signer thumbprint is invalid")
-                if not re.fullmatch(
-                    r"[a-f0-9]{64}",
-                    str(verification.get("evidence_sha256") or ""),
-                ):
-                    fail("enabled Windows evidence hash is invalid")
                 release_prefix = f"{PUBLIC_RELEASE_URL_PREFIX}{version}/"
-                if verification.get("update_manifest_url") != (
-                    f"{release_prefix}latest.json"
-                ):
-                    fail("enabled Windows update manifest URL is invalid")
-                if verification.get("update_manifest_signature_url") != (
-                    f"{release_prefix}latest.json.sig"
-                ):
-                    fail("enabled Windows update manifest signature URL is invalid")
+                expected_name = f"Catalyst-Setup-{version}.exe"
+                if asset["name"] != expected_name:
+                    fail("enabled Windows installer name is invalid")
+                if asset["download_url"] != f"{release_prefix}{expected_name}":
+                    fail("enabled Windows installer URL is invalid")
+                if not is_unsigned_windows_beta(asset):
+                    if asset.get("distribution_status") is not None:
+                        fail("verified Windows download has an invalid distribution status")
+                    expected_verification = {
+                        "authenticode_status": "valid",
+                        "publisher": "SignPath Foundation",
+                        "timestamp_status": "valid",
+                        "update_manifest_status": "valid",
+                    }
+                    for field, expected_value in expected_verification.items():
+                        if verification.get(field) != expected_value:
+                            fail(f"enabled Windows {field} is not verified")
+                    if not re.fullmatch(
+                        r"[A-F0-9]{40}",
+                        str(verification.get("signer_thumbprint") or ""),
+                    ):
+                        fail("enabled Windows signer thumbprint is invalid")
+                    if not re.fullmatch(
+                        r"[a-f0-9]{64}",
+                        str(verification.get("evidence_sha256") or ""),
+                    ):
+                        fail("enabled Windows evidence hash is invalid")
+                    if verification.get("update_manifest_url") != (
+                        f"{release_prefix}latest.json"
+                    ):
+                        fail("enabled Windows update manifest URL is invalid")
+                    if verification.get("update_manifest_signature_url") != (
+                        f"{release_prefix}latest.json.sig"
+                    ):
+                        fail("enabled Windows update manifest signature URL is invalid")
+                else:
+                    if verification.get("update_manifest_url") != (
+                        f"{release_prefix}latest.json"
+                    ):
+                        fail("unsigned Windows update manifest URL is invalid")
+                    if verification.get("update_manifest_signature_url") != (
+                        f"{release_prefix}latest.json.sig"
+                    ):
+                        fail("unsigned Windows update manifest signature URL is invalid")
         else:
             if asset["download_url"] is not None:
                 fail("download_url must be null while downloads_enabled is false")
@@ -407,6 +445,7 @@ def validate_fallback_records(
     latest = data["latest"]
     asset = find_asset(data, "windows", "installer")
     linux_asset = find_platform_download(data, "linux")
+    unsigned_windows_beta = bool(asset and is_unsigned_windows_beta(asset))
     release_date = format_date(latest.get("published_at", ""))
     if asset and linux_asset:
         status = "Windows/Linux downloads available"
@@ -438,9 +477,28 @@ def validate_fallback_records(
         else "",
         "data-release-sha256": asset["sha256"] if asset else "Not available",
         "data-release-windows-signature": (
-            "Verified publisher: SignPath Foundation"
+            "Unsigned beta - expect a Windows SmartScreen warning"
+            if unsigned_windows_beta
+            else "Verified publisher: SignPath Foundation"
             if asset
             else "Windows installer unavailable - signature verification required"
+        ),
+        "data-release-windows-tag": (
+            "Unsigned beta"
+            if unsigned_windows_beta
+            else "Verified"
+            if asset
+            else "Unavailable"
+        ),
+        "data-windows-download-notice-title": (
+            "Unsigned Windows beta"
+            if unsigned_windows_beta
+            else "Windows download temporarily unavailable"
+        ),
+        "data-windows-download-notice-body": (
+            "Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -> Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning."
+            if unsigned_windows_beta
+            else "A verified signed installer is not available. Linux packages and the source code remain available."
         ),
         "data-release-macos-size": "GitHub source",
         "data-release-linux-size": format_bytes(linux_asset["size_bytes"])
@@ -503,6 +561,7 @@ def validate_website_wiring(data: dict, version: str) -> None:
         "update_manifest_url",
         "update_manifest_signature_url",
         "evidence_sha256",
+        "unsigned_beta",
     ):
         if marker not in release_js:
             fail(f"assets/release.js is missing Windows verification marker {marker}")
@@ -522,6 +581,12 @@ def validate_website_wiring(data: dict, version: str) -> None:
             fail(f"{rel} must contain data-release-version hooks")
         if "data-release-windows-signature" not in html:
             fail(f"{rel} must contain data-release-windows-signature hooks")
+        if html_path.name == "index.html" and (
+            "data-release-windows-tag" not in html
+            or "data-windows-download-notice-title" not in html
+            or "data-windows-download-notice-body" not in html
+        ):
+            fail("index.html must contain unsigned Windows beta status hooks")
         if CODE_SIGNING_POLICY_URL not in html or not re.search(
             r">\s*Code signing policy\s*<", html, re.IGNORECASE
         ):

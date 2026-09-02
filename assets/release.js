@@ -66,6 +66,8 @@
     const releaseBase = `https://github.com/Lowestofttim/catalyst-releases/releases/download/${tag}/`;
     return (
       asset.download_url === `${releaseBase}${asset.name}` &&
+      /^[a-f0-9]{64}$/.test(asset.sha256 || "") &&
+      asset.distribution_status !== "unsigned_beta" &&
       asset.verification.authenticode_status === "valid" &&
       asset.verification.publisher === "SignPath Foundation" &&
       asset.verification.timestamp_status === "valid" &&
@@ -75,6 +77,28 @@
       asset.verification.evidence_url === `${releaseBase}windows-signature-${tag}.json` &&
       /^[A-F0-9]{40}$/.test(asset.verification.signer_thumbprint || "") &&
       /^[a-f0-9]{64}$/.test(asset.verification.evidence_sha256 || "")
+    );
+  };
+
+  const isUnsignedWindowsBeta = (asset) => {
+    if (!asset || asset.download_enabled !== true || !asset.verification) return false;
+    const nameMatch = /^Catalyst-Setup-(v\d+\.\d+\.\d+)\.exe$/.exec(asset.name || "");
+    if (!nameMatch) return false;
+    const releaseBase = `https://github.com/Lowestofttim/catalyst-releases/releases/download/${nameMatch[1]}/`;
+    return (
+      asset.distribution_status === "unsigned_beta" &&
+      asset.download_url === `${releaseBase}${asset.name}` &&
+      /^[a-f0-9]{64}$/.test(asset.sha256 || "") &&
+      asset.verification.authenticode_status === "unsigned" &&
+      asset.verification.publisher === null &&
+      asset.verification.signer_subject === null &&
+      asset.verification.signer_thumbprint === null &&
+      asset.verification.timestamp_status === "unavailable" &&
+      asset.verification.update_manifest_status === "valid" &&
+      asset.verification.update_manifest_url === `${releaseBase}latest.json` &&
+      asset.verification.update_manifest_signature_url === `${releaseBase}latest.json.sig` &&
+      asset.verification.evidence_url === null &&
+      asset.verification.evidence_sha256 === null
     );
   };
 
@@ -97,7 +121,7 @@
 
   const findWindowsInstaller = (latest) => {
     const asset = findAsset(latest, "windows", "installer");
-    return isVerifiedWindowsInstaller(asset) ? asset : null;
+    return (isVerifiedWindowsInstaller(asset) || isUnsignedWindowsBeta(asset)) ? asset : null;
   };
   const findPlatformDownload = (latest, platform) => (
     findAsset(latest, platform, "installer") ||
@@ -154,6 +178,11 @@
 
   const disableWindowsDownload = () => {
     setHidden("[data-windows-download-notice]", false);
+    setText("[data-windows-download-notice-title]", "Windows download temporarily unavailable");
+    setText(
+      "[data-windows-download-notice-body]",
+      "A verified signed installer is not available. Linux packages and the source code remain available."
+    );
     setText("[data-release-download-name]", "Not available");
     setText("[data-release-download-size]", "");
     setText("[data-release-sha256]", "Not available");
@@ -161,6 +190,7 @@
       "[data-release-windows-signature]",
       "Windows installer unavailable - signature verification required"
     );
+    setText("[data-release-windows-tag]", "Unavailable");
     disableDownload("[data-download-windows]");
   };
 
@@ -206,14 +236,28 @@
     }
 
     const size = formatBytes(windowsInstaller.size_bytes);
+    const unsignedWindowsBeta = isUnsignedWindowsBeta(windowsInstaller);
     setText("[data-release-download-name]", windowsInstaller.name);
     setText("[data-release-download-size]", size);
     setText("[data-release-sha256]", windowsInstaller.sha256);
     setText(
       "[data-release-windows-signature]",
-      "Verified publisher: SignPath Foundation"
+      unsignedWindowsBeta
+        ? "Unsigned beta - expect a Windows SmartScreen warning"
+        : "Verified publisher: SignPath Foundation"
     );
-    setHidden("[data-windows-download-notice]", true);
+    setText(
+      "[data-release-windows-tag]",
+      unsignedWindowsBeta ? "Unsigned beta" : "Verified"
+    );
+    if (unsignedWindowsBeta) {
+      setText("[data-windows-download-notice-title]", "Unsigned Windows beta");
+      setText(
+        "[data-windows-download-notice-body]",
+        "Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -> Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning."
+      );
+    }
+    setHidden("[data-windows-download-notice]", !unsignedWindowsBeta);
     enableDownload("[data-download-windows]", windowsInstaller);
   };
 

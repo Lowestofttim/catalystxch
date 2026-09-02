@@ -20,6 +20,7 @@ from pathlib import Path
 
 from windows_release_verification import (
     ReleaseVerificationError,
+    verify_unsigned_windows_release,
     verify_windows_release,
 )
 
@@ -184,6 +185,14 @@ def _unavailable_windows_verification() -> dict[str, object]:
     }
 
 
+def _has_windows_signing_evidence(release: dict, version: str) -> bool:
+    expected_name = f"windows-signature-{version}.json"
+    return any(
+        isinstance(asset, dict) and asset.get("name") == expected_name
+        for asset in (release.get("assets") or [])
+    )
+
+
 def _refresh_download_status(metadata: dict) -> None:
     assets = metadata["latest"]["assets"]
     enabled = sum(asset.get("download_enabled") is True for asset in assets)
@@ -204,7 +213,9 @@ def build_metadata(
     platform: str,
     kind: str,
     *,
+    allow_unsigned_windows_beta: bool = False,
     windows_verifier=verify_windows_release,
+    windows_unsigned_verifier=verify_unsigned_windows_release,
 ) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
@@ -221,11 +232,21 @@ def build_metadata(
         release_notes = fallback_notes(body)
 
     windows_result = None
+    unsigned_windows_result = None
     if platform == "windows" and include_download_urls:
         try:
             windows_result = windows_verifier(release)
         except ReleaseVerificationError:
             windows_result = None
+        if (
+            windows_result is None
+            and allow_unsigned_windows_beta
+            and not _has_windows_signing_evidence(release, version)
+        ):
+            try:
+                unsigned_windows_result = windows_unsigned_verifier(release)
+            except ReleaseVerificationError:
+                unsigned_windows_result = None
 
     expected_windows_name = f"Catalyst-Setup-{version}.exe"
     assets = []
@@ -251,10 +272,19 @@ def build_metadata(
         }
         if platform == "windows":
             if windows_result is None:
-                asset["download_url"] = None
-                asset["sha256"] = None
-                asset["download_enabled"] = False
-                asset["verification"] = _unavailable_windows_verification()
+                if unsigned_windows_result is not None:
+                    asset["download_enabled"] = (
+                        unsigned_windows_result.get("download_enabled") is True
+                    )
+                    asset["distribution_status"] = unsigned_windows_result[
+                        "distribution_status"
+                    ]
+                    asset["verification"] = unsigned_windows_result["verification"]
+                else:
+                    asset["download_url"] = None
+                    asset["sha256"] = None
+                    asset["download_enabled"] = False
+                    asset["verification"] = _unavailable_windows_verification()
             else:
                 asset["download_enabled"] = (
                     windows_result.get("download_enabled") is True
@@ -486,6 +516,11 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     latest = metadata["latest"]
     windows = _find_platform_download(metadata, "windows")
     linux = _find_platform_download(metadata, "linux")
+    unsigned_windows_beta = bool(
+        windows
+        and windows.get("distribution_status") == "unsigned_beta"
+        and windows.get("verification", {}).get("authenticode_status") == "unsigned"
+    )
     if windows and linux:
         status = "Windows/Linux downloads available"
     elif windows:
@@ -517,9 +552,24 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         else "",
         "data-release-sha256": windows["sha256"] if windows else "Not available",
         "data-release-windows-signature": (
-            "Verified publisher: SignPath Foundation"
+            "Unsigned beta - expect a Windows SmartScreen warning"
+            if unsigned_windows_beta
+            else "Verified publisher: SignPath Foundation"
             if windows
             else "Windows installer unavailable - signature verification required"
+        ),
+        "data-release-windows-tag": (
+            "Unsigned beta" if unsigned_windows_beta else "Verified" if windows else "Unavailable"
+        ),
+        "data-windows-download-notice-title": (
+            "Unsigned Windows beta"
+            if unsigned_windows_beta
+            else "Windows download temporarily unavailable"
+        ),
+        "data-windows-download-notice-body": (
+            "Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -> Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning."
+            if unsigned_windows_beta
+            else "A verified signed installer is not available. Linux packages and the source code remain available."
         ),
         "data-release-macos-size": "GitHub source",
         "data-release-macos-sha256": "Source only from GitHub",
@@ -533,7 +583,7 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     return _set_release_hook_hidden(
         rendered,
         "data-windows-download-notice",
-        hidden=windows is not None,
+        hidden=windows is not None and not unsigned_windows_beta,
     )
 
 
@@ -624,6 +674,11 @@ def parse_args() -> argparse.Namespace:
         help="include GitHub asset URLs in JSON; leave off while downloads are coming soon",
     )
     parser.add_argument(
+        "--allow-unsigned-windows-beta",
+        action="store_true",
+        help="publish an explicitly labelled unsigned Windows beta when signature verification is unavailable",
+    )
+    parser.add_argument(
         "--include-experimental-archives",
         action="store_true",
         help="legacy alias for --include-platform-downloads",
@@ -648,7 +703,12 @@ def main() -> None:
         raise SystemExit("refusing to publish metadata for a draft release")
 
     metadata = build_metadata(
-        release, args.repo, args.include_download_urls, args.platform, args.kind
+        release,
+        args.repo,
+        args.include_download_urls,
+        args.platform,
+        args.kind,
+        allow_unsigned_windows_beta=args.allow_unsigned_windows_beta,
     )
     if args.include_platform_downloads or args.include_experimental_archives:
         platform_release = run_gh(args.experimental_repo, metadata["latest"]["version"])

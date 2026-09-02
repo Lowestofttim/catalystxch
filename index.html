@@ -1631,7 +1631,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Linux download available - current release v1.3.16</span>
+                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.16</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -2053,12 +2053,12 @@
         <div class="download-wrap">
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
             <div class="download-title">Download CATalyst</div>
-            <p class="download-sub">Windows downloads are enabled only after independent Authenticode verification. Linux packages come from GitHub Releases, and Mac users can run from the source repo.</p>
+            <p class="download-sub">Windows releases are either independently signature-verified or explicitly labelled as unsigned beta builds. Linux packages come from GitHub Releases, and Mac users can run from the source repo.</p>
             <aside class="windows-download-notice" data-windows-download-notice role="status">
                 <span class="windows-download-notice-icon" aria-hidden="true">⚠</span>
                 <div>
-                    <strong class="windows-download-notice-title">Windows download temporarily unavailable</strong>
-                    <p>A SignPath Foundation-verified installer is not available yet. Unsigned or unverifiable Windows installers are withheld because Windows may block or flag them. Linux packages and the source code remain available, and this notice will clear automatically after a verified signed installer is published.</p>
+                    <strong class="windows-download-notice-title" data-windows-download-notice-title>Unsigned Windows beta</strong>
+                    <p data-windows-download-notice-body>Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -&gt; Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning.</p>
                 </div>
             </aside>
             <div class="platforms">
@@ -2066,9 +2066,9 @@
                     <div class="platform-row">
                         <span class="platform-icon">🪟</span>
                         <span class="platform-name">Windows</span>
-                        <span class="platform-tag tested">Stable</span>
+                        <span class="platform-tag tested" data-release-windows-tag>Unsigned beta</span>
                     </div>
-                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size></span></div>
+                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>26.9 MB</span></div>
                 </a>
                 <a class="platform-card" data-download-macos href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">
                     <div class="platform-row">
@@ -2092,7 +2092,7 @@
                     <div class="release-label">Latest packaged build</div>
                     <div class="release-name" data-release-name>CATalyst v1.3.16</div>
                     <div class="release-version" data-release-version>v1.3.16</div>
-                    <div class="release-meta" data-release-meta>Stable - published 27 Aug 2026 - linux download available</div>
+                    <div class="release-meta" data-release-meta>Stable - published 27 Aug 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
@@ -2123,15 +2123,15 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Not available</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.16.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>Not available</div>
+                    <div class="download-detail-value" data-release-sha256>c3e91980ee8057a96339c121e531177ff96597a57a580b6884d20f799c994b5c</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows signature</div>
-                    <div class="download-detail-value" data-release-windows-signature>Windows installer unavailable - signature verification required</div>
+                    <div class="download-detail-value" data-release-windows-signature>Unsigned beta - expect a Windows SmartScreen warning</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">macOS package</div>
@@ -2146,7 +2146,7 @@
                 <div class="download-security-title">Safe download rules</div>
                 <ul class="download-security-list">
                     <li>Public installers link only to official CATalyst GitHub Releases over HTTPS.</li>
-                    <li>Windows installers are exposed only after independent SignPath Foundation Authenticode and timestamp verification.</li>
+                    <li>Windows installers are either independently Authenticode-verified or explicitly marked as unsigned beta builds with a visible SmartScreen warning.</li>
                     <li>Each download shows its version, release notes, file size, and SHA-256 checksum.</li>
                     <li>There will be no mirror links, shortened URLs, or installer links posted only in chat.</li>
                     <li>Bug reports and feedback go through the public bot repo during beta testing.</li>
@@ -2294,7 +2294,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=20260828-windows-pause" defer></script>
+<script src="assets/release.js?v=20260902-unsigned-beta" defer></script>
 
 </body>
 </html>

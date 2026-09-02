@@ -52,6 +52,7 @@ jobs:
         run: >-
           python scripts/sync_release_metadata.py
           --include-download-urls
+          --allow-unsigned-windows-beta
           --include-platform-downloads
           --update-html-fallbacks
 

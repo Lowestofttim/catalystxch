@@ -14,6 +14,7 @@ const verifiedWindows = {
   download_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/${windowsInstaller.name}`,
   sha256: "a".repeat(64),
   download_enabled: true,
+  distribution_status: undefined,
   verification: {
     authenticode_status: "valid",
     publisher: "SignPath Foundation",
@@ -31,6 +32,53 @@ const verifiedLatest = {
   ...baseLatest,
   assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? verifiedWindows : asset)
 };
+const unsignedWindows = {
+  ...windowsInstaller,
+  download_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/${windowsInstaller.name}`,
+  sha256: "b".repeat(64),
+  download_enabled: true,
+  distribution_status: "unsigned_beta",
+  verification: {
+    authenticode_status: "unsigned",
+    publisher: null,
+    signer_subject: null,
+    signer_thumbprint: null,
+    timestamp_status: "unavailable",
+    update_manifest_status: "valid",
+    update_manifest_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/latest.json`,
+    update_manifest_signature_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/latest.json.sig`,
+    evidence_url: null,
+    evidence_sha256: null
+  }
+};
+const unsignedLatest = {
+  ...baseLatest,
+  assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? unsignedWindows : asset)
+};
+const disabledWindows = {
+  ...windowsInstaller,
+  download_url: null,
+  sha256: null,
+  download_enabled: false,
+  distribution_status: undefined,
+  verification: {
+    authenticode_status: "unavailable",
+    publisher: null,
+    signer_subject: null,
+    signer_thumbprint: null,
+    timestamp_status: "unavailable",
+    update_manifest_status: "unavailable",
+    update_manifest_url: null,
+    update_manifest_signature_url: null,
+    evidence_url: null,
+    evidence_sha256: null
+  }
+};
+const disabledLatest = {
+  ...baseLatest,
+  assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? disabledWindows : asset)
+};
+const disabledMetadata = { downloads_enabled: true, latest: disabledLatest };
 const platformDownloadPriority = (asset, platform) => {
   const name = String(asset && asset.name || "").toLowerCase();
   if (platform === "linux") {
@@ -151,6 +199,9 @@ function buildDocument(link, macosLink, linuxLink) {
     ["[data-release-linux-size]", [makeTextNode(formatBytes(linuxDownload.size_bytes))]],
     ["[data-release-sha256]", [makeTextNode(SHA256)]],
     ["[data-release-windows-signature]", [makeTextNode()]],
+    ["[data-release-windows-tag]", [makeTextNode()]],
+    ["[data-windows-download-notice-title]", [makeTextNode()]],
+    ["[data-windows-download-notice-body]", [makeTextNode()]],
     ["[data-release-macos-sha256]", [makeTextNode("Source only from GitHub")]],
     ["[data-release-linux-sha256]", [makeTextNode(linuxDownload.sha256)]],
     ["[data-release-notes]", [makeListNode()]],
@@ -267,13 +318,25 @@ async function main() {
   assert(enabled.text("[data-release-version]") === baseLatest.version, "enabled release should show the release version");
   assert(enabled.text("[data-release-sha256]") === SHA256, "enabled release should show SHA-256");
   assert(enabled.text("[data-release-windows-signature]") === "Verified publisher: SignPath Foundation", "enabled release should show verified publisher");
+  assert(enabled.text("[data-release-windows-tag]") === "Verified", "verified release should show a verified platform tag");
   assert(enabled.hidden("[data-windows-download-notice]") === true, "verified Windows release should hide the temporary pause notice");
   assert(enabled.text("[data-release-macos-size]") === "GitHub source", "enabled release should show macOS source status");
   assert(enabled.text("[data-release-linux-size]") === formatBytes(linuxDownload.size_bytes), "enabled release should show Linux size");
   assert(enabled.text("[data-release-macos-sha256]") === "Source only from GitHub", "enabled release should show macOS source-only detail");
   assert(enabled.text("[data-release-linux-sha256]") === linuxDownload.sha256, "enabled release should show Linux SHA-256");
 
-  const disabled = await runRelease(metadata, PUBLIC_URL);
+  const unsigned = await runRelease({ downloads_enabled: true, latest: unsignedLatest });
+  assert(unsigned.link.href === unsignedWindows.download_url, "explicit unsigned beta should set the Windows download href");
+  assert(!unsigned.link.attrs.has("aria-disabled"), "explicit unsigned beta should enable the Windows link");
+  assert(unsigned.text("[data-release-sha256]") === unsignedWindows.sha256, "unsigned beta should show SHA-256");
+  assert(unsigned.text("[data-release-windows-signature]") === "Unsigned beta - expect a Windows SmartScreen warning", "unsigned beta should be labelled honestly");
+  assert(unsigned.text("[data-release-windows-tag]") === "Unsigned beta", "unsigned beta should be labelled on its platform card");
+  assert(unsigned.hidden("[data-windows-download-notice]") === false, "unsigned beta should keep its warning visible");
+  assert(unsigned.text("[data-windows-download-notice-title]") === "Unsigned Windows beta", "unsigned beta should show a specific warning title");
+  assert(unsigned.text("[data-windows-download-notice-body]").includes("Windows protected your PC"), "unsigned beta should explain the normal SmartScreen warning");
+  assert(unsigned.text("[data-windows-download-notice-body]").includes("Do not continue"), "unsigned beta should distinguish malware or PUA warnings");
+
+  const disabled = await runRelease(disabledMetadata, PUBLIC_URL);
   assert(disabled.link.href === "", "disabled release should remove stale Windows download href");
   assert(disabled.macosLink.href === MAC_SOURCE_URL, "disabled release should preserve macOS source href");
   assert(disabled.linuxLink.href === LINUX_URL, "disabled Windows should preserve Linux download href");
@@ -314,6 +377,18 @@ async function main() {
     {
       name: "wrong host",
       asset: { ...verifiedWindows, download_url: `https://example.com/${DOWNLOAD_NAME}` }
+    },
+    {
+      name: "unsigned without explicit beta marker",
+      asset: { ...unsignedWindows, distribution_status: undefined }
+    },
+    {
+      name: "unsigned beta without hash",
+      asset: { ...unsignedWindows, sha256: null }
+    },
+    {
+      name: "unsigned beta claiming a publisher",
+      asset: { ...unsignedWindows, verification: { ...unsignedWindows.verification, publisher: "Unknown" } }
     }
   ];
   for (const testCase of guardedCases) {

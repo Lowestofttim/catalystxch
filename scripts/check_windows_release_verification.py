@@ -20,9 +20,11 @@ from windows_release_verification import (
     find_release_asset,
     parse_osslsigncode_output,
     parse_sha256_sidecar,
+    prove_no_authenticode_signature,
     sha256_file,
     validate_evidence,
     validate_signed_update_manifest,
+    verify_unsigned_windows_release,
     verify_windows_release,
 )
 
@@ -361,6 +363,104 @@ The signature is timestamped: Aug 28 2026
             "evidence_sha256": hashlib.sha256(evidence_bytes).hexdigest(),
         },
     }
+
+    unsigned_release = copy.deepcopy(release)
+    unsigned_release["assets"] = [
+        asset
+        for asset in unsigned_release["assets"]
+        if asset["name"] != "windows-signature-v1.3.17.json"
+    ]
+
+    def unsigned_runner(command, **options):
+        assert command[0:3] == ["osslsigncode", "verify", "-in"]
+        assert Path(command[3]).read_bytes() == b"signed-installer"
+        assert options["check"] is False
+        return subprocess.CompletedProcess(
+            command,
+            1,
+            "PE checksum   : 0005CC67\nNo signature found\n\nFailed\n",
+            "",
+        )
+
+    unsigned_result = verify_unsigned_windows_release(
+        unsigned_release,
+        urlopen=opener,
+        runner=unsigned_runner,
+        system_name="Linux",
+        manifest_public_key_b64=public_key_b64,
+    )
+    assert unsigned_result == {
+        "download_enabled": True,
+        "distribution_status": "unsigned_beta",
+        "verification": {
+            "authenticode_status": "unsigned",
+            "publisher": None,
+            "signer_subject": None,
+            "signer_thumbprint": None,
+            "timestamp_status": "unavailable",
+            "update_manifest_status": "valid",
+            "update_manifest_url": (
+                "https://github.com/Lowestofttim/catalyst-releases/"
+                "releases/download/v1.3.17/latest.json"
+            ),
+            "update_manifest_signature_url": (
+                "https://github.com/Lowestofttim/catalyst-releases/"
+                "releases/download/v1.3.17/latest.json.sig"
+            ),
+            "evidence_url": None,
+            "evidence_sha256": None,
+        },
+    }
+
+    prove_no_authenticode_signature(
+        Path("unsigned.exe"),
+        runner=lambda command, **options: subprocess.CompletedProcess(
+            command,
+            0,
+            '{"Status":"NotSigned","HasSigner":false,"HasTimestamp":false}',
+            "",
+        ),
+        system_name="Windows",
+    )
+    for completed, system_name in (
+        (
+            subprocess.CompletedProcess([], 0, "Succeeded", ""),
+            "Linux",
+        ),
+        (
+            subprocess.CompletedProcess([], 1, "Corrupt signature", ""),
+            "Linux",
+        ),
+        (
+            subprocess.CompletedProcess(
+                [],
+                0,
+                '{"Status":"Valid","HasSigner":true,"HasTimestamp":true}',
+                "",
+            ),
+            "Windows",
+        ),
+    ):
+        expect_failure(
+            lambda completed=completed, system_name=system_name: prove_no_authenticode_signature(
+                Path("candidate.exe"),
+                runner=lambda command, **options: completed,
+                system_name=system_name,
+            ),
+            "not proven unsigned",
+        )
+
+    signed_evidence_release = copy.deepcopy(release)
+    expect_failure(
+        lambda: verify_unsigned_windows_release(
+            signed_evidence_release,
+            urlopen=opener,
+            runner=unsigned_runner,
+            system_name="Linux",
+            manifest_public_key_b64=public_key_b64,
+        ),
+        "Unsigned Windows release verification failed",
+    )
 
     def expect_verification_failure(release_value, payload_values, runner_value=runner):
         def test_opener(request, timeout):
