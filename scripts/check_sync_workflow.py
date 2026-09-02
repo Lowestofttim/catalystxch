@@ -33,6 +33,7 @@ def main() -> None:
         "cryptography==50.0.1": "the pinned CATalyst manifest signature verifier",
         "python scripts/check_windows_release_verification.py": "pure Windows release verifier regression checks",
         "windows-signature-": "the signed evidence companion asset",
+        "--allow-unsigned-windows-beta": "the explicit unsigned Windows beta policy switch",
     }
     for marker, purpose in required.items():
         if marker not in workflow:

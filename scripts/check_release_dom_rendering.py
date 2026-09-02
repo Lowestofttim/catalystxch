@@ -14,7 +14,7 @@ from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
-RELEASE_JS_ASSET = "assets/release.js?v=20260828-windows-pause"
+RELEASE_JS_ASSET = "assets/release.js?v=20260902-unsigned-beta"
 
 
 def serve_site() -> tuple[ThreadingHTTPServer, str]:
@@ -50,6 +50,7 @@ def main() -> None:
         ),
         "sha256": "a" * 64,
         "download_enabled": True,
+        "distribution_status": None,
         "verification": {
             "authenticode_status": "valid",
             "publisher": "SignPath Foundation",
@@ -80,6 +81,40 @@ def main() -> None:
             **enabled_latest,
             "assets": [
                 verified_installer if asset is enabled_installer else asset
+                for asset in enabled_latest["assets"]
+            ],
+        },
+    }
+    unsigned_installer = {
+        **enabled_installer,
+        "download_url": (
+            "https://github.com/Lowestofttim/catalyst-releases/releases/"
+            "download/v1.3.16/Catalyst-Setup-v1.3.16.exe"
+        ),
+        "sha256": "b" * 64,
+        "download_enabled": True,
+        "distribution_status": "unsigned_beta",
+        "verification": {
+            "authenticode_status": "unsigned",
+            "publisher": None,
+            "signer_subject": None,
+            "signer_thumbprint": None,
+            "timestamp_status": "unavailable",
+            "update_manifest_status": "unavailable",
+            "update_manifest_url": None,
+            "update_manifest_signature_url": None,
+            "evidence_url": None,
+            "evidence_sha256": None,
+        },
+    }
+    unsigned_metadata = {
+        **metadata,
+        "downloads_enabled": True,
+        "download_status": "available",
+        "latest": {
+            **enabled_latest,
+            "assets": [
+                unsigned_installer if asset is enabled_installer else asset
                 for asset in enabled_latest["assets"]
             ],
         },
@@ -115,6 +150,18 @@ def main() -> None:
                 verified_page.goto(url, wait_until="networkidle")
                 assert_release_panel(verified_page, verified_metadata)
 
+                unsigned_page = browser.new_page(viewport={"width": 390, "height": 900})
+                unsigned_page.route(
+                    "**/assets/release/latest.json",
+                    lambda route: route.fulfill(
+                        status=200,
+                        content_type="application/json",
+                        body=json.dumps(unsigned_metadata),
+                    ),
+                )
+                unsigned_page.goto(url, wait_until="networkidle")
+                assert_release_panel(unsigned_page, unsigned_metadata)
+
             finally:
                 browser.close()
     finally:
@@ -138,10 +185,19 @@ def find_windows_installer(latest: dict) -> dict | None:
             if asset["platform"] == "windows"
             and asset["kind"] == "installer"
             and asset.get("download_enabled") is True
-            and asset.get("verification", {}).get("authenticode_status") == "valid"
-            and asset.get("verification", {}).get("publisher") == "SignPath Foundation"
-            and asset.get("verification", {}).get("timestamp_status") == "valid"
-            and asset.get("verification", {}).get("update_manifest_status") == "valid"
+            and (
+                (
+                    asset.get("verification", {}).get("authenticode_status") == "valid"
+                    and asset.get("verification", {}).get("publisher") == "SignPath Foundation"
+                    and asset.get("verification", {}).get("timestamp_status") == "valid"
+                    and asset.get("verification", {}).get("update_manifest_status") == "valid"
+                )
+                or (
+                    asset.get("distribution_status") == "unsigned_beta"
+                    and asset.get("verification", {}).get("authenticode_status") == "unsigned"
+                    and asset.get("verification", {}).get("publisher") is None
+                )
+            )
         ),
         None,
     )
@@ -174,6 +230,9 @@ def assert_release_panel(page, metadata: dict) -> None:
     installer = find_windows_installer(latest)
     linux = find_platform_download(latest, "linux")
     downloads_available = bool(installer and installer["download_url"])
+    unsigned_beta = bool(
+        installer and installer.get("distribution_status") == "unsigned_beta"
+    )
     linux_available = bool(linux and linux["download_url"])
 
     expect(page.locator("[data-release-eyebrow]")).to_contain_text(latest["version"])
@@ -196,7 +255,19 @@ def assert_release_panel(page, metadata: dict) -> None:
     windows_notice = page.locator("[data-windows-download-notice]")
     expect(windows_notice).to_have_count(1)
     if downloads_available:
-        expect(windows_notice).to_be_hidden()
+        if unsigned_beta:
+            expect(windows_notice).to_be_visible()
+            expect(page.locator("[data-windows-download-notice-title]")).to_have_text(
+                "Unsigned Windows beta"
+            )
+            expect(page.locator("[data-windows-download-notice-body]")).to_contain_text(
+                "Windows protected your PC"
+            )
+            expect(page.locator("[data-windows-download-notice-body]")).to_contain_text(
+                "Do not continue"
+            )
+        else:
+            expect(windows_notice).to_be_hidden()
         expect(download_link).not_to_have_attribute("aria-disabled", "true")
         expect(macos_link).not_to_have_attribute("aria-disabled", "true")
         if linux_available:
@@ -232,7 +303,9 @@ def assert_release_panel(page, metadata: dict) -> None:
         expect(download_link).not_to_have_attribute("href", re.compile(r".+"))
 
     expect(page.locator("[data-release-windows-signature]")).to_have_text(
-        "Verified publisher: SignPath Foundation"
+        "Unsigned beta - expect a Windows SmartScreen warning"
+        if unsigned_beta
+        else "Verified publisher: SignPath Foundation"
         if downloads_available
         else "Windows installer unavailable - signature verification required"
     )

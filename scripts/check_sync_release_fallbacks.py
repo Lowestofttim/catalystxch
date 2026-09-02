@@ -79,9 +79,13 @@ def main() -> None:
   <span data-release-download-size>1 MB</span>
   <span data-release-sha256>old-sha</span>
   <span data-release-windows-signature>old-signature</span>
+  <span data-release-windows-tag>old-tag</span>
   <span data-release-linux-size>2 MB</span>
   <span data-release-linux-sha256>old-linux-sha</span>
-  <aside data-windows-download-notice>Windows downloads paused</aside>
+  <aside data-windows-download-notice>
+    <strong data-windows-download-notice-title>Windows downloads paused</strong>
+    <p data-windows-download-notice-body>old warning</p>
+  </aside>
   <ul data-release-notes>
     <li>old note</li>
   </ul>
@@ -100,6 +104,7 @@ def main() -> None:
         ">189.8 MB</span>",
         "a" * 64,
         "Verified publisher: SignPath Foundation",
+        ">Verified</span>",
         "b" * 64,
         "<li>First &amp; safest</li>",
         "<li>Second &lt;fix&gt;</li>",
@@ -333,6 +338,79 @@ def main() -> None:
             for asset in written["latest"]["assets"]
         ):
             raise SystemExit("failed Windows verification removed the Linux release")
+
+        unsigned_metadata = build_metadata(
+            release,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_beta=True,
+            windows_verifier=fail_verification,
+        )
+        unsigned_windows = unsigned_metadata["latest"]["assets"][0]
+        if unsigned_windows != {
+            "name": "Catalyst-Setup-v9.8.7.exe",
+            "platform": "windows",
+            "kind": "installer",
+            "size_bytes": 28_169_368,
+            "download_url": release["assets"][0]["url"],
+            "sha256": "a" * 64,
+            "download_enabled": True,
+            "distribution_status": "unsigned_beta",
+            "verification": {
+                "authenticode_status": "unsigned",
+                "publisher": None,
+                "signer_subject": None,
+                "signer_thumbprint": None,
+                "timestamp_status": "unavailable",
+                "update_manifest_status": "unavailable",
+                "update_manifest_url": None,
+                "update_manifest_signature_url": None,
+                "evidence_url": None,
+                "evidence_sha256": None,
+            },
+        }:
+            raise SystemExit("explicit unsigned Windows beta metadata is incorrect")
+        unsigned_html = render_release_fallbacks(source, unsigned_metadata)
+        for expected in (
+            "Unsigned beta - expect a Windows SmartScreen warning",
+            "Unsigned Windows beta",
+            ">Unsigned beta</span>",
+            "Windows protected your PC",
+            "Do not continue",
+        ):
+            if expected not in unsigned_html:
+                raise SystemExit(f"unsigned Windows fallback is missing: {expected}")
+        if "<aside data-windows-download-notice hidden>" in unsigned_html:
+            raise SystemExit("unsigned Windows fallback must keep its warning visible")
+
+        invalid_signed_release = deepcopy(release)
+        invalid_signed_release["assets"].append(
+            {
+                "name": "windows-signature-v9.8.7.json",
+                "size": 500,
+                "url": (
+                    "https://github.com/Lowestofttim/catalyst-releases/"
+                    "releases/download/v9.8.7/windows-signature-v9.8.7.json"
+                ),
+                "digest": "sha256:" + "c" * 64,
+            }
+        )
+        invalid_signed_metadata = build_metadata(
+            invalid_signed_release,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_beta=True,
+            windows_verifier=fail_verification,
+        )
+        invalid_signed_windows = invalid_signed_metadata["latest"]["assets"][0]
+        if invalid_signed_windows["download_enabled"] is not False:
+            raise SystemExit(
+                "a release with invalid signing evidence must fail closed instead of falling back to unsigned beta"
+            )
 
         before_replace_failure = output.read_bytes()
         with patch.object(Path, "replace", side_effect=OSError("replace failed")):
