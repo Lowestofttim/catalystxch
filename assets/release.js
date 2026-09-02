@@ -94,9 +94,9 @@
       asset.verification.signer_subject === null &&
       asset.verification.signer_thumbprint === null &&
       asset.verification.timestamp_status === "unavailable" &&
-      asset.verification.update_manifest_status === "unavailable" &&
-      asset.verification.update_manifest_url === null &&
-      asset.verification.update_manifest_signature_url === null &&
+      asset.verification.update_manifest_status === "valid" &&
+      asset.verification.update_manifest_url === `${releaseBase}latest.json` &&
+      asset.verification.update_manifest_signature_url === `${releaseBase}latest.json.sig` &&
       asset.verification.evidence_url === null &&
       asset.verification.evidence_sha256 === null
     );

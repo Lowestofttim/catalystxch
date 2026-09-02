@@ -20,6 +20,7 @@ from pathlib import Path
 
 from windows_release_verification import (
     ReleaseVerificationError,
+    verify_unsigned_windows_release,
     verify_windows_release,
 )
 
@@ -184,21 +185,6 @@ def _unavailable_windows_verification() -> dict[str, object]:
     }
 
 
-def _unsigned_windows_beta_verification() -> dict[str, object]:
-    return {
-        "authenticode_status": "unsigned",
-        "publisher": None,
-        "signer_subject": None,
-        "signer_thumbprint": None,
-        "timestamp_status": "unavailable",
-        "update_manifest_status": "unavailable",
-        "update_manifest_url": None,
-        "update_manifest_signature_url": None,
-        "evidence_url": None,
-        "evidence_sha256": None,
-    }
-
-
 def _has_windows_signing_evidence(release: dict, version: str) -> bool:
     expected_name = f"windows-signature-{version}.json"
     return any(
@@ -229,6 +215,7 @@ def build_metadata(
     *,
     allow_unsigned_windows_beta: bool = False,
     windows_verifier=verify_windows_release,
+    windows_unsigned_verifier=verify_unsigned_windows_release,
 ) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
@@ -245,11 +232,21 @@ def build_metadata(
         release_notes = fallback_notes(body)
 
     windows_result = None
+    unsigned_windows_result = None
     if platform == "windows" and include_download_urls:
         try:
             windows_result = windows_verifier(release)
         except ReleaseVerificationError:
             windows_result = None
+        if (
+            windows_result is None
+            and allow_unsigned_windows_beta
+            and not _has_windows_signing_evidence(release, version)
+        ):
+            try:
+                unsigned_windows_result = windows_unsigned_verifier(release)
+            except ReleaseVerificationError:
+                unsigned_windows_result = None
 
     expected_windows_name = f"Catalyst-Setup-{version}.exe"
     assets = []
@@ -275,13 +272,14 @@ def build_metadata(
         }
         if platform == "windows":
             if windows_result is None:
-                if (
-                    allow_unsigned_windows_beta
-                    and include_download_urls
-                    and not _has_windows_signing_evidence(release, version)
-                ):
-                    asset["distribution_status"] = "unsigned_beta"
-                    asset["verification"] = _unsigned_windows_beta_verification()
+                if unsigned_windows_result is not None:
+                    asset["download_enabled"] = (
+                        unsigned_windows_result.get("download_enabled") is True
+                    )
+                    asset["distribution_status"] = unsigned_windows_result[
+                        "distribution_status"
+                    ]
+                    asset["verification"] = unsigned_windows_result["verification"]
                 else:
                     asset["download_url"] = None
                     asset["sha256"] = None

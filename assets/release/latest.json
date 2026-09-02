@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-02T13:59:44Z",
+  "generated_at": "2026-09-02T14:23:11Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
@@ -29,9 +29,9 @@
           "signer_subject": null,
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
-          "update_manifest_status": "unavailable",
-          "update_manifest_url": null,
-          "update_manifest_signature_url": null,
+          "update_manifest_status": "valid",
+          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.16/latest.json",
+          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.16/latest.json.sig",
           "evidence_url": null,
           "evidence_sha256": null
         }

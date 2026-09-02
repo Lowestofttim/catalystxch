@@ -229,9 +229,9 @@ def is_unsigned_windows_beta(asset: dict) -> bool:
         and verification.get("signer_subject") is None
         and verification.get("signer_thumbprint") is None
         and verification.get("timestamp_status") == "unavailable"
-        and verification.get("update_manifest_status") == "unavailable"
-        and verification.get("update_manifest_url") is None
-        and verification.get("update_manifest_signature_url") is None
+        and verification.get("update_manifest_status") == "valid"
+        and isinstance(verification.get("update_manifest_url"), str)
+        and isinstance(verification.get("update_manifest_signature_url"), str)
         and verification.get("evidence_url") is None
         and verification.get("evidence_sha256") is None
     )
@@ -368,6 +368,15 @@ def validate_metadata(data: dict) -> str:
                         f"{release_prefix}latest.json.sig"
                     ):
                         fail("enabled Windows update manifest signature URL is invalid")
+                else:
+                    if verification.get("update_manifest_url") != (
+                        f"{release_prefix}latest.json"
+                    ):
+                        fail("unsigned Windows update manifest URL is invalid")
+                    if verification.get("update_manifest_signature_url") != (
+                        f"{release_prefix}latest.json.sig"
+                    ):
+                        fail("unsigned Windows update manifest signature URL is invalid")
         else:
             if asset["download_url"] is not None:
                 fail("download_url must be null while downloads_enabled is false")

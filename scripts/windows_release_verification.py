@@ -6,6 +6,8 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import os
+import platform
 import re
 import subprocess
 import tempfile
@@ -243,6 +245,73 @@ def parse_osslsigncode_output(output: str) -> str:
     return matching[0].strip()
 
 
+def prove_no_authenticode_signature(
+    path: Path,
+    *,
+    runner=subprocess.run,
+    system_name: str | None = None,
+) -> None:
+    """Independently prove that a candidate Windows executable is unsigned."""
+
+    current_system = system_name or platform.system()
+    if current_system == "Windows":
+        environment = dict(os.environ)
+        environment["CATALYST_AUTHENTICODE_PATH"] = str(path)
+        command = [
+            "pwsh.exe",
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            (
+                "$signature = Get-AuthenticodeSignature -LiteralPath "
+                "$env:CATALYST_AUTHENTICODE_PATH; "
+                "[pscustomobject]@{Status=[string]$signature.Status; "
+                "HasSigner=($null -ne $signature.SignerCertificate); "
+                "HasTimestamp=($null -ne $signature.TimeStamperCertificate)} "
+                "| ConvertTo-Json -Compress"
+            ),
+        ]
+        completed = runner(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=environment,
+        )
+        try:
+            result = json.loads(completed.stdout)
+        except (json.JSONDecodeError, TypeError):
+            result = None
+        if (
+            completed.returncode == 0
+            and isinstance(result, Mapping)
+            and result.get("Status") == "NotSigned"
+            and result.get("HasSigner") is False
+            and result.get("HasTimestamp") is False
+        ):
+            return
+    else:
+        command = ["osslsigncode", "verify", "-in", str(path)]
+        completed = runner(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        output = f"{completed.stdout}\n{completed.stderr}"
+        if (
+            completed.returncode != 0
+            and "Succeeded" not in output
+            and re.search(r"(?mi)^\s*No signature found\s*$", output)
+        ):
+            return
+    raise ReleaseVerificationError("installer was not proven unsigned")
+
+
 def _asset_url(asset: Mapping[str, object], expected: str) -> str:
     url = str(asset.get("url") or "")
     if url != expected:
@@ -434,3 +503,134 @@ def verify_windows_release(
         ReleaseVerificationError,
     ) as exc:
         raise ReleaseVerificationError("Windows release verification failed") from exc
+
+
+def verify_unsigned_windows_release(
+    release: Mapping[str, object],
+    temp_root: Path | None = None,
+    urlopen=urllib.request.urlopen,
+    runner=subprocess.run,
+    system_name: str | None = None,
+    manifest_public_key_b64: str = UPDATE_MANIFEST_PUBLIC_KEY_B64,
+) -> dict[str, object]:
+    """Verify exact release bytes and prove no Authenticode signature is present."""
+
+    try:
+        tag = str(release.get("tagName") or "")
+        if not re.fullmatch(r"v\d+\.\d+\.\d+", tag):
+            raise ReleaseVerificationError("release tag is not semantic")
+        installer_name = f"Catalyst-Setup-{tag}.exe"
+        sidecar_name = f"{installer_name}.sha256"
+        evidence_name = f"windows-signature-{tag}.json"
+        manifest_name = "latest.json"
+        manifest_signature_name = "latest.json.sig"
+        release_prefix = (
+            f"https://github.com/Lowestofttim/catalyst-releases/releases/download/{tag}"
+        )
+
+        assets = release.get("assets")
+        if not isinstance(assets, list):
+            raise ReleaseVerificationError("release assets are missing")
+        if any(
+            isinstance(asset, Mapping) and asset.get("name") == evidence_name
+            for asset in assets
+        ):
+            raise ReleaseVerificationError(
+                "release with signing evidence cannot use the unsigned path"
+            )
+
+        installer_asset = find_release_asset(release, installer_name)
+        sidecar_asset = find_release_asset(release, sidecar_name)
+        manifest_asset = find_release_asset(release, manifest_name)
+        manifest_signature_asset = find_release_asset(release, manifest_signature_name)
+        installer_url = _asset_url(
+            installer_asset, f"{release_prefix}/{installer_name}"
+        )
+        sidecar_url = _asset_url(sidecar_asset, f"{release_prefix}/{sidecar_name}")
+        manifest_url = _asset_url(manifest_asset, f"{release_prefix}/{manifest_name}")
+        manifest_signature_url = _asset_url(
+            manifest_signature_asset,
+            f"{release_prefix}/{manifest_signature_name}",
+        )
+
+        root = None if temp_root is None else str(temp_root)
+        with tempfile.TemporaryDirectory(dir=root) as directory:
+            temporary = Path(directory)
+            installer_path = temporary / installer_name
+            sidecar_path = temporary / sidecar_name
+            manifest_path = temporary / manifest_name
+            manifest_signature_path = temporary / manifest_signature_name
+            _download(installer_url, installer_path, urlopen=urlopen)
+            _download(sidecar_url, sidecar_path, urlopen=urlopen)
+            _download(manifest_url, manifest_path, urlopen=urlopen)
+            _download(
+                manifest_signature_url,
+                manifest_signature_path,
+                urlopen=urlopen,
+            )
+
+            expected_size = installer_asset.get("size")
+            if (
+                not isinstance(expected_size, int)
+                or expected_size <= 0
+                or installer_path.stat().st_size != expected_size
+            ):
+                raise ReleaseVerificationError("installer size does not match")
+            installer_sha256 = sha256_file(installer_path)
+            if installer_asset.get("digest") != f"sha256:{installer_sha256}":
+                raise ReleaseVerificationError("GitHub installer digest does not match")
+            sidecar_digest = parse_sha256_sidecar(
+                sidecar_path.read_text(encoding="utf-8"),
+                installer_name,
+                expected_sha256=installer_sha256,
+            )
+            if sidecar_digest != installer_sha256:
+                raise ReleaseVerificationError("sidecar digest does not match")
+
+            manifest = json.loads(manifest_path.read_bytes())
+            if not isinstance(manifest, Mapping):
+                raise ReleaseVerificationError("update manifest is not an object")
+            validate_signed_update_manifest(
+                manifest,
+                manifest_signature_path.read_bytes(),
+                public_key_b64=manifest_public_key_b64,
+                installer_name=installer_name,
+                installer_url=installer_url,
+                installer_size=expected_size,
+                installer_sha256=installer_sha256,
+                expected_tag=tag,
+            )
+            prove_no_authenticode_signature(
+                installer_path,
+                runner=runner,
+                system_name=system_name,
+            )
+
+        return {
+            "download_enabled": True,
+            "distribution_status": "unsigned_beta",
+            "verification": {
+                "authenticode_status": "unsigned",
+                "publisher": None,
+                "signer_subject": None,
+                "signer_thumbprint": None,
+                "timestamp_status": "unavailable",
+                "update_manifest_status": "valid",
+                "update_manifest_url": manifest_url,
+                "update_manifest_signature_url": manifest_signature_url,
+                "evidence_url": None,
+                "evidence_sha256": None,
+            },
+        }
+    except (
+        FileNotFoundError,
+        OSError,
+        subprocess.CalledProcessError,
+        urllib.error.URLError,
+        UnicodeError,
+        json.JSONDecodeError,
+        ReleaseVerificationError,
+    ) as exc:
+        raise ReleaseVerificationError(
+            "Unsigned Windows release verification failed"
+        ) from exc

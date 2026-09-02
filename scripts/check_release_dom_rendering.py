@@ -100,9 +100,15 @@ def main() -> None:
             "signer_subject": None,
             "signer_thumbprint": None,
             "timestamp_status": "unavailable",
-            "update_manifest_status": "unavailable",
-            "update_manifest_url": None,
-            "update_manifest_signature_url": None,
+            "update_manifest_status": "valid",
+            "update_manifest_url": (
+                "https://github.com/Lowestofttim/catalyst-releases/releases/"
+                "download/v1.3.16/latest.json"
+            ),
+            "update_manifest_signature_url": (
+                "https://github.com/Lowestofttim/catalyst-releases/releases/"
+                "download/v1.3.16/latest.json.sig"
+            ),
             "evidence_url": None,
             "evidence_sha256": None,
         },

@@ -347,6 +347,28 @@ def main() -> None:
             "installer",
             allow_unsigned_windows_beta=True,
             windows_verifier=fail_verification,
+            windows_unsigned_verifier=lambda value: {
+                "download_enabled": True,
+                "distribution_status": "unsigned_beta",
+                "verification": {
+                    "authenticode_status": "unsigned",
+                    "publisher": None,
+                    "signer_subject": None,
+                    "signer_thumbprint": None,
+                    "timestamp_status": "unavailable",
+                    "update_manifest_status": "valid",
+                    "update_manifest_url": (
+                        "https://github.com/Lowestofttim/catalyst-releases/"
+                        "releases/download/v9.8.7/latest.json"
+                    ),
+                    "update_manifest_signature_url": (
+                        "https://github.com/Lowestofttim/catalyst-releases/"
+                        "releases/download/v9.8.7/latest.json.sig"
+                    ),
+                    "evidence_url": None,
+                    "evidence_sha256": None,
+                },
+            },
         )
         unsigned_windows = unsigned_metadata["latest"]["assets"][0]
         if unsigned_windows != {
@@ -364,9 +386,15 @@ def main() -> None:
                 "signer_subject": None,
                 "signer_thumbprint": None,
                 "timestamp_status": "unavailable",
-                "update_manifest_status": "unavailable",
-                "update_manifest_url": None,
-                "update_manifest_signature_url": None,
+                "update_manifest_status": "valid",
+                "update_manifest_url": (
+                    "https://github.com/Lowestofttim/catalyst-releases/"
+                    "releases/download/v9.8.7/latest.json"
+                ),
+                "update_manifest_signature_url": (
+                    "https://github.com/Lowestofttim/catalyst-releases/"
+                    "releases/download/v9.8.7/latest.json.sig"
+                ),
                 "evidence_url": None,
                 "evidence_sha256": None,
             },
@@ -405,6 +433,9 @@ def main() -> None:
             "installer",
             allow_unsigned_windows_beta=True,
             windows_verifier=fail_verification,
+            windows_unsigned_verifier=lambda value: (_ for _ in ()).throw(
+                AssertionError("unsigned verifier must not run when signing evidence exists")
+            ),
         )
         invalid_signed_windows = invalid_signed_metadata["latest"]["assets"][0]
         if invalid_signed_windows["download_enabled"] is not False:

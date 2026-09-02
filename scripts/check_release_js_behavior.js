@@ -44,9 +44,9 @@ const unsignedWindows = {
     signer_subject: null,
     signer_thumbprint: null,
     timestamp_status: "unavailable",
-    update_manifest_status: "unavailable",
-    update_manifest_url: null,
-    update_manifest_signature_url: null,
+    update_manifest_status: "valid",
+    update_manifest_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/latest.json`,
+    update_manifest_signature_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/latest.json.sig`,
     evidence_url: null,
     evidence_sha256: null
   }
