@@ -804,16 +804,15 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows releases are either independently signature-verified or explicitly labelled as unsigned beta builds with a visible SmartScreen warning. Linux packages use the website's official public GitHub release links. Mac users can run from the GitHub source repo; a signed/notarized Mac installer or DMG is not currently published.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.3.17</span> (<span data-release-version>v1.3.17</span>)</div>
-                    <div class="version-state" data-release-status>Linux download available</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.3.18</span> (<span data-release-version>v1.3.18</span>)</div>
+                    <div class="version-state" data-release-status>Windows/Linux downloads available</div>
                 </div>
-                <p data-release-windows-signature>Windows installer unavailable - signature verification required</p>
+                <p data-release-windows-signature>Unsigned beta - expect a Windows SmartScreen warning</p>
                 <p><a class="text-link" href="https://github.com/catalystxch/catalyst-bot/blob/main/docs/CODE_SIGNING_POLICY.md" target="_blank" rel="noopener">Code signing policy</a> · <a class="text-link" href="https://github.com/catalystxch/catalyst-bot/blob/main/docs/PRIVACY.md" target="_blank" rel="noopener">Privacy policy</a></p>
                 <ul class="version-list" data-release-notes>
-                    <li>The Windows v1.3.17 download is temporarily withheld because Microsoft Defender currently classifies the installer as Trojan:Win32/Wacatac.B!ml. Do not bypass this alert.</li>
-                    <li>The installed v1.3.17 payload passed Defender, but the public installer remains unavailable while a replacement package is verified.</li>
-                    <li>Fixes startup recovery after an upgrade or forced shutdown leaves an offer publication claim in an ambiguous state. CATalyst now verifies Dexie state, safely suppresses only the exact ambiguous orphan, retires a decisively dead short-lived runtime lease, and continues startup instead of remaining blocked by PUBLICATION_CLAIM_RECOVERY_REQUIRED.</li>
-                    <li>Preserves fail-closed behavior for live owners, unproven owners, malformed evidence, long-lived leases, and uncertain publication state.</li>
+                    <li>Replaces the withheld v1.3.17 Windows package after its solid-compressed wrapper triggered Microsoft Defender's Trojan:Win32/Wacatac.B!ml heuristic.</li>
+                    <li>Keeps LZMA2/ultra compression while storing installer files as non-solid blocks; the exact v1.3.18 installer and bundled payload pass the same current Defender scanner.</li>
+                    <li>Adds a regression test that prevents solid compression from being restored accidentally.</li>
                 </ul>
             </div>
             <ol>
@@ -1267,7 +1266,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=20260902-unsigned-beta" defer></script>
+<script src="assets/release.js?v=20260903-v1.3.18" defer></script>
 <script src="assets/docs.js" defer></script>
 
 </body>

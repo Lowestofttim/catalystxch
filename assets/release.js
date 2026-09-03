@@ -181,7 +181,7 @@
     setText("[data-windows-download-notice-title]", "Windows download temporarily unavailable");
     setText(
       "[data-windows-download-notice-body]",
-      "CATalyst v1.3.17 is temporarily withheld because Microsoft Defender currently classifies its installer as Trojan:Win32/Wacatac.B!ml. Do not bypass this alert. Linux packages and the source code remain available while a replacement Windows build is verified."
+      "A verified signed installer is not available. Linux packages and the source code remain available."
     );
     setText("[data-release-download-name]", "Not available");
     setText("[data-release-download-size]", "");
