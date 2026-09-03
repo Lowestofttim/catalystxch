@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-03T11:27:01Z",
+  "generated_at": "2026-09-03T13:20:00Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
@@ -10,8 +10,8 @@
     "published_at": "2026-09-03T11:01:57Z",
     "channel": "stable",
     "release_notes": [
-      "This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.",
-      "The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.",
+      "The Windows v1.3.17 download is temporarily withheld because Microsoft Defender currently classifies the installer as Trojan:Win32/Wacatac.B!ml. Do not bypass this alert.",
+      "The installed v1.3.17 payload passed Defender, but the public installer remains unavailable while a replacement package is verified.",
       "Fixes startup recovery after an upgrade or forced shutdown leaves an offer publication claim in an ambiguous state. CATalyst now verifies Dexie state, safely suppresses only the exact ambiguous orphan, retires a decisively dead short-lived runtime lease, and continues startup instead of remaining blocked by PUBLICATION_CLAIM_RECOVERY_REQUIRED.",
       "Preserves fail-closed behavior for live owners, unproven owners, malformed evidence, long-lived leases, and uncertain publication state."
     ],
@@ -28,19 +28,19 @@
         "platform": "windows",
         "kind": "installer",
         "size_bytes": 29201003,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.17/Catalyst-Setup-v1.3.17.exe",
-        "sha256": "b95bbc921f7a939e7c9f9ad2a57c3e2d0718f3f050410aad6c430abc9affdcbb",
-        "download_enabled": true,
-        "distribution_status": "unsigned_beta",
+        "download_url": null,
+        "sha256": null,
+        "download_enabled": false,
+        "distribution_status": "withheld_defender_detection",
         "verification": {
-          "authenticode_status": "unsigned",
+          "authenticode_status": "unavailable",
           "publisher": null,
           "signer_subject": null,
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
-          "update_manifest_status": "valid",
-          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.17/latest.json",
-          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.17/latest.json.sig",
+          "update_manifest_status": "unavailable",
+          "update_manifest_url": null,
+          "update_manifest_signature_url": null,
           "evidence_url": null,
           "evidence_sha256": null
         }
