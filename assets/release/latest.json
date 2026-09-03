@@ -1,29 +1,34 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-03T14:36:43Z",
+  "generated_at": "2026-09-03T16:25:27Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.18",
-    "name": "CATalyst v1.3.18",
-    "published_at": "2026-09-03T12:51:11Z",
+    "version": "v1.3.19",
+    "name": "CATalyst v1.3.19",
+    "published_at": "2026-09-03T16:16:43Z",
     "channel": "stable",
     "release_notes": [
-      "The v1.3.18 Windows installer is temporarily withheld. A clean browser download carrying Windows' Internet-origin marker is currently classified by Microsoft Defender as Trojan:Win32/Wacatac.B!ml, even though local and clean GitHub-runner scans passed.",
-      "Do not bypass a Defender malware or unwanted-software alert. Linux packages and source remain available while a replacement Windows package is developed and verified with the public-download path.",
-      "Changed the Inno Setup wrapper from solid to non-solid LZMA2 blocks and added packaging regression coverage.",
-      "Includes the v1.3.17 startup publication-claim recovery fixes."
+      "This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.",
+      "The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.",
+      "Replaces the withheld v1.3.18 Windows installer after the actual browser download was quarantined by Microsoft Defender as Trojan:Win32/Wacatac.B!ml only when carrying Internet-origin context.",
+      "Uses non-solid ZIP compression for the Inno Setup wrapper. Both the unchanged-payload diagnostic probe and the exact v1.3.19 installer downloaded publicly with ZoneId=3, matched their SHA-256 checksums, and produced no Defender detection."
     ],
-    "verification_notes": [],
+    "verification_notes": [
+      "5,405 tests passed; 23 skipped; 415 subtests passed.",
+      "Ruff, GitHub unit, CodeQL, Semgrep, Gitleaks, and security checks passed.",
+      "The exact tagged build passed local Defender scans and packaged Sage RPC, API, desktop startup/duplicate/persisted safety, and upgrade-publication-recovery smokes.",
+      "The exact GitHub release installer completed a real public browser download, retained ZoneId=3, matched SHA-256, and passed both browser/IOAV handling and a subsequent explicit Microsoft Defender scan with zero detections."
+    ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.18.exe",
+        "name": "Catalyst-Setup-v1.3.19.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 30614698,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/Catalyst-Setup-v1.3.18.exe",
-        "sha256": "bd41886fab29f5a7726ece775297ac55fb09b17db3f521b868d632d2c17a6433",
+        "size_bytes": 37686657,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.19/Catalyst-Setup-v1.3.19.exe",
+        "sha256": "b220e53410e0e2eb888dfdd9f24797e761800adf8d68988fc45bffd748277877",
         "download_enabled": true,
         "distribution_status": "unsigned_beta",
         "verification": {
@@ -33,28 +38,28 @@
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
           "update_manifest_status": "valid",
-          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/latest.json",
-          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/latest.json.sig",
+          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.19/latest.json",
+          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.19/latest.json.sig",
           "evidence_url": null,
           "evidence_sha256": null
         }
       },
       {
-        "name": "catalyst_v1.3.18_amd64.deb",
+        "name": "catalyst_v1.3.19_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 199154944,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.18/catalyst_v1.3.18_amd64.deb",
-        "sha256": "ce3f1132762c52f9c04adcbf99a2b611bfdd4204f6bc89d18b28e23cf0bfa047",
+        "size_bytes": 199137906,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.19/catalyst_v1.3.19_amd64.deb",
+        "sha256": "5673f6f1f1a0f9a053af1ed59d43be3f98393b1cf9a208f418dfc354dbac8044",
         "download_enabled": true
       },
       {
-        "name": "Catalyst-linux-v1.3.18-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.3.19-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 256537792,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.18/Catalyst-linux-v1.3.18-x86_64.AppImage",
-        "sha256": "6297e91df23a3774c1d9107c8d3609a63ad1aca27662bde0ac93cbd51d522b42",
+        "size_bytes": 256533696,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.19/Catalyst-linux-v1.3.19-x86_64.AppImage",
+        "sha256": "eef0f448cca8ea02a49ac83eb74588ade801c810b401e650de9e0a5721253cd7",
         "download_enabled": true
       }
     ]

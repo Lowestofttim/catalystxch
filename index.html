@@ -1631,7 +1631,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.18</span>
+                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.19</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -2068,7 +2068,7 @@
                         <span class="platform-name">Windows</span>
                         <span class="platform-tag tested" data-release-windows-tag>Unsigned beta</span>
                     </div>
-                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>29.2 MB</span></div>
+                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>35.9 MB</span></div>
                 </a>
                 <a class="platform-card" data-download-macos href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">
                     <div class="platform-row">
@@ -2090,17 +2090,17 @@
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest packaged build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.3.18</div>
-                    <div class="release-version" data-release-version>v1.3.18</div>
+                    <div class="release-name" data-release-name>CATalyst v1.3.19</div>
+                    <div class="release-version" data-release-version>v1.3.19</div>
                     <div class="release-meta" data-release-meta>Stable - published 3 Sep 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>The v1.3.18 Windows installer is temporarily withheld. A clean browser download carrying Windows' Internet-origin marker is currently classified by Microsoft Defender as Trojan:Win32/Wacatac.B!ml, even though local and clean GitHub-runner scans passed.</li>
-                        <li>Do not bypass a Defender malware or unwanted-software alert. Linux packages and source remain available while a replacement Windows package is developed and verified with the public-download path.</li>
-                        <li>Changed the Inno Setup wrapper from solid to non-solid LZMA2 blocks and added packaging regression coverage.</li>
-                        <li>Includes the v1.3.17 startup publication-claim recovery fixes.</li>
+                        <li>This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.</li>
+                        <li>The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.</li>
+                        <li>Replaces the withheld v1.3.18 Windows installer after the actual browser download was quarantined by Microsoft Defender as Trojan:Win32/Wacatac.B!ml only when carrying Internet-origin context.</li>
+                        <li>Uses non-solid ZIP compression for the Inno Setup wrapper. Both the unchanged-payload diagnostic probe and the exact v1.3.19 installer downloaded publicly with ZoneId=3, matched their SHA-256 checksums, and produced no Defender detection.</li>
                     </ul>
                 </div>
             </div>
@@ -2126,11 +2126,11 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.18.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.19.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>bd41886fab29f5a7726ece775297ac55fb09b17db3f521b868d632d2c17a6433</div>
+                    <div class="download-detail-value" data-release-sha256>b220e53410e0e2eb888dfdd9f24797e761800adf8d68988fc45bffd748277877</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows signature</div>
@@ -2142,7 +2142,7 @@
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>ce3f1132762c52f9c04adcbf99a2b611bfdd4204f6bc89d18b28e23cf0bfa047</div>
+                    <div class="download-detail-value" data-release-linux-sha256>5673f6f1f1a0f9a053af1ed59d43be3f98393b1cf9a208f418dfc354dbac8044</div>
                 </div>
             </div>
             <div class="download-security">
@@ -2297,7 +2297,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=20260903-v1.3.18-withheld" defer></script>
+<script src="assets/release.js?v=20260903-v1.3.19" defer></script>
 
 </body>
 </html>
