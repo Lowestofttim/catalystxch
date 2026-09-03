@@ -1,26 +1,35 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-02T14:23:11Z",
+  "generated_at": "2026-09-03T11:27:01Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.16",
-    "name": "CATalyst v1.3.16",
-    "published_at": "2026-08-27T17:31:40Z",
+    "version": "v1.3.17",
+    "name": "CATalyst v1.3.17",
+    "published_at": "2026-09-03T11:01:57Z",
     "channel": "stable",
     "release_notes": [
-      "Recover publication claims interrupted by upgrades"
+      "This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.",
+      "The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.",
+      "Fixes startup recovery after an upgrade or forced shutdown leaves an offer publication claim in an ambiguous state. CATalyst now verifies Dexie state, safely suppresses only the exact ambiguous orphan, retires a decisively dead short-lived runtime lease, and continues startup instead of remaining blocked by PUBLICATION_CLAIM_RECOVERY_REQUIRED.",
+      "Preserves fail-closed behavior for live owners, unproven owners, malformed evidence, long-lived leases, and uncertain publication state."
     ],
-    "verification_notes": [],
+    "verification_notes": [
+      "5,395 tests passed; 23 skipped; 415 subtests passed",
+      "Ruff lint and formatting checks passed",
+      "Clean PyInstaller build from tag v1.3.17",
+      "Installer upgrade from v1.3.16 to v1.3.17 passed",
+      "Packaged Sage RPC, API, desktop startup/duplicate/persisted safety, and upgrade-publication-recovery smokes passed"
+    ],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.16.exe",
+        "name": "Catalyst-Setup-v1.3.17.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 28225931,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.16/Catalyst-Setup-v1.3.16.exe",
-        "sha256": "c3e91980ee8057a96339c121e531177ff96597a57a580b6884d20f799c994b5c",
+        "size_bytes": 29201003,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.17/Catalyst-Setup-v1.3.17.exe",
+        "sha256": "b95bbc921f7a939e7c9f9ad2a57c3e2d0718f3f050410aad6c430abc9affdcbb",
         "download_enabled": true,
         "distribution_status": "unsigned_beta",
         "verification": {
@@ -30,28 +39,28 @@
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
           "update_manifest_status": "valid",
-          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.16/latest.json",
-          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.16/latest.json.sig",
+          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.17/latest.json",
+          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.17/latest.json.sig",
           "evidence_url": null,
           "evidence_sha256": null
         }
       },
       {
-        "name": "catalyst_v1.3.16_amd64.deb",
+        "name": "catalyst_v1.3.17_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 199265512,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.16/catalyst_v1.3.16_amd64.deb",
-        "sha256": "d7006b0b0f46818b84efc42d9b7e3a30c4dde12791e233c50f71945f22fc257f",
+        "size_bytes": 199138596,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.17/catalyst_v1.3.17_amd64.deb",
+        "sha256": "1fcf705101d8cd1048682fb6723148904960bcc37d14feb45ac842e935e96554",
         "download_enabled": true
       },
       {
-        "name": "Catalyst-linux-v1.3.16-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.3.17-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 256521408,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.16/Catalyst-linux-v1.3.16-x86_64.AppImage",
-        "sha256": "ecf086af1f5f0e3ac6ab7c30840c8364232977d5389404e03f761244497d9dc8",
+        "size_bytes": 256533696,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.17/Catalyst-linux-v1.3.17-x86_64.AppImage",
+        "sha256": "bf809a5353ac6ec33961ffb128d5c45889a3e49882238610eb12ccac7508c607",
         "download_enabled": true
       }
     ]
