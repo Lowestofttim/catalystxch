@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-03T13:09:24Z",
+  "generated_at": "2026-09-03T14:36:43Z",
   "downloads_enabled": true,
-  "download_status": "partial",
+  "download_status": "available",
   "latest": {
     "version": "v1.3.18",
     "name": "CATalyst v1.3.18",
@@ -22,18 +22,19 @@
         "platform": "windows",
         "kind": "installer",
         "size_bytes": 30614698,
-        "download_url": null,
-        "sha256": null,
-        "download_enabled": false,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/Catalyst-Setup-v1.3.18.exe",
+        "sha256": "bd41886fab29f5a7726ece775297ac55fb09b17db3f521b868d632d2c17a6433",
+        "download_enabled": true,
+        "distribution_status": "unsigned_beta",
         "verification": {
-          "authenticode_status": "unavailable",
+          "authenticode_status": "unsigned",
           "publisher": null,
           "signer_subject": null,
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
-          "update_manifest_status": "unavailable",
-          "update_manifest_url": null,
-          "update_manifest_signature_url": null,
+          "update_manifest_status": "valid",
+          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/latest.json",
+          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/latest.json.sig",
           "evidence_url": null,
           "evidence_sha256": null
         }
