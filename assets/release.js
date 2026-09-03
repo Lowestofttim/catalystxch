@@ -181,7 +181,7 @@
     setText("[data-windows-download-notice-title]", "Windows download temporarily unavailable");
     setText(
       "[data-windows-download-notice-body]",
-      "A verified signed installer is not available. Linux packages and the source code remain available."
+      "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. Linux packages and the source code remain available while a replacement is verified."
     );
     setText("[data-release-download-name]", "Not available");
     setText("[data-release-download-size]", "");
