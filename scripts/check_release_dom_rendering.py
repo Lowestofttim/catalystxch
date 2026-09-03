@@ -42,12 +42,19 @@ def main() -> None:
         for asset in enabled_latest["assets"]
         if asset["platform"] == "windows" and asset["kind"] == "installer"
     )
+    installer_name = enabled_installer["name"]
+    installer_tag_match = re.fullmatch(
+        r"Catalyst-Setup-(v\d+\.\d+\.\d+)\.exe", installer_name
+    )
+    assert installer_tag_match, f"unexpected Windows installer name: {installer_name}"
+    installer_tag = installer_tag_match.group(1)
+    release_base = (
+        "https://github.com/Lowestofttim/catalyst-releases/releases/"
+        f"download/{installer_tag}"
+    )
     verified_installer = {
         **enabled_installer,
-        "download_url": (
-            "https://github.com/Lowestofttim/catalyst-releases/releases/"
-            "download/v1.3.16/Catalyst-Setup-v1.3.16.exe"
-        ),
+        "download_url": f"{release_base}/{installer_name}",
         "sha256": "a" * 64,
         "download_enabled": True,
         "distribution_status": None,
@@ -58,18 +65,9 @@ def main() -> None:
             "signer_thumbprint": "A" * 40,
             "timestamp_status": "valid",
             "update_manifest_status": "valid",
-            "update_manifest_url": (
-                "https://github.com/Lowestofttim/catalyst-releases/releases/"
-                "download/v1.3.16/latest.json"
-            ),
-            "update_manifest_signature_url": (
-                "https://github.com/Lowestofttim/catalyst-releases/releases/"
-                "download/v1.3.16/latest.json.sig"
-            ),
-            "evidence_url": (
-                "https://github.com/Lowestofttim/catalyst-releases/releases/"
-                "download/v1.3.16/windows-signature-v1.3.16.json"
-            ),
+            "update_manifest_url": f"{release_base}/latest.json",
+            "update_manifest_signature_url": f"{release_base}/latest.json.sig",
+            "evidence_url": f"{release_base}/windows-signature-{installer_tag}.json",
             "evidence_sha256": "c" * 64,
         },
     }
@@ -87,10 +85,7 @@ def main() -> None:
     }
     unsigned_installer = {
         **enabled_installer,
-        "download_url": (
-            "https://github.com/Lowestofttim/catalyst-releases/releases/"
-            "download/v1.3.16/Catalyst-Setup-v1.3.16.exe"
-        ),
+        "download_url": f"{release_base}/{installer_name}",
         "sha256": "b" * 64,
         "download_enabled": True,
         "distribution_status": "unsigned_beta",
@@ -101,14 +96,8 @@ def main() -> None:
             "signer_thumbprint": None,
             "timestamp_status": "unavailable",
             "update_manifest_status": "valid",
-            "update_manifest_url": (
-                "https://github.com/Lowestofttim/catalyst-releases/releases/"
-                "download/v1.3.16/latest.json"
-            ),
-            "update_manifest_signature_url": (
-                "https://github.com/Lowestofttim/catalyst-releases/releases/"
-                "download/v1.3.16/latest.json.sig"
-            ),
+            "update_manifest_url": f"{release_base}/latest.json",
+            "update_manifest_signature_url": f"{release_base}/latest.json.sig",
             "evidence_url": None,
             "evidence_sha256": None,
         },
