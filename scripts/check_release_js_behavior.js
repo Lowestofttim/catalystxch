@@ -351,7 +351,7 @@ async function main() {
   assert(disabled.text("[data-release-windows-signature]") === "Windows installer unavailable - signature verification required", "disabled release should show signature requirement");
   assert(disabled.hidden("[data-windows-download-notice]") === false, "disabled Windows release should show the temporary pause notice");
   assert(disabled.text("[data-windows-download-notice-title]") === "Windows download temporarily unavailable", "disabled release should show the generic pause title");
-  assert(disabled.text("[data-windows-download-notice-body]") === "A verified signed installer is not available. Linux packages and the source code remain available.", "disabled release should explain the generic pause without stale incident wording");
+  assert(disabled.text("[data-windows-download-notice-body]") === "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. Linux packages and the source code remain available while a replacement is verified.", "disabled release should explain the Defender pause without stale version wording");
   assert(disabled.text("[data-release-macos-sha256]") === "Source only from GitHub", "disabled release should keep macOS source-only detail");
   assert(disabled.text("[data-release-linux-sha256]") === linuxDownload.sha256, "disabled Windows should preserve Linux SHA-256 detail");
 

@@ -1,44 +1,39 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-03T12:57:52Z",
+  "generated_at": "2026-09-03T13:09:24Z",
   "downloads_enabled": true,
-  "download_status": "available",
+  "download_status": "partial",
   "latest": {
     "version": "v1.3.18",
     "name": "CATalyst v1.3.18",
     "published_at": "2026-09-03T12:51:11Z",
     "channel": "stable",
     "release_notes": [
-      "Replaces the withheld v1.3.17 Windows package after its solid-compressed wrapper triggered Microsoft Defender's Trojan:Win32/Wacatac.B!ml heuristic.",
-      "Keeps LZMA2/ultra compression while storing installer files as non-solid blocks; the exact v1.3.18 installer and bundled payload pass the same current Defender scanner.",
-      "Adds a regression test that prevents solid compression from being restored accidentally."
+      "The v1.3.18 Windows installer is temporarily withheld. A clean browser download carrying Windows' Internet-origin marker is currently classified by Microsoft Defender as Trojan:Win32/Wacatac.B!ml, even though local and clean GitHub-runner scans passed.",
+      "Do not bypass a Defender malware or unwanted-software alert. Linux packages and source remain available while a replacement Windows package is developed and verified with the public-download path.",
+      "Changed the Inno Setup wrapper from solid to non-solid LZMA2 blocks and added packaging regression coverage.",
+      "Includes the v1.3.17 startup publication-claim recovery fixes."
     ],
-    "verification_notes": [
-      "5,405 tests passed; 23 skipped; 415 subtests passed.",
-      "The official public installer passed checksum, version, Defender, clean-install, Sage RPC, API, desktop startup/duplicate/persisted safety, and upgrade-publication-recovery verification on a clean GitHub Windows runner.",
-      "The public download upgraded this PC from v1.3.17 to v1.3.18 and passed Defender plus the same packaged-runtime smokes.",
-      "Linux AppImage and Debian packages passed their packaged API and desktop smokes."
-    ],
+    "verification_notes": [],
     "assets": [
       {
         "name": "Catalyst-Setup-v1.3.18.exe",
         "platform": "windows",
         "kind": "installer",
         "size_bytes": 30614698,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/Catalyst-Setup-v1.3.18.exe",
-        "sha256": "bd41886fab29f5a7726ece775297ac55fb09b17db3f521b868d632d2c17a6433",
-        "download_enabled": true,
-        "distribution_status": "unsigned_beta",
+        "download_url": null,
+        "sha256": null,
+        "download_enabled": false,
         "verification": {
-          "authenticode_status": "unsigned",
+          "authenticode_status": "unavailable",
           "publisher": null,
           "signer_subject": null,
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
-          "update_manifest_status": "valid",
-          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/latest.json",
-          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.18/latest.json.sig",
+          "update_manifest_status": "unavailable",
+          "update_manifest_url": null,
+          "update_manifest_signature_url": null,
           "evidence_url": null,
           "evidence_sha256": null
         }

@@ -805,14 +805,15 @@
             <div class="version-card">
                 <div class="version-head">
                     <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.3.18</span> (<span data-release-version>v1.3.18</span>)</div>
-                    <div class="version-state" data-release-status>Windows/Linux downloads available</div>
+                    <div class="version-state" data-release-status>Linux download available</div>
                 </div>
-                <p data-release-windows-signature>Unsigned beta - expect a Windows SmartScreen warning</p>
+                <p data-release-windows-signature>Windows installer unavailable - signature verification required</p>
                 <p><a class="text-link" href="https://github.com/catalystxch/catalyst-bot/blob/main/docs/CODE_SIGNING_POLICY.md" target="_blank" rel="noopener">Code signing policy</a> · <a class="text-link" href="https://github.com/catalystxch/catalyst-bot/blob/main/docs/PRIVACY.md" target="_blank" rel="noopener">Privacy policy</a></p>
                 <ul class="version-list" data-release-notes>
-                    <li>Replaces the withheld v1.3.17 Windows package after its solid-compressed wrapper triggered Microsoft Defender's Trojan:Win32/Wacatac.B!ml heuristic.</li>
-                    <li>Keeps LZMA2/ultra compression while storing installer files as non-solid blocks; the exact v1.3.18 installer and bundled payload pass the same current Defender scanner.</li>
-                    <li>Adds a regression test that prevents solid compression from being restored accidentally.</li>
+                    <li>The v1.3.18 Windows installer is temporarily withheld. A clean browser download carrying Windows' Internet-origin marker is currently classified by Microsoft Defender as Trojan:Win32/Wacatac.B!ml, even though local and clean GitHub-runner scans passed.</li>
+                    <li>Do not bypass a Defender malware or unwanted-software alert. Linux packages and source remain available while a replacement Windows package is developed and verified with the public-download path.</li>
+                    <li>Changed the Inno Setup wrapper from solid to non-solid LZMA2 blocks and added packaging regression coverage.</li>
+                    <li>Includes the v1.3.17 startup publication-claim recovery fixes.</li>
                 </ul>
             </div>
             <ol>
@@ -1266,7 +1267,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=20260903-v1.3.18" defer></script>
+<script src="assets/release.js?v=20260903-v1.3.18-withheld" defer></script>
 <script src="assets/docs.js" defer></script>
 
 </body>
