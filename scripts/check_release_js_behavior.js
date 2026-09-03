@@ -350,6 +350,9 @@ async function main() {
   assert(disabled.text("[data-release-sha256]") === "Not available", "disabled release should reset SHA-256 detail");
   assert(disabled.text("[data-release-windows-signature]") === "Windows installer unavailable - signature verification required", "disabled release should show signature requirement");
   assert(disabled.hidden("[data-windows-download-notice]") === false, "disabled Windows release should show the temporary pause notice");
+  assert(disabled.text("[data-windows-download-notice-title]") === "Windows download temporarily unavailable", "disabled release should explain that Windows is unavailable");
+  assert(disabled.text("[data-windows-download-notice-body]").includes("Trojan:Win32/Wacatac.B!ml"), "disabled release should name the Defender detection that caused the pause");
+  assert(disabled.text("[data-windows-download-notice-body]").includes("Do not bypass"), "disabled release should tell users not to bypass the Defender detection");
   assert(disabled.text("[data-release-macos-sha256]") === "Source only from GitHub", "disabled release should keep macOS source-only detail");
   assert(disabled.text("[data-release-linux-sha256]") === linuxDownload.sha256, "disabled Windows should preserve Linux SHA-256 detail");
 
