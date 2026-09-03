@@ -1631,7 +1631,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Linux download available - current release v1.3.17</span>
+                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.18</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -2057,8 +2057,8 @@
             <aside class="windows-download-notice" data-windows-download-notice role="status">
                 <span class="windows-download-notice-icon" aria-hidden="true">⚠</span>
                 <div>
-                    <strong class="windows-download-notice-title" data-windows-download-notice-title>Windows download temporarily unavailable</strong>
-                    <p data-windows-download-notice-body>CATalyst v1.3.17 is temporarily withheld because Microsoft Defender currently classifies its installer as Trojan:Win32/Wacatac.B!ml. Do not bypass this alert. Linux packages and the source code remain available while a replacement Windows build is verified.</p>
+                    <strong class="windows-download-notice-title" data-windows-download-notice-title>Unsigned Windows beta</strong>
+                    <p data-windows-download-notice-body>Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -&gt; Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning.</p>
                 </div>
             </aside>
             <div class="platforms">
@@ -2066,9 +2066,9 @@
                     <div class="platform-row">
                         <span class="platform-icon">🪟</span>
                         <span class="platform-name">Windows</span>
-                        <span class="platform-tag tested" data-release-windows-tag>Unavailable</span>
+                        <span class="platform-tag tested" data-release-windows-tag>Unsigned beta</span>
                     </div>
-                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size></span></div>
+                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>29.2 MB</span></div>
                 </a>
                 <a class="platform-card" data-download-macos href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">
                     <div class="platform-row">
@@ -2090,17 +2090,16 @@
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest packaged build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.3.17</div>
-                    <div class="release-version" data-release-version>v1.3.17</div>
-                    <div class="release-meta" data-release-meta>Stable - published 3 Sep 2026 - linux download available</div>
+                    <div class="release-name" data-release-name>CATalyst v1.3.18</div>
+                    <div class="release-version" data-release-version>v1.3.18</div>
+                    <div class="release-meta" data-release-meta>Stable - published 3 Sep 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>The Windows v1.3.17 download is temporarily withheld because Microsoft Defender currently classifies the installer as Trojan:Win32/Wacatac.B!ml. Do not bypass this alert.</li>
-                        <li>The installed v1.3.17 payload passed Defender, but the public installer remains unavailable while a replacement package is verified.</li>
-                        <li>Fixes startup recovery after an upgrade or forced shutdown leaves an offer publication claim in an ambiguous state. CATalyst now verifies Dexie state, safely suppresses only the exact ambiguous orphan, retires a decisively dead short-lived runtime lease, and continues startup instead of remaining blocked by PUBLICATION_CLAIM_RECOVERY_REQUIRED.</li>
-                        <li>Preserves fail-closed behavior for live owners, unproven owners, malformed evidence, long-lived leases, and uncertain publication state.</li>
+                        <li>Replaces the withheld v1.3.17 Windows package after its solid-compressed wrapper triggered Microsoft Defender's Trojan:Win32/Wacatac.B!ml heuristic.</li>
+                        <li>Keeps LZMA2/ultra compression while storing installer files as non-solid blocks; the exact v1.3.18 installer and bundled payload pass the same current Defender scanner.</li>
+                        <li>Adds a regression test that prevents solid compression from being restored accidentally.</li>
                     </ul>
                 </div>
             </div>
@@ -2126,15 +2125,15 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Not available</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.18.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>Not available</div>
+                    <div class="download-detail-value" data-release-sha256>bd41886fab29f5a7726ece775297ac55fb09b17db3f521b868d632d2c17a6433</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows signature</div>
-                    <div class="download-detail-value" data-release-windows-signature>Windows installer unavailable - signature verification required</div>
+                    <div class="download-detail-value" data-release-windows-signature>Unsigned beta - expect a Windows SmartScreen warning</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">macOS package</div>
@@ -2142,7 +2141,7 @@
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>1fcf705101d8cd1048682fb6723148904960bcc37d14feb45ac842e935e96554</div>
+                    <div class="download-detail-value" data-release-linux-sha256>ce3f1132762c52f9c04adcbf99a2b611bfdd4204f6bc89d18b28e23cf0bfa047</div>
                 </div>
             </div>
             <div class="download-security">
@@ -2297,7 +2296,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=20260902-unsigned-beta" defer></script>
+<script src="assets/release.js?v=20260903-v1.3.18" defer></script>
 
 </body>
 </html>

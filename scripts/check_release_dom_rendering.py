@@ -14,7 +14,7 @@ from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
-RELEASE_JS_ASSET = "assets/release.js?v=20260902-unsigned-beta"
+RELEASE_JS_ASSET = "assets/release.js?v=20260903-v1.3.18"
 
 
 def serve_site() -> tuple[ThreadingHTTPServer, str]:
