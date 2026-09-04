@@ -804,16 +804,16 @@
             <p>The bot is designed to work out of the box once Sage is running. Windows releases are either independently signature-verified or explicitly labelled as unsigned beta builds with a visible SmartScreen warning. Linux packages use the website's official public GitHub release links. Mac users can run from the GitHub source repo; a signed/notarized Mac installer or DMG is not currently published.</p>
             <div class="version-card">
                 <div class="version-head">
-                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.3.19</span> (<span data-release-version>v1.3.19</span>)</div>
+                    <div class="version-name">Latest desktop beta: <span data-release-name>CATalyst v1.3.20</span> (<span data-release-version>v1.3.20</span>)</div>
                     <div class="version-state" data-release-status>Windows/Linux downloads available</div>
                 </div>
                 <p data-release-windows-signature>Unsigned beta - expect a Windows SmartScreen warning</p>
                 <p><a class="text-link" href="https://github.com/catalystxch/catalyst-bot/blob/main/docs/CODE_SIGNING_POLICY.md" target="_blank" rel="noopener">Code signing policy</a> · <a class="text-link" href="https://github.com/catalystxch/catalyst-bot/blob/main/docs/PRIVACY.md" target="_blank" rel="noopener">Privacy policy</a></p>
                 <ul class="version-list" data-release-notes>
-                    <li>This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.</li>
-                    <li>The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.</li>
-                    <li>Replaces the withheld v1.3.18 Windows installer after the actual browser download was quarantined by Microsoft Defender as Trojan:Win32/Wacatac.B!ml only when carrying Internet-origin context.</li>
-                    <li>Uses non-solid ZIP compression for the Inno Setup wrapper. Both the unchanged-payload diagnostic probe and the exact v1.3.19 installer downloaded publicly with ZoneId=3, matched their SHA-256 checksums, and produced no Defender detection.</li>
+                    <li>Fixes the Authoritative state conflict that could leave Coin Prep stuck after upgrading from older CATalyst versions. Legacy offer locks are now cleared only when complete, fresh Sage evidence proves the corresponding offers are terminal or expired.</li>
+                    <li>Takes a complete wallet-wide Sage offer snapshot before Coin Prep and fails safely when the offer book cannot be proven complete.</li>
+                    <li>Stops the bot and drains concurrent wallet mutations before Coin Prep changes coin state, preventing offer creation and coin splitting from racing each other.</li>
+                    <li>Keeps automatic Coin Prep recovery polling while Sage cancellation proof is still propagating instead of abandoning the workflow prematurely.</li>
                 </ul>
             </div>
             <ol>
@@ -1267,7 +1267,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=20260903-v1.3.19" defer></script>
+<script src="assets/release.js?v=v1.3.20" defer></script>
 <script src="assets/docs.js" defer></script>
 
 </body>

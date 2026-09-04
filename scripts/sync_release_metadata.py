@@ -489,6 +489,23 @@ def _replace_release_notes(html_text: str, notes: list[str]) -> str:
     return pattern.sub(replace, html_text)
 
 
+def _replace_release_script_cache_key(html_text: str, version: str) -> str:
+    """Tie the release loader cache key to the synchronized release version."""
+
+    pattern = re.compile(
+        r"(?P<prefix>\bsrc=(?P<quote>[\"'])assets/release\.js\?v=)"
+        r"[^\"']+(?P=quote)",
+        re.IGNORECASE,
+    )
+    escaped_version = html.escape(version, quote=True)
+    return pattern.sub(
+        lambda match: (
+            f"{match.group('prefix')}{escaped_version}{match.group('quote')}"
+        ),
+        html_text,
+    )
+
+
 def _set_release_hook_hidden(html_text: str, hook: str, hidden: bool) -> str:
     pattern = re.compile(
         rf"<(?P<tag>[A-Za-z][\w:-]*)(?P<attrs>[^<>]*\b{re.escape(hook)}"
@@ -580,6 +597,7 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     for attribute, value in values.items():
         rendered = _replace_release_text(rendered, attribute, value)
     rendered = _replace_release_notes(rendered, latest["release_notes"])
+    rendered = _replace_release_script_cache_key(rendered, latest["version"])
     return _set_release_hook_hidden(
         rendered,
         "data-windows-download-notice",

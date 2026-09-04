@@ -14,7 +14,6 @@ from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot"
-RELEASE_JS_ASSET = "assets/release.js?v=20260903-v1.3.19"
 
 
 def serve_site() -> tuple[ThreadingHTTPServer, str]:
@@ -126,12 +125,14 @@ def main() -> None:
             try:
                 page = browser.new_page(viewport={"width": 390, "height": 900})
                 page.goto(url, wait_until="networkidle")
-                assert_release_script_cache_key(page)
+                assert_release_script_cache_key(page, enabled_latest["version"])
                 assert_release_panel(page, metadata)
 
                 docs_page = browser.new_page(viewport={"width": 390, "height": 900})
                 docs_page.goto(urljoin(url, "docs.html"), wait_until="networkidle")
-                assert_release_script_cache_key(docs_page)
+                assert_release_script_cache_key(
+                    docs_page, enabled_latest["version"]
+                )
 
                 verified_page = browser.new_page(viewport={"width": 390, "height": 900})
                 verified_page.route(
@@ -166,9 +167,9 @@ def main() -> None:
     print(f"release DOM rendering check passed for {enabled_latest['version']}")
 
 
-def assert_release_script_cache_key(page) -> None:
+def assert_release_script_cache_key(page, version: str) -> None:
     expect(page.locator('script[src^="assets/release.js"]')).to_have_attribute(
-        "src", RELEASE_JS_ASSET
+        "src", f"assets/release.js?v={version}"
     )
 
 
