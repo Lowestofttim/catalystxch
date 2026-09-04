@@ -89,6 +89,7 @@ def main() -> None:
   <ul data-release-notes>
     <li>old note</li>
   </ul>
+  <script src="assets/release.js?v=20260903-v1.3.19" defer></script>
 </main>
 """
 
@@ -108,11 +109,18 @@ def main() -> None:
         "b" * 64,
         "<li>First &amp; safest</li>",
         "<li>Second &lt;fix&gt;</li>",
+        'src="assets/release.js?v=v9.8.7"',
     ]
     for fragment in expected_fragments:
         if fragment not in rendered:
             raise SystemExit(f"missing synchronized fallback: {fragment}")
-    for stale in ("v1.0.0", "old note", "old-sha", "old-linux-sha"):
+    for stale in (
+        "v1.0.0",
+        "v1.3.19",
+        "old note",
+        "old-sha",
+        "old-linux-sha",
+    ):
         if stale in rendered:
             raise SystemExit(f"stale fallback remains: {stale}")
     if "<aside data-windows-download-notice hidden>" not in rendered:

@@ -1631,7 +1631,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.19</span>
+                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.20</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -2068,7 +2068,7 @@
                         <span class="platform-name">Windows</span>
                         <span class="platform-tag tested" data-release-windows-tag>Unsigned beta</span>
                     </div>
-                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>35.9 MB</span></div>
+                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>36.0 MB</span></div>
                 </a>
                 <a class="platform-card" data-download-macos href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">
                     <div class="platform-row">
@@ -2084,23 +2084,23 @@
                         <span class="platform-name">Linux</span>
                         <span class="platform-tag tested">Package</span>
                     </div>
-                    <div class="platform-note">deb/AppImage · <span data-release-linux-size>189.9 MB</span> · opens without manual env setup</div>
+                    <div class="platform-note">deb/AppImage · <span data-release-linux-size>190.0 MB</span> · opens without manual env setup</div>
                 </a>
             </div>
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest packaged build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.3.19</div>
-                    <div class="release-version" data-release-version>v1.3.19</div>
-                    <div class="release-meta" data-release-meta>Stable - published 3 Sep 2026 - windows/linux downloads available</div>
+                    <div class="release-name" data-release-name>CATalyst v1.3.20</div>
+                    <div class="release-version" data-release-version>v1.3.20</div>
+                    <div class="release-meta" data-release-meta>Stable - published 4 Sep 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.</li>
-                        <li>The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.</li>
-                        <li>Replaces the withheld v1.3.18 Windows installer after the actual browser download was quarantined by Microsoft Defender as Trojan:Win32/Wacatac.B!ml only when carrying Internet-origin context.</li>
-                        <li>Uses non-solid ZIP compression for the Inno Setup wrapper. Both the unchanged-payload diagnostic probe and the exact v1.3.19 installer downloaded publicly with ZoneId=3, matched their SHA-256 checksums, and produced no Defender detection.</li>
+                        <li>Fixes the Authoritative state conflict that could leave Coin Prep stuck after upgrading from older CATalyst versions. Legacy offer locks are now cleared only when complete, fresh Sage evidence proves the corresponding offers are terminal or expired.</li>
+                        <li>Takes a complete wallet-wide Sage offer snapshot before Coin Prep and fails safely when the offer book cannot be proven complete.</li>
+                        <li>Stops the bot and drains concurrent wallet mutations before Coin Prep changes coin state, preventing offer creation and coin splitting from racing each other.</li>
+                        <li>Keeps automatic Coin Prep recovery polling while Sage cancellation proof is still propagating instead of abandoning the workflow prematurely.</li>
                     </ul>
                 </div>
             </div>
@@ -2126,11 +2126,11 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.19.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.20.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>b220e53410e0e2eb888dfdd9f24797e761800adf8d68988fc45bffd748277877</div>
+                    <div class="download-detail-value" data-release-sha256>96fd8b7792cd094b3c2576d80d2669e60edfcee5c9e46a74822ca82210436c63</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows signature</div>
@@ -2142,7 +2142,7 @@
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>5673f6f1f1a0f9a053af1ed59d43be3f98393b1cf9a208f418dfc354dbac8044</div>
+                    <div class="download-detail-value" data-release-linux-sha256>8392ec22d0382ea7ad0ac19cca9385eb1949fe473ae998141fc42b6c1be5542d</div>
                 </div>
             </div>
             <div class="download-security">
@@ -2297,7 +2297,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=20260903-v1.3.19" defer></script>
+<script src="assets/release.js?v=v1.3.20" defer></script>
 
 </body>
 </html>
