@@ -1,34 +1,30 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-04T02:46:44Z",
+  "generated_at": "2026-09-07T09:15:27Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.20",
-    "name": "CATalyst v1.3.20",
-    "published_at": "2026-09-04T02:40:42Z",
+    "version": "v1.3.21",
+    "name": "CATalyst v1.3.21",
+    "published_at": "2026-09-07T09:10:14Z",
     "channel": "stable",
     "release_notes": [
-      "Fixes the Authoritative state conflict that could leave Coin Prep stuck after upgrading from older CATalyst versions. Legacy offer locks are now cleared only when complete, fresh Sage evidence proves the corresponding offers are terminal or expired.",
-      "Takes a complete wallet-wide Sage offer snapshot before Coin Prep and fails safely when the offer book cannot be proven complete.",
-      "Stops the bot and drains concurrent wallet mutations before Coin Prep changes coin state, preventing offer creation and coin splitting from racing each other.",
-      "Keeps automatic Coin Prep recovery polling while Sage cancellation proof is still propagating instead of abandoning the workflow prematurely."
+      "Harden CATalyst lifecycle and Coin Prep stability",
+      "Harden packaged TLS trust store",
+      "Fix secondary-PC wallet and cancellation races",
+      "Bound exhausted fill verification retries",
+      "Fix stale cancel diagnostics and top-up authority race"
     ],
-    "verification_notes": [
-      "5,423 tests passed; 35 skipped; 418 subtests passed.",
-      "Ruff, GitHub unit tests, CodeQL, Semgrep, Gitleaks, and security scans passed.",
-      "The exact Windows package passed clean-build, Sage RPC, API, desktop startup/duplicate/persisted-safety, and upgrade-publication-recovery smokes.",
-      "The installer and installed executable were scanned by Microsoft Defender with no detections."
-    ],
+    "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.20.exe",
+        "name": "Catalyst-Setup-v1.3.21.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 37706902,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.20/Catalyst-Setup-v1.3.20.exe",
-        "sha256": "96fd8b7792cd094b3c2576d80d2669e60edfcee5c9e46a74822ca82210436c63",
+        "size_bytes": 37788131,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.21/Catalyst-Setup-v1.3.21.exe",
+        "sha256": "49ec98b5ff8fc19ce3490bed5a7a4d011551b7fa48e6423dbb1744d38cfabe58",
         "download_enabled": true,
         "distribution_status": "unsigned_beta",
         "verification": {
@@ -38,28 +34,28 @@
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
           "update_manifest_status": "valid",
-          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.20/latest.json",
-          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.20/latest.json.sig",
+          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.21/latest.json",
+          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.21/latest.json.sig",
           "evidence_url": null,
           "evidence_sha256": null
         }
       },
       {
-        "name": "catalyst_v1.3.20_amd64.deb",
+        "name": "catalyst_v1.3.21_amd64.deb",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 199202904,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.20/catalyst_v1.3.20_amd64.deb",
-        "sha256": "8392ec22d0382ea7ad0ac19cca9385eb1949fe473ae998141fc42b6c1be5542d",
+        "size_bytes": 199219966,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.21/catalyst_v1.3.21_amd64.deb",
+        "sha256": "55b5e00ab785d2f1c506c346ad84d6188294d36312729c0c9efb78ac46a66867",
         "download_enabled": true
       },
       {
-        "name": "Catalyst-linux-v1.3.20-x86_64.AppImage",
+        "name": "Catalyst-linux-v1.3.21-x86_64.AppImage",
         "platform": "linux",
         "kind": "installer",
-        "size_bytes": 256550080,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.20/Catalyst-linux-v1.3.20-x86_64.AppImage",
-        "sha256": "e79a99f11aa679b535a4f059c631a7fdf159043a235c6f799f46ed2f42bdfc79",
+        "size_bytes": 256636096,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.21/Catalyst-linux-v1.3.21-x86_64.AppImage",
+        "sha256": "49cd7719f89864788b024682adf2157244d3739e81118bedfbd17545bbcc4a19",
         "download_enabled": true
       }
     ]

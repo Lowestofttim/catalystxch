@@ -1631,7 +1631,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.20</span>
+                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.21</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -2090,17 +2090,18 @@
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest packaged build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.3.20</div>
-                    <div class="release-version" data-release-version>v1.3.20</div>
-                    <div class="release-meta" data-release-meta>Stable - published 4 Sep 2026 - windows/linux downloads available</div>
+                    <div class="release-name" data-release-name>CATalyst v1.3.21</div>
+                    <div class="release-version" data-release-version>v1.3.21</div>
+                    <div class="release-meta" data-release-meta>Stable - published 7 Sep 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>Fixes the Authoritative state conflict that could leave Coin Prep stuck after upgrading from older CATalyst versions. Legacy offer locks are now cleared only when complete, fresh Sage evidence proves the corresponding offers are terminal or expired.</li>
-                        <li>Takes a complete wallet-wide Sage offer snapshot before Coin Prep and fails safely when the offer book cannot be proven complete.</li>
-                        <li>Stops the bot and drains concurrent wallet mutations before Coin Prep changes coin state, preventing offer creation and coin splitting from racing each other.</li>
-                        <li>Keeps automatic Coin Prep recovery polling while Sage cancellation proof is still propagating instead of abandoning the workflow prematurely.</li>
+                        <li>Harden CATalyst lifecycle and Coin Prep stability</li>
+                        <li>Harden packaged TLS trust store</li>
+                        <li>Fix secondary-PC wallet and cancellation races</li>
+                        <li>Bound exhausted fill verification retries</li>
+                        <li>Fix stale cancel diagnostics and top-up authority race</li>
                     </ul>
                 </div>
             </div>
@@ -2126,11 +2127,11 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.20.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.21.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>96fd8b7792cd094b3c2576d80d2669e60edfcee5c9e46a74822ca82210436c63</div>
+                    <div class="download-detail-value" data-release-sha256>49ec98b5ff8fc19ce3490bed5a7a4d011551b7fa48e6423dbb1744d38cfabe58</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows signature</div>
@@ -2142,7 +2143,7 @@
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>8392ec22d0382ea7ad0ac19cca9385eb1949fe473ae998141fc42b6c1be5542d</div>
+                    <div class="download-detail-value" data-release-linux-sha256>55b5e00ab785d2f1c506c346ad84d6188294d36312729c0c9efb78ac46a66867</div>
                 </div>
             </div>
             <div class="download-security">
@@ -2297,7 +2298,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=v1.3.20" defer></script>
+<script src="assets/release.js?v=v1.3.21" defer></script>
 
 </body>
 </html>
