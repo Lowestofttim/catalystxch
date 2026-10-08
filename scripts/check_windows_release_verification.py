@@ -202,7 +202,7 @@ class FakeResponse:
         return None
 
 
-def build_release_fixture():
+def build_release_fixture(channel="stable"):
     installer_bytes = b"signed-installer"
     installer_hash = hashlib.sha256(installer_bytes).hexdigest()
     base_url = (
@@ -218,7 +218,7 @@ def build_release_fixture():
     manifest = {
         "schema": 1,
         "app": "CATalyst",
-        "channel": "stable",
+        "channel": channel,
         "version": "1.3.17",
         "tag": "v1.3.17",
         "published_at": "2026-08-28T08:00:00Z",
@@ -256,6 +256,7 @@ def build_release_fixture():
     }
     release = {
         "tagName": "v1.3.17",
+        "isPrerelease": channel == "beta",
         "assets": [
             {
                 "name": INSTALLER_NAME,
@@ -364,7 +365,9 @@ The signature is timestamped: Aug 28 2026
         },
     }
 
-    unsigned_release = copy.deepcopy(release)
+    unsigned_release, unsigned_payloads, _, _, _ = build_release_fixture(
+        channel="beta"
+    )
     unsigned_release["assets"] = [
         asset
         for asset in unsigned_release["assets"]
@@ -382,9 +385,14 @@ The signature is timestamped: Aug 28 2026
             "",
         )
 
+    def unsigned_opener(request, timeout):
+        assert timeout > 0
+        url = request.full_url
+        return FakeResponse(unsigned_payloads[url], url)
+
     unsigned_result = verify_unsigned_windows_release(
         unsigned_release,
-        urlopen=opener,
+        urlopen=unsigned_opener,
         runner=unsigned_runner,
         system_name="Linux",
         manifest_public_key_b64=public_key_b64,
@@ -411,6 +419,29 @@ The signature is timestamped: Aug 28 2026
             "evidence_sha256": None,
         },
     }
+
+    expect_failure(
+        lambda: verify_unsigned_windows_release(
+            unsigned_release,
+            urlopen=opener,
+            runner=unsigned_runner,
+            system_name="Linux",
+            manifest_public_key_b64=public_key_b64,
+        ),
+        "Unsigned Windows release verification failed",
+    )
+    stable_labeled_beta = copy.deepcopy(unsigned_release)
+    stable_labeled_beta["isPrerelease"] = False
+    expect_failure(
+        lambda: verify_unsigned_windows_release(
+            stable_labeled_beta,
+            urlopen=unsigned_opener,
+            runner=unsigned_runner,
+            system_name="Linux",
+            manifest_public_key_b64=public_key_b64,
+        ),
+        "Unsigned Windows release verification failed",
+    )
 
     prove_no_authenticode_signature(
         Path("unsigned.exe"),

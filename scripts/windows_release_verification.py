@@ -190,6 +190,7 @@ def validate_signed_update_manifest(
     installer_size: int,
     installer_sha256: str,
     expected_tag: str,
+    expected_channel: str = "stable",
 ) -> dict[str, object]:
     """Verify CATalyst's project key and bind it to exact installer bytes."""
 
@@ -211,7 +212,7 @@ def validate_signed_update_manifest(
     expected = {
         "schema": (manifest.get("schema"), 1),
         "app": (manifest.get("app"), "CATalyst"),
-        "channel": (manifest.get("channel"), "stable"),
+        "channel": (manifest.get("channel"), expected_channel),
         "version": (manifest.get("version"), version),
         "tag": (manifest.get("tag"), expected_tag),
         "release URL": (
@@ -519,6 +520,8 @@ def verify_unsigned_windows_release(
         tag = str(release.get("tagName") or "")
         if not re.fullmatch(r"v\d+\.\d+\.\d+", tag):
             raise ReleaseVerificationError("release tag is not semantic")
+        if release.get("isPrerelease") is not True:
+            raise ReleaseVerificationError("unsigned beta release must be prerelease")
         installer_name = f"Catalyst-Setup-{tag}.exe"
         sidecar_name = f"{installer_name}.sha256"
         evidence_name = f"windows-signature-{tag}.json"
@@ -599,6 +602,7 @@ def verify_unsigned_windows_release(
                 installer_size=expected_size,
                 installer_sha256=installer_sha256,
                 expected_tag=tag,
+                expected_channel="beta",
             )
             prove_no_authenticode_signature(
                 installer_path,
