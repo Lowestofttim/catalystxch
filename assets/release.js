@@ -201,12 +201,13 @@
     const version = latest.version;
     const releaseDate = formatDate(latest.published_at);
     const windowsInstaller = findWindowsInstaller(latest);
+    const unsignedWindowsBeta = isUnsignedWindowsBeta(windowsInstaller);
     const linuxDownload = findPlatformDownload(latest, "linux");
     const downloadsAvailable = Boolean(windowsInstaller);
     const status = downloadsAvailable
       ? (linuxDownload ? "Windows/Linux downloads available" : "Windows download available")
       : (linuxDownload ? "Linux download available" : "Public links coming soon");
-    const channel = latest.channel === "prerelease" ? "Prerelease" : "Stable";
+    const channel = unsignedWindowsBeta ? "Unsigned beta" : (latest.channel === "prerelease" ? "Prerelease" : "Stable");
     const meta = releaseDate
       ? `${channel} - published ${releaseDate} - ${status.toLowerCase()}`
       : `${channel} - ${status.toLowerCase()}`;
@@ -236,7 +237,6 @@
     }
 
     const size = formatBytes(windowsInstaller.size_bytes);
-    const unsignedWindowsBeta = isUnsignedWindowsBeta(windowsInstaller);
     setText("[data-release-download-name]", windowsInstaller.name);
     setText("[data-release-download-size]", size);
     setText("[data-release-sha256]", windowsInstaller.sha256);

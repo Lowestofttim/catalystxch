@@ -331,6 +331,7 @@ async function main() {
   assert(unsigned.text("[data-release-sha256]") === unsignedWindows.sha256, "unsigned beta should show SHA-256");
   assert(unsigned.text("[data-release-windows-signature]") === "Unsigned beta - expect a Windows SmartScreen warning", "unsigned beta should be labelled honestly");
   assert(unsigned.text("[data-release-windows-tag]") === "Unsigned beta", "unsigned beta should be labelled on its platform card");
+  assert(unsigned.text("[data-release-meta]").startsWith("Unsigned beta -"), "unsigned beta must not be described as stable in the release summary");
   assert(unsigned.hidden("[data-windows-download-notice]") === false, "unsigned beta should keep its warning visible");
   assert(unsigned.text("[data-windows-download-notice-title]") === "Unsigned Windows beta", "unsigned beta should show a specific warning title");
   assert(unsigned.text("[data-windows-download-notice-body]").includes("Windows protected your PC"), "unsigned beta should explain the normal SmartScreen warning");
