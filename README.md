@@ -92,7 +92,7 @@ python scripts/check_sync_release_fallbacks.py
 python scripts/check_sync_workflow.py
 node scripts/check_release_js_behavior.js
 python scripts/check_release_dom_rendering.py
-npx --yes html-validate index.html docs.html
+npx --yes html-validate@11.4.0 index.html docs.html beta-guide.html
 ```
 
 The hourly and manually dispatchable `Sync release metadata` workflow reads the

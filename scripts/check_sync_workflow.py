@@ -20,7 +20,7 @@ def main() -> None:
         "playwright==1.60.0": "a pinned browser-test dependency",
         "python -m playwright install --with-deps chromium": "the Chromium browser used by the DOM check",
         'node-version: "24"': "a runtime supported by html-validate 11.4.0",
-        "html-validate@11.4.0": "a pinned HTML validator",
+        "html-validate@11.4.0 index.html docs.html beta-guide.html": "a pinned HTML validator covering the beta guide",
         "gh auth setup-git": "post-validation Git authentication",
         "automation/sync-release-metadata": "dedicated automation branch",
         "gh pr create": "protected-branch pull request creation",
