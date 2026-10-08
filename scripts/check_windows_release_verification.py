@@ -238,6 +238,8 @@ def build_release_fixture(channel="stable"):
             }
         },
     }
+    if channel == "beta":
+        manifest["source_commit"] = "a" * 40
     manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
     signing_key = Ed25519PrivateKey.from_private_bytes(bytes(range(32)))
     public_key_b64 = base64.b64encode(
@@ -254,6 +256,9 @@ def build_release_fixture(channel="stable"):
         f"{base_url}/{manifest_name}": manifest_bytes,
         f"{base_url}/{manifest_signature_name}": manifest_signature,
     }
+    payloads[
+        "https://api.github.com/repos/catalystxch/catalyst-bot/commits/v1.3.17"
+    ] = json.dumps({"sha": "a" * 40}).encode()
     release = {
         "tagName": "v1.3.17",
         "isPrerelease": channel == "beta",
@@ -419,6 +424,26 @@ The signature is timestamped: Aug 28 2026
             "evidence_sha256": None,
         },
     }
+
+    wrong_source_payloads = dict(unsigned_payloads)
+    wrong_source_payloads[
+        "https://api.github.com/repos/catalystxch/catalyst-bot/commits/v1.3.17"
+    ] = json.dumps({"sha": "b" * 40}).encode()
+
+    def wrong_source_opener(request, timeout):
+        url = request.full_url
+        return FakeResponse(wrong_source_payloads[url], url)
+
+    expect_failure(
+        lambda: verify_unsigned_windows_release(
+            unsigned_release,
+            urlopen=wrong_source_opener,
+            runner=unsigned_runner,
+            system_name="Linux",
+            manifest_public_key_b64=public_key_b64,
+        ),
+        "Unsigned Windows release verification failed",
+    )
 
     expect_failure(
         lambda: verify_unsigned_windows_release(

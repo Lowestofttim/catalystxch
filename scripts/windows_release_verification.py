@@ -191,6 +191,7 @@ def validate_signed_update_manifest(
     installer_sha256: str,
     expected_tag: str,
     expected_channel: str = "stable",
+    expected_source_commit: str | None = None,
 ) -> dict[str, object]:
     """Verify CATalyst's project key and bind it to exact installer bytes."""
 
@@ -227,7 +228,30 @@ def validate_signed_update_manifest(
     for field, (actual, wanted) in expected.items():
         if actual != wanted:
             raise ReleaseVerificationError(f"signed manifest {field} does not match")
+    if expected_channel == "beta":
+        if not re.fullmatch(r"[a-f0-9]{40}", str(expected_source_commit or "")):
+            raise ReleaseVerificationError("source tag commit is unavailable")
+        if manifest.get("source_commit") != expected_source_commit:
+            raise ReleaseVerificationError("signed manifest source commit does not match")
     return dict(manifest)
+
+
+def resolve_source_tag_commit(tag: str, *, urlopen) -> str:
+    """Resolve the public source tag to its exact commit through GitHub."""
+    if not re.fullmatch(r"v\d+\.\d+\.\d+", tag):
+        raise ReleaseVerificationError("source tag is invalid")
+    url = f"https://api.github.com/repos/catalystxch/catalyst-bot/commits/{tag}"
+    request = urllib.request.Request(
+        url, headers={"User-Agent": "CATalyst-website-release-verifier/1"}
+    )
+    with urlopen(request, timeout=60) as response:
+        if response.geturl() != url:
+            raise ReleaseVerificationError("source tag API redirect is not canonical")
+        record = json.loads(response.read())
+    commit = record.get("sha") if isinstance(record, Mapping) else None
+    if not re.fullmatch(r"[a-f0-9]{40}", str(commit or "")):
+        raise ReleaseVerificationError("source tag did not resolve to a commit")
+    return commit
 
 
 def parse_osslsigncode_output(output: str) -> str:
@@ -593,6 +617,7 @@ def verify_unsigned_windows_release(
             manifest = json.loads(manifest_path.read_bytes())
             if not isinstance(manifest, Mapping):
                 raise ReleaseVerificationError("update manifest is not an object")
+            source_commit = resolve_source_tag_commit(tag, urlopen=urlopen)
             validate_signed_update_manifest(
                 manifest,
                 manifest_signature_path.read_bytes(),
@@ -603,6 +628,7 @@ def verify_unsigned_windows_release(
                 installer_sha256=installer_sha256,
                 expected_tag=tag,
                 expected_channel="beta",
+                expected_source_commit=source_commit,
             )
             prove_no_authenticode_signature(
                 installer_path,

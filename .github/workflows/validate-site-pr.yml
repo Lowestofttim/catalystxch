@@ -36,4 +36,5 @@ jobs:
           python scripts/check_sync_workflow.py
           node scripts/check_release_js_behavior.js
           python scripts/check_release_dom_rendering.py
+          python scripts/check_beta_copy.py
           npx --yes html-validate@11.4.0 index.html docs.html beta-guide.html
