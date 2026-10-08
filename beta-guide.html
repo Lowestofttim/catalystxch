@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Setup and safety guide for the CATalyst v1.4 Dexie-only beta.">
+  <meta name="theme-color" content="#080C12">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'none'; frame-src 'none'; form-action 'none'; upgrade-insecure-requests">
+  <title>Dexie-only beta guide | CATalyst</title>
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <style>
+    :root { color-scheme: dark; font: 16px/1.65 system-ui, sans-serif; background: #080c12; color: #dbe6ef; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: #64dfc0; }
+    a:focus-visible { outline: 3px solid #d4a84b; outline-offset: 3px; }
+    header, main, footer { max-width: 860px; margin: 0 auto; padding: 24px; }
+    nav { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+    nav a { text-decoration: none; }
+    h1, h2, h3 { line-height: 1.25; color: #fff; }
+    h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 48px 0 12px; }
+    h2 { margin-top: 42px; padding-top: 14px; border-top: 1px solid #263848; }
+    h3 { margin-top: 24px; }
+    p, li { max-width: 75ch; }
+    li { margin: 8px 0; }
+    .eyebrow { color: #64dfc0; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .lead { font-size: 1.15rem; color: #b9c9d7; }
+    .notice { background: #13222c; border-left: 4px solid #d4a84b; padding: 16px 20px; margin: 28px 0; }
+    .notice strong { color: #fff; }
+    .checklist { padding: 4px 20px; background: #101923; border: 1px solid #263848; border-radius: 12px; }
+    code { background: #172631; padding: 2px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+    footer { border-top: 1px solid #263848; color: #9cb0c1; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Primary navigation">
+      <a href="index.html">CATalyst home</a>
+      <a href="index.html#download">Downloads</a>
+      <a href="https://github.com/catalystxch/catalyst-bot/issues" rel="noopener">Feedback and bugs</a>
+    </nav>
+    <h1>Dexie-only beta guide</h1>
+    <p class="eyebrow">CATalyst v1.4 · Windows beta</p>
+    <p class="lead">CATalyst connects to Sage Wallet locally, builds Chia CAT/XCH offers, and publishes them to Dexie. TibetSwap, AMM pricing, Arb Sniper, and Close the Gap are retired in this beta.</p>
+    <div class="notice"><strong>Real wallet actions:</strong> Offers, cancellations, and coin preparation can move or lock funds and incur network fees. Start with amounts you understand. Review the selected wallet, exact CAT asset ID, campaign limits, and fee scope in the app before proceeding.</div>
+  </header>
+  <main>
+    <section>
+      <h2>1. Download and verify</h2>
+      <ol>
+        <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the v1.4 Dexie-only beta. The Windows panel labels an unsigned build <strong>Unsigned beta</strong> and shows the installer SHA-256.</li>
+        <li>Download from the exact GitHub release link shown there. Compare the SHA-256 of the downloaded installer with the value on the page before running it.</li>
+        <li>An unsigned beta may show the ordinary blue Windows SmartScreen unrecognized-app warning. Do not continue if Windows or your security software reports malware or potentially unwanted software.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>2. Connect Sage and check the pair</h2>
+      <ol>
+        <li>Start Sage Wallet, choose the intended <strong>mainnet</strong> wallet, and wait for sync. CATalyst will show its connection state in the native app.</li>
+        <li>Read the Risk Disclosure in the app. Choose the intended CAT/XCH pair and verify the full CAT asset ID and wallet fingerprint, not just the ticker or logo.</li>
+        <li>Check spendable balances, pending transactions, and existing offers in Sage. If any state is unexpected, stop before starting a bot or campaign.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>3. Review the market and limits</h2>
+      <p>The Market view shows Dexie offer-book evidence and its freshness. When the book cannot support a trustworthy reference price, Follow mode can hold or withdraw exposure instead of quoting from stale or invented data.</p>
+      <p>Choose a liquidity mode and review offer sizes, inventory limits, price corridor, and any Bootstrap campaign duration and budget. A Bootstrap campaign for a thin market is a separate, bounded decision. It does not begin just because you selected a pair.</p>
+      <div class="checklist">
+        <h3>Before any start action</h3>
+        <ul>
+          <li>Confirm the wallet fingerprint and exact CAT asset ID again.</li>
+          <li>Review the displayed buy and sell sizes, total inventory budgets, and maximum network fee.</li>
+          <li>Check for pending transactions or existing offers that could overlap the new plan.</li>
+          <li>Approve the exact action in the app only if its limits match what you intend.</li>
+        </ul>
+      </div>
+    </section>
+    <section>
+      <h2>4. Coin preparation and offers</h2>
+      <p>Each offer needs suitable wallet coins. Coin Prep can split coins and may cancel existing offers first. Its estimated network fee and spending ceiling require a separate approval. Review the on-screen summary and recovery state before repeating any interrupted operation.</p>
+      <p>Once running, compare CATalyst's Offers view with Sage's wallet offers and the Dexie links. A posted offer may take time to appear in a public indexer; Sage and confirmed chain state are authoritative for wallet effects.</p>
+    </section>
+    <section>
+      <h2>5. Stop, recover, and report</h2>
+      <p><strong>Stop Bot</strong> stops new trading work. Existing offers can remain live until you explicitly cancel them and confirm they are terminal in Sage. <strong>Cancel All</strong> is a separate protected action. On restart, use the Previous Session choices only after checking which offers are still active.</p>
+      <p>If the app shows a safety block, stale wallet state, unknown Coin Prep outcome, or conflicting offers, leave it stopped and gather a Debug Bundle from the Logs tab. Do not repeatedly retry a wallet action whose outcome is unknown.</p>
+      <p>Report bugs through the <a href="https://github.com/catalystxch/catalyst-bot/issues/new/choose" rel="noopener">public issue forms</a>. Never post seed phrases, private keys, wallet TLS keys, or unredacted personal wallet data.</p>
+    </section>
+  </main>
+  <footer>
+    <p>This guide is for the Dexie-only beta. The <a href="docs.html">v1.3.21 guide</a> describes the previous public version and its retired TibetSwap features.</p>
+  </footer>
+</body>
+</html>

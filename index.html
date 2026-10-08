@@ -17,7 +17,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://catalystxch.com/">
     <meta property="og:title" content="CATalyst | Dexie Market-Making Bot for Chia CATs">
-    <meta property="og:description" content="Local-first desktop beta for managing Dexie offers, requotes, coin prep, and gap-closing safely from a Sage wallet.">
+    <meta property="og:description" content="Local-first desktop beta for managing Dexie offers, requotes, coin prep, and risk controls from a Sage wallet.">
     <meta property="og:image" content="https://catalystxch.com/assets/social-preview.png">
     <meta property="og:image:secure_url" content="https://catalystxch.com/assets/social-preview.png">
     <meta property="og:image:type" content="image/png">
@@ -451,6 +451,25 @@
             height: auto;
         }
 
+        .hero-proof {
+            padding: clamp(24px, 4vw, 48px);
+            display: grid;
+            gap: 16px;
+            min-height: 430px;
+            align-content: center;
+        }
+
+        .hero-proof h2 { font-size: clamp(22px, 3vw, 30px); margin: 0 0 4px; }
+        .hero-proof p { color: var(--text-secondary); margin: 0; }
+        .hero-proof-step {
+            border: 1px solid var(--border-mid);
+            background: rgba(255,255,255,0.025);
+            border-radius: 12px;
+            padding: 13px 16px;
+        }
+        .hero-proof-step strong { display: block; color: var(--cat-teal); }
+        .hero-proof-step span { color: var(--text-secondary); font-size: 14px; }
+
         .hero-shot-chrome {
             display: flex;
             align-items: center;
@@ -744,6 +763,16 @@
             height: auto;
             border-bottom: 1px solid var(--border);
         }
+
+        .showcase-context {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(62,201,163,0.09), rgba(212,168,75,0.05));
+            color: var(--text-secondary);
+        }
+        .showcase-context strong { display: block; color: var(--cat-teal); margin-bottom: 10px; }
+        .showcase-context ul { padding-left: 20px; margin: 0; }
+        .showcase-context li { margin: 7px 0; }
 
         .showcase-card-body {
             padding: 22px 24px 26px;
@@ -1613,9 +1642,8 @@
         <ul class="nav-links">
             <li><a href="#features">Features</a></li>
             <li><a href="#how-it-works">How it works</a></li>
-            <li><a href="#walkthrough">Video</a></li>
             <li><a href="#setup">Setup</a></li>
-            <li><a href="docs.html">Docs</a></li>
+            <li><a href="beta-guide.html">Beta guide</a></li>
             <li><a href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">GitHub</a></li>
         </ul>
         <div class="nav-cta">
@@ -1638,14 +1666,14 @@
                     for Chia CAT tokens.
                 </h1>
                 <p class="hero-sub">
-                    Set up your bid/ask ladder, pick your spread, and let it run. CATalyst keeps your offers on the book, requotes when price moves, snipes arb gaps, and uses side-aware adverse-selection scoring to back off when flow turns toxic, all from a Sage wallet on your own machine.
+                    Configure a bid/ask ladder, inventory limits, and your spread. CATalyst manages Dexie offers from Sage Wallet, checks market confidence before quoting, and backs off when wallet or market evidence is uncertain.
                 </p>
                 <div class="hero-actions">
                     <a href="#download" class="btn btn-primary btn-lg">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         Get CATalyst
                     </a>
-                    <a href="docs.html" class="btn btn-ghost btn-lg">Read the docs</a>
+                    <a href="beta-guide.html" class="btn btn-ghost btn-lg">Read the beta guide</a>
                 </div>
                 <div class="beta-callout" role="note" aria-labelledby="beta-callout-title">
                     <div class="beta-callout-title" id="beta-callout-title">Public beta</div>
@@ -1666,7 +1694,7 @@
                     </span>
                     <span class="meta-item">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        Built on <a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a> &amp; <a href="https://v2.tibetswap.io" target="_blank" rel="noopener">TibetSwap</a>
+                        Built around <a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a> offer-book liquidity
                     </span>
                 </div>
             </div>
@@ -1674,9 +1702,16 @@
             <div class="hero-shot">
                 <div class="hero-shot-chrome">
                     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    <span class="label">CATalyst · Dashboard · current beta</span>
+                    <span class="label">CATalyst · Dexie-only beta</span>
                 </div>
-                <img src="assets/screenshots/01_dashboard.png" alt="CATalyst dashboard showing live market making session" loading="eager">
+                <div class="hero-proof">
+                    <h2>Evidence before every offer</h2>
+                    <p>CATalyst checks four things before it changes your book:</p>
+                    <div class="hero-proof-step"><strong>Dexie market context</strong><span>Fresh, attributable offer-book data</span></div>
+                    <div class="hero-proof-step"><strong>Sage wallet state</strong><span>Selected asset, balances, and active offers</span></div>
+                    <div class="hero-proof-step"><strong>Safety and inventory limits</strong><span>Confidence, exposure, and recovery checks</span></div>
+                    <div class="hero-proof-step"><strong>Your action approval</strong><span>Explicit campaign and fee limits when required</span></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1695,8 +1730,8 @@
                 <div class="stat-label">Mempool fill detection</div>
             </div>
             <div class="stat">
-                <div class="stat-value">2 venues</div>
-                <div class="stat-label">Dexie + TibetSwap pricing</div>
+                <div class="stat-value">Dexie</div>
+                <div class="stat-label">Offer-book market context</div>
             </div>
             <div class="stat">
                 <div class="stat-value alyst">Local</div>
@@ -1706,53 +1741,12 @@
     </div>
 </div>
 
-<!-- ── Walkthrough video ── -->
-<section class="video-section" id="walkthrough">
-    <div class="container">
-        <div class="video-grid">
-            <div class="video-copy">
-                <span class="section-kicker">Introduction video</span>
-                <h2 class="section-title">A walkthrough video of the CATalyst application.</h2>
-                <p class="section-subtitle">Follow CATalyst from download to making a market with your selected CAT, including the setup flow, Smart Settings, coin prep, and the first live ladder.</p>
-                <ul class="video-points">
-                    <li><span class="check">&#10003;</span><span>Dashboard, settings, offers, and wallet safety at a beginner pace.</span></li>
-                    <li><span class="check">&#10003;</span><span>Smart Settings, coin prep, and the route toward your first live ladder.</span></li>
-                    <li><span class="check">&#10003;</span><span>Risk controls, monitoring, and where to stop or gather a debug bundle.</span></li>
-                </ul>
-                <div class="video-actions">
-                    <a href="https://www.youtube.com/watch?v=yzwJckup9Ps" target="_blank" rel="noopener" class="btn btn-primary btn-lg">Watch on YouTube</a>
-                    <a href="#setup" class="btn btn-ghost btn-lg">Read setup steps</a>
-                </div>
-            </div>
-
-            <a class="video-card" href="https://www.youtube.com/watch?v=yzwJckup9Ps" target="_blank" rel="noopener" aria-label="Watch the CATalyst introduction walkthrough on YouTube">
-                <div class="video-poster">
-                    <img src="assets/screenshots/01_dashboard.png" alt="CATalyst dashboard preview for the introduction walkthrough video" loading="lazy">
-                    <span class="video-play" aria-hidden="true">
-                        <span class="video-play-button"></span>
-                    </span>
-                </div>
-                <div class="video-card-body">
-                    <div>
-                        <div class="video-card-kicker">YouTube walkthrough</div>
-                        <div class="video-card-title">From download to making a market</div>
-                        <p>Opens in a new YouTube tab so this static site stays lightweight and does not load third-party video code until you choose to watch.</p>
-                    </div>
-                    <div class="video-card-meta">Watch now</div>
-                </div>
-            </a>
-        </div>
-    </div>
-</section>
-
-<div class="divider"></div>
-
 <!-- ── Pillars ── -->
 <section class="section" id="why">
     <div class="container">
         <span class="section-kicker">Why CATalyst</span>
         <h2 class="section-title">Built for the Chia CAT market, not retrofitted.</h2>
-        <p class="section-subtitle">Every piece is wired around how Chia actually works: UTXO coins, mempool flow, and pool-aware pricing across Dexie and TibetSwap.</p>
+        <p class="section-subtitle">Every piece is wired around how Chia actually works: UTXO coins, wallet offer state, and observable Dexie order-book pricing.</p>
 
         <div class="pillars">
             <div class="pillar">
@@ -1762,8 +1756,8 @@
             </div>
             <div class="pillar">
                 <div class="pillar-num">02</div>
-                <div class="pillar-title">Aware of the pool, not just the book</div>
-                <div class="pillar-body">Dynamic spreads adapt to volatility, depth, fill rate, competitor positioning, and side-aware adverse-selection pressure. The Arb Sniper fires probes when Dexie and TibetSwap diverge.</div>
+                <div class="pillar-title">Built around the offer book</div>
+                <div class="pillar-body">Quote decisions use fresh Dexie market evidence, wallet state, and inventory limits. When the market evidence is insufficient, CATalyst holds back rather than inventing a price.</div>
             </div>
             <div class="pillar">
                 <div class="pillar-num">03</div>
@@ -1781,7 +1775,7 @@
     <div class="container">
         <span class="section-kicker">Inside the app</span>
         <h2 class="section-title">A trading desk you can actually read.</h2>
-        <p class="section-subtitle">Five core views: Dashboard, Offers, P&amp;L, Market Intel, and Settings. Each tuned for a single job. No tab clutter, no screen-of-numbers.</p>
+        <p class="section-subtitle">Five core views: Dashboard, Offers, P&amp;L, Market Intel, and Settings. The Offers and P&amp;L screenshots below show the previous public beta; the Dexie-only interface may differ.</p>
 
         <div class="showcase">
             <div class="showcase-card">
@@ -1802,11 +1796,18 @@
                     </div>
                 </div>
                 <div class="showcase-card">
-                    <img src="assets/screenshots/04_intel.png" alt="Market Intel view: competitor orderbook, pool depth, Spacescan data" class="showcase-img" loading="lazy">
+                    <div class="showcase-context">
+                        <strong>Dexie-only market context</strong>
+                        <ul>
+                            <li>Fresh offer-book evidence</li>
+                            <li>Competitor and depth context</li>
+                            <li>Provider health and confidence</li>
+                        </ul>
+                    </div>
                     <div class="showcase-card-body">
                         <div class="showcase-card-kicker">MARKET INTEL</div>
-                        <div class="showcase-card-title">Competitor and pool context in one place.</div>
-                        <p>Orderbook depth, TibetSwap slippage, DBX rewards eligibility, Splash P2P broadcast counters.</p>
+                        <div class="showcase-card-title">Offer-book context in one place.</div>
+                        <p>Read the order book and see when its evidence is too weak for automatic quoting.</p>
                     </div>
                 </div>
             </div>
@@ -1846,13 +1847,13 @@
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
-                <div class="feature-title">Arb Sniper</div>
-                <div class="feature-body">Fires probe pairs when Dexie and TibetSwap diverge. Inventory-aware, cooled-down, and uses a dedicated coin pool.</div>
+                <div class="feature-title">Market Bootstrap</div>
+                <div class="feature-body">A bounded starting campaign for thin markets, with explicit asset, inventory, time, and fee limits before offers can be posted.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🧭</div>
-                <div class="feature-title">Close the Gap</div>
-                <div class="feature-body">Adaptive spread-tightening probes that find the safest edge above the arb floor, then plant a real inner-tier offer there.</div>
+                <div class="feature-title">Market Confidence</div>
+                <div class="feature-body">Checks whether the offer book supports a trustworthy quote. Unclear or stale evidence blocks automatic quoting.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📈</div>
@@ -1872,7 +1873,7 @@
             <div class="feature-card">
                 <div class="feature-icon">📡</div>
                 <div class="feature-title">Market Intelligence</div>
-                <div class="feature-body">Competitor spreads on Dexie, TibetSwap pool depth and slippage, Spacescan token health, DBX reward eligibility.</div>
+                <div class="feature-body">Dexie order-book and competitor context, provider health, and available token information.</div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">↔️</div>
@@ -1944,7 +1945,7 @@
     <div class="container">
         <span class="section-kicker">The loop</span>
         <h2 class="section-title">A steady loop, with fast watchers between cycles.</h2>
-        <p class="section-subtitle">The main loop defaults to 90 seconds, while TibetSwap, AMM, and Coinset watchers can wake it early when fills or price shocks appear.</p>
+        <p class="section-subtitle">The main loop checks wallet offers, market evidence, inventory, and safety before it creates or changes any offer.</p>
         <p class="section-subtitle">After a sweep or toxic flow, the ladder may not rebuild instantly. In calm markets it can refill in a cycle or two; if adverse-selection scoring, coin top-up, or market movement is active, it may take several cycles while CATalyst widens, waits, and rebuilds safely.</p>
 
         <div class="loop-wrap">
@@ -1953,7 +1954,7 @@
                     <div class="loop-step-num">01</div>
                     <div>
                         <div class="loop-step-title">Fetch prices</div>
-                        <div class="loop-step-body">Mid-price from Dexie + TibetSwap, plus arb-gap measurement and competitor spread.</div>
+                        <div class="loop-step-body">Build a reference from fresh Dexie offer-book evidence and show when confidence is too low to quote.</div>
                     </div>
                 </div>
                 <div class="loop-step">
@@ -1980,8 +1981,8 @@
                 <div class="loop-step">
                     <div class="loop-step-num">05</div>
                     <div>
-                        <div class="loop-step-title">Snipe &amp; tighten</div>
-                        <div class="loop-step-body">Arb Sniper fires probes if the gap is wide. Close the Gap tightens toward the floor when enabled.</div>
+                        <div class="loop-step-title">Check limits</div>
+                        <div class="loop-step-body">Respect inventory, campaign, fee, and safety limits before submitting changes to Sage.</div>
                     </div>
                 </div>
                 <div class="loop-step">
@@ -2169,7 +2170,7 @@
     <div class="container">
         <span class="section-kicker">Installation</span>
         <h2 class="section-title">Setup guide</h2>
-        <p class="section-subtitle">About ten minutes if Sage is already installed. The full version of every step lives in the <a href="docs.html" class="text-link">docs</a>.</p>
+        <p class="section-subtitle">Follow the <a href="beta-guide.html" class="text-link">Dexie-only beta guide</a> and review every wallet and fee action in the app.</p>
 
         <div class="setup-steps">
             <div class="setup-step">
@@ -2204,7 +2205,7 @@
                 <div>
                     <div class="setup-step-title">Pick your trading pair</div>
                     <div class="setup-step-body">
-                        Use the pair selector at the top of the dashboard to choose your CAT / XCH pair. CATalyst pulls the live price from TibetSwap and the orderbook from Dexie.
+                        Use the pair selector at the top of the dashboard to choose your CAT / XCH pair. CATalyst reads Dexie offer-book context for the selected asset.
                     </div>
                 </div>
             </div>
@@ -2222,7 +2223,7 @@
                 <div>
                     <div class="setup-step-title">Coin prep, then Start Bot</div>
                     <div class="setup-step-body">
-                        Click <strong>Prepare Coins</strong> to split your wallet into offer-sized UTXOs (a few minutes the first time). Then hit <strong>Start Bot</strong>. The dashboard switches to live mode and the ladder goes up.
+                        Review the proposed offer sizes, coin prep, and any Bootstrap campaign limits in the app. Wallet actions and network fees require your explicit approval in the app before trading starts.
                         <div class="tip-block">
                             <strong>Tip:</strong>&nbsp;close the window and CATalyst keeps running from the system tray. Re-open it any time to inspect the session.
                         </div>
@@ -2237,7 +2238,7 @@
                 <div class="rec-box-label">Optional enhancement</div>
                 <div class="rec-box-title">Spacescan API key</div>
                 <p class="rec-box-body">
-                    CATalyst works without a Spacescan key, but an API key improves token-health context, holder/activity data, and Smart Settings risk estimates. Live quote pricing still comes from Dexie and TibetSwap.
+                    CATalyst works without a Spacescan key, but an API key improves token-health context, holder/activity data, and Smart Settings risk estimates. Live offer-book context comes from Dexie.
                 </p>
                 <div class="rec-box-features">
                     <span class="rec-box-tag"><span class="check">&#10003;</span> Token icons and basic data</span>
@@ -2263,7 +2264,7 @@
             </div>
             <p>CATalyst is <strong>beta software</strong> for advanced users. It places real offers using real funds in your Sage wallet. Bugs, edge cases, and adverse market conditions can cause losses, including filling at unfavourable prices, getting stuck on one side of an inventory limit, or having open offers cancelled mid-trade.</p>
             <p>Nothing in this app or on this site constitutes financial advice. <strong>Use only with capital you can afford to lose.</strong> CATalyst is provided as-is, with no warranty, support obligation, or guarantee of profit. You are responsible for your own trading decisions, tax reporting, and operational security.</p>
-            <p>Read the <a href="docs.html#troubleshooting" class="text-link">Troubleshooting</a> section before running for the first time. Start with small trade sizes and a wide spread until you understand how the bot behaves with your specific CAT pair.</p>
+            <p>Read the <a href="beta-guide.html" class="text-link">beta guide</a> before running for the first time. Start with small trade sizes and a wide spread until you understand how the bot behaves with your specific CAT pair.</p>
         </div>
     </div>
 </section>
@@ -2278,8 +2279,7 @@
             </div>
             <ul class="footer-links">
                 <li><a href="#features">Features</a></li>
-                <li><a href="#walkthrough">Video</a></li>
-                <li><a href="docs.html">Docs</a></li>
+                <li><a href="beta-guide.html">Beta guide</a></li>
                 <li><a href="#setup">Setup</a></li>
                 <li><a href="#download">Download</a></li>
                 <li><a href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">GitHub</a></li>
@@ -2287,7 +2287,6 @@
                 <li><a href="#download">Release status</a></li>
                 <li><a href="https://sagewallet.net" target="_blank" rel="noopener">Sage</a></li>
                 <li><a href="https://dexie.space" target="_blank" rel="noopener">Dexie</a></li>
-                <li><a href="https://v2.tibetswap.io" target="_blank" rel="noopener">TibetSwap</a></li>
                 <li><a href="https://coinset.org" target="_blank" rel="noopener">Coinset</a></li>
             </ul>
             <p class="footer-copy">
