@@ -54,7 +54,6 @@ jobs:
           --tag v1.4.0
           --include-download-urls
           --allow-unsigned-windows-beta
-          --include-platform-downloads
           --update-html-fallbacks
 
       - name: Verify release metadata and website rendering

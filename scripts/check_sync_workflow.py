@@ -39,6 +39,8 @@ def main() -> None:
     for marker, purpose in required.items():
         if marker not in workflow:
             raise SystemExit(f"sync workflow is missing {purpose}: {marker}")
+    if "--include-platform-downloads" in workflow:
+        raise SystemExit("Windows-only beta sync must not require unpublished Linux assets")
     if re.search(r"(?m)^\s*git push\s*$", workflow):
         raise SystemExit("sync workflow must not push directly to protected main")
     if re.search(r"uses:\s*actions/[^@\s]+@v\d+", workflow):
