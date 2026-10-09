@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Setup and safety guide for the CATalyst v1.4 Dexie-only beta.">
+  <meta name="description" content="Setup and safety guide for the CATalyst v1.4 beta with optional Splash offer broadcasting.">
   <meta name="theme-color" content="#080C12">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'none'; frame-src 'none'; form-action 'none'; upgrade-insecure-requests">
-  <title>Dexie-only beta guide | CATalyst</title>
+  <title>v1.4 beta guide | CATalyst</title>
   <link rel="icon" type="image/png" href="assets/icon.png">
   <style>
     :root { color-scheme: dark; font: 16px/1.65 system-ui, sans-serif; background: #080c12; color: #dbe6ef; }
@@ -40,16 +40,16 @@
       <a href="index.html#download">Downloads</a>
       <a href="https://github.com/catalystxch/catalyst-bot/issues" rel="noopener">Feedback and bugs</a>
     </nav>
-    <h1>Dexie-only beta guide</h1>
+    <h1>v1.4 beta guide</h1>
     <p class="eyebrow">CATalyst v1.4 · Windows beta</p>
-    <p class="lead">CATalyst connects to Sage Wallet locally, builds Chia CAT/XCH offers, and publishes them to Dexie. TibetSwap, AMM pricing, Arb Sniper, and Close the Gap are retired in this beta.</p>
+    <p class="lead">CATalyst connects to Sage Wallet locally, builds Chia CAT/XCH offers, and publishes them to Dexie. Optional Splash P2P can also broadcast offers. TibetSwap, AMM pricing, Arb Sniper, and Close the Gap are retired in this beta.</p>
     <div class="notice"><strong>Real wallet actions:</strong> Offers, cancellations, and coin preparation can move or lock funds and incur network fees. Start with amounts you understand. Review the selected wallet, exact CAT asset ID, campaign limits, and fee scope in the app before proceeding.</div>
   </header>
   <main>
     <section>
       <h2>1. Download and verify</h2>
       <ol>
-        <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the v1.4 Dexie-only beta. The Windows panel labels an unsigned build <strong>Unsigned beta</strong> and shows the installer SHA-256.</li>
+        <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the v1.4 beta. The Windows panel labels an unsigned build <strong>Unsigned beta</strong> and shows the installer SHA-256.</li>
         <li>Download from the exact GitHub release link shown there. Compare the SHA-256 of the downloaded installer with the value on the page before running it.</li>
         <li>An unsigned beta may show the ordinary blue Windows SmartScreen unrecognized-app warning. Do not continue if Windows or your security software reports malware or potentially unwanted software.</li>
       </ol>
@@ -80,6 +80,7 @@
       <h2>4. Coin preparation and offers</h2>
       <p>Each offer needs suitable wallet coins. Coin Prep can split coins and may cancel existing offers first. Its estimated network fee and spending ceiling require a separate approval. Review the on-screen summary and recovery state before repeating any interrupted operation.</p>
       <p>Once running, compare CATalyst's Offers view with Sage's wallet offers and the Dexie links. A posted offer may take time to appear in a public indexer; Sage and confirmed chain state are authoritative for wallet effects.</p>
+      <p>Splash P2P is an optional offer broadcasting path in Settings. It starts off for new installs and can share your signed offers with peers when enabled. A running local Splash node does not by itself prove that peers received an offer; check peer status and exact offer rediscovery before relying on broadcast reach.</p>
     </section>
     <section>
       <h2>5. Stop, recover, and report</h2>
@@ -89,7 +90,7 @@
     </section>
   </main>
   <footer>
-    <p>This guide is for the Dexie-only beta. The <a href="docs.html">v1.3.21 guide</a> describes the previous public version and its retired TibetSwap features.</p>
+    <p>This guide is for the v1.4 beta. The <a href="docs.html">v1.3.21 guide</a> describes the previous public version and its retired TibetSwap features.</p>
   </footer>
 </body>
 </html>

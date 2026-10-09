@@ -3,7 +3,7 @@
 This is the public website repository for CATalyst:
 
 - Website: https://catalystxch.com
-- Dexie-only beta guide: https://catalystxch.com/beta-guide.html
+- v1.4 beta guide (Dexie with optional Splash): https://catalystxch.com/beta-guide.html
 - Previous v1.3.21 docs: https://catalystxch.com/docs.html
 - Downloads: https://catalystxch.com/#download
 
