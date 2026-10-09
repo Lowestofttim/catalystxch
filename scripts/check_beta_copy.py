@@ -15,6 +15,10 @@ def main() -> int:
         raise SystemExit("Both current beta pages must describe Splash as optional")
     if "dexie-only" in homepage or "dexie-only" in guide:
         raise SystemExit("Current beta pages must not describe the build as Dexie-only")
+    if "peer delivery needs separate verification" not in homepage:
+        raise SystemExit("Homepage must not imply local Splash acceptance proves peer delivery")
+    if "exact offer rediscovery" not in guide:
+        raise SystemExit("Beta guide must require exact offer rediscovery for Splash reach")
     return 0
 
 
