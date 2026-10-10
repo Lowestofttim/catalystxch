@@ -65,7 +65,7 @@
       <ol>
         <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the v1.4 Dexie beta. Windows and Linux downloads point to official GitHub Releases.</li>
         <li>Compare the downloaded package's SHA-256 with the value on the page and its release sidecar before running it.</li>
-        <li>On Windows, the beta installer has no Authenticode publisher certificate, so SmartScreen may show an unrecognized-app warning. Do not continue if Windows or your security software reports malware or potentially unwanted software.</li>
+        <li>On Windows, you may see a blue “Windows protected your PC” screen because the beta installer does not yet have a verified Windows publisher certificate. If the download came from this page and its SHA-256 matches, choose More info, check the app name, then Run anyway. Stop if Windows or your antivirus reports malware or potentially unwanted software.</li>
         <li>On Linux x86-64, Ubuntu/Debian users can choose the <code>.deb</code>. The <a href="https://github.com/catalystxch/catalyst-bot/releases/tag/v1.4.1" rel="noopener">exact source release</a> also has an AppImage and tarball. The packages follow the PyInstaller, AppImage and Debian build path used for the earlier working Linux release.</li>
         <li>In the download directory, verify the Debian package with <code>sha256sum -c catalyst_v1.4.1_amd64.deb.sha256</code>, then install it using <code>sudo apt install ./catalyst_v1.4.1_amd64.deb</code>. Or verify the matching AppImage sidecar, run <code>chmod +x Catalyst-linux-v1.4.1-x86_64.AppImage</code>, and launch the AppImage. Some distributions need FUSE 2 for AppImage; extract-and-run mode is available when FUSE is absent.</li>
       </ol>
@@ -116,8 +116,9 @@
     </section>
     <section aria-labelledby="faq">
       <h2 id="faq">Frequently asked questions</h2>
-      <h3>Why does the Windows beta say “unsigned”?</h3>
-      <p>The Windows installer does not have an Authenticode publisher certificate. Its update manifest <em>is</em> cryptographically signed, and the release has SHA-256 checksums. Those are different controls: a signed update manifest does not make the installer Authenticode-signed. Linux AppImage and Debian files have SHA-256 sidecars but are not signed by a distribution repository key. Check exact files and stop if security software identifies malware or a potentially unwanted app.</p>
+      <h3>Why might Windows show a blue warning?</h3>
+      <p>Windows may say “Windows protected your PC” because this new beta installer does not yet have a verified Windows publisher certificate or established download reputation. That warning alone does not mean malware was found. Get the installer from this site, compare its SHA-256 with the value on the download page, then choose More info, check the app name, and Run anyway if you want to continue. Stop and report it if Windows or your antivirus specifically detects malware or a potentially unwanted app.</p>
+      <p>In the release notes, “unsigned installer” means only that the Windows installer lacks that publisher certificate. CATalyst separately signs its update information and publishes SHA-256 checksums; those checks do not remove the Windows warning. Linux packages also have checksum files but no distribution repository signature.</p>
       <h3>Does “Dexie only” mean Splash was removed?</h3>
       <p>No. Dexie is the offer marketplace. Splash can optionally broadcast the same signed offers to peers and starts off. Separate-peer delivery has not been proven for this beta; check the exact offer's visibility before relying on Splash reach.</p>
       <h3>Where does the reference price come from?</h3>

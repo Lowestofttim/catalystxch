@@ -210,7 +210,7 @@
     const status = downloadsAvailable
       ? (linuxDownload ? "Windows/Linux downloads available" : "Windows download available")
       : (linuxDownload ? "Linux download available" : "Public links coming soon");
-    const channel = unsignedWindowsBeta ? "Unsigned beta" : (latest.channel === "prerelease" ? "Prerelease" : "Stable");
+    const channel = unsignedWindowsBeta ? "Tester beta" : (latest.channel === "prerelease" ? "Prerelease" : "Stable");
     const meta = releaseDate
       ? `${channel} - published ${releaseDate} - ${status.toLowerCase()}`
       : `${channel} - ${status.toLowerCase()}`;
@@ -246,18 +246,18 @@
     setText(
       "[data-release-windows-signature]",
       unsignedWindowsBeta
-        ? "Unsigned beta - expect a Windows SmartScreen warning"
+        ? "No verified Windows publisher certificate; blue warning possible"
         : "Verified publisher: SignPath Foundation"
     );
     setText(
       "[data-release-windows-tag]",
-      unsignedWindowsBeta ? "Unsigned beta" : "Verified"
+      unsignedWindowsBeta ? "Beta" : "Verified"
     );
     if (unsignedWindowsBeta) {
-      setText("[data-windows-download-notice-title]", "Unsigned Windows beta");
+      setText("[data-windows-download-notice-title]", "Windows may show a blue warning");
       setText(
         "[data-windows-download-notice-body]",
-        "Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -> Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning."
+        "You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it."
       );
     }
     setHidden("[data-windows-download-notice]", !unsignedWindowsBeta);

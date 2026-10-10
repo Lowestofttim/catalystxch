@@ -246,7 +246,7 @@ def assert_release_panel(page, metadata: dict) -> None:
     )
     if unsigned_beta:
         expect(page.locator("#download [data-release-meta]")).to_contain_text(
-            "Unsigned beta"
+            "Tester beta"
         )
     download_link = page.locator("[data-download-windows]")
     macos_link = page.locator("[data-download-macos]")
@@ -257,13 +257,13 @@ def assert_release_panel(page, metadata: dict) -> None:
         if unsigned_beta:
             expect(windows_notice).to_be_visible()
             expect(page.locator("[data-windows-download-notice-title]")).to_have_text(
-                "Unsigned Windows beta"
+                "Windows may show a blue warning"
             )
             expect(page.locator("[data-windows-download-notice-body]")).to_contain_text(
                 "Windows protected your PC"
             )
             expect(page.locator("[data-windows-download-notice-body]")).to_contain_text(
-                "Do not continue"
+                "stop and report it"
             )
         else:
             expect(windows_notice).to_be_hidden()
@@ -302,7 +302,7 @@ def assert_release_panel(page, metadata: dict) -> None:
         expect(download_link).not_to_have_attribute("href", re.compile(r".+"))
 
     expect(page.locator("[data-release-windows-signature]")).to_have_text(
-        "Unsigned beta - expect a Windows SmartScreen warning"
+        "No verified Windows publisher certificate; blue warning possible"
         if unsigned_beta
         else "Verified publisher: SignPath Foundation"
         if downloads_available
