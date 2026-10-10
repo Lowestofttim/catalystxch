@@ -1644,6 +1644,7 @@
             <li><a href="#how-it-works">How it works</a></li>
             <li><a href="#setup">Setup</a></li>
             <li><a href="beta-guide.html">Beta guide</a></li>
+            <li><a href="docs.html">FAQ &amp; screenshots</a></li>
             <li><a href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">GitHub</a></li>
         </ul>
         <div class="nav-cta">
@@ -1659,7 +1660,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows download available - current release v1.4.1</span>
+                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.4.1</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -1775,24 +1776,24 @@
     <div class="container">
         <span class="section-kicker">Inside the app</span>
         <h2 class="section-title">A trading desk you can actually read.</h2>
-        <p class="section-subtitle">Five core views: Dashboard, Offers, P&amp;L, Market Intel, and Settings. The Offers and P&amp;L screenshots below show the previous public beta; the v1.4 interface may differ.</p>
+        <p class="section-subtitle">Current v1.4.1 Dexie beta interface. These isolated previews show a disconnected, stopped wallet and no live offers; your own balances and market data appear after connecting Sage.</p>
 
         <div class="showcase">
             <div class="showcase-card">
-                <img src="assets/screenshots/02_offers.png" alt="Offers view: order book depth chart and active offer cards" class="showcase-img" loading="lazy">
+                <img src="assets/screenshots/v1.4.1-offers-empty.png" alt="Current Dexie beta Offers view with no wallet or active offers" class="showcase-img" loading="lazy">
                 <div class="showcase-card-body">
                     <div class="showcase-card-kicker">OFFERS</div>
                     <div class="showcase-card-title">See your ladder, side by side with the book.</div>
-                    <p>The depth chart shows your buys and sells against mid-price. Each offer card lists tier, spread, coin ID, Dexie status, and a one-click link to the live offer.</p>
+                    <p>The Offers view separates buy and sell offers, shows publication and wallet state, and makes an empty book explicit. Live offer details appear only after a wallet is connected and offers exist.</p>
                 </div>
             </div>
             <div class="showcase-stack">
                 <div class="showcase-card">
-                    <img src="assets/screenshots/03_pnl.png" alt="P&amp;L view: cumulative profit chart and inventory position" class="showcase-img" loading="lazy">
+                    <img src="assets/screenshots/v1.4.1-pnl-empty.png" alt="Current Dexie beta P&amp;L and inventory view before trading" class="showcase-img" loading="lazy">
                     <div class="showcase-card-body">
                         <div class="showcase-card-kicker">P&amp;L &amp; INVENTORY</div>
                         <div class="showcase-card-title">Round-trip matching, not vanity metrics.</div>
-                        <p>Realised PnL pairs buy fills with sells of similar size. Net position, drift, and unmatched legs are all visible.</p>
+                        <p>Only confirmed fills count toward P&amp;L. A fresh test profile starts at zero; round trips, net flow, and inventory update as Sage confirms activity.</p>
                     </div>
                 </div>
                 <div class="showcase-card">
@@ -1989,7 +1990,7 @@
                 </div>
             </div>
             <div class="loop-shot">
-                <img src="assets/screenshots/05_settings_live.png" alt="Settings → Live: hot-reloadable controls for spread, skew, and feature toggles" loading="lazy">
+                <img src="assets/screenshots/v1.4.1-settings-setup.png" alt="Current Dexie beta Settings setup view before connecting Sage" loading="lazy">
             </div>
         </div>
     </div>
@@ -2049,7 +2050,7 @@
         <div class="download-wrap">
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
             <div class="download-title">Download CATalyst</div>
-            <p class="download-sub">Windows releases are either independently signature-verified or explicitly labelled as unsigned beta builds. Linux packages come from GitHub Releases, and Mac users can run from the source repo.</p>
+            <p class="download-sub">Windows and Linux beta packages come from official GitHub Releases. The Windows installer has no publisher certificate; the release manifest is signed, and each package has a SHA-256 checksum. Mac users can run from source.</p>
             <aside class="windows-download-notice" data-windows-download-notice role="status">
                 <span class="windows-download-notice-icon" aria-hidden="true">⚠</span>
                 <div>
@@ -2078,17 +2079,18 @@
                     <div class="platform-row">
                         <span class="platform-icon">🐧</span>
                         <span class="platform-name">Linux</span>
-                        <span class="platform-tag tested">When published</span>
+                        <span class="platform-tag tested">Beta · x86-64</span>
                     </div>
-                    <div class="platform-note">Linux packages depend on the selected release · <span data-release-linux-size></span></div>
+                    <div class="platform-note">Ubuntu/Debian .deb · AppImage also available in the release · <span data-release-linux-size>190.7 MB</span></div>
                 </a>
             </div>
+            <p class="download-note">Linux testers: the Debian package is the primary button. The same <a href="https://github.com/catalystxch/catalyst-bot/releases/tag/v1.4.1" target="_blank" rel="noopener">v1.4.1 source release</a> also has an AppImage and tarball with checksum sidecars. See the <a href="docs.html#faq">FAQ</a> for package verification and the Windows signing explanation.</p>
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest packaged build</div>
                     <div class="release-name" data-release-name>CATalyst v1.4.1</div>
                     <div class="release-version" data-release-version>v1.4.1</div>
-                    <div class="release-meta" data-release-meta>Unsigned beta - published 10 Oct 2026 - windows download available</div>
+                    <div class="release-meta" data-release-meta>Unsigned beta - published 10 Oct 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
@@ -2114,7 +2116,7 @@
             </div>
             <div class="download-feedback" role="note" aria-labelledby="download-dev-title">
                 <div class="download-security-title" id="download-dev-title">Developers wanted</div>
-                <p>CATalyst is now public. Developers who want to improve wallet handling, Linux packaging, Mac source setup, trading safety, docs, tests, or UI polish should work from the bot repository and open pull requests there.</p>
+                <p>The tester beta is public. Developers who want to improve wallet handling, Linux compatibility, Mac source setup, trading safety, docs, tests, or UI polish should work from the bot repository and open pull requests there.</p>
                 <div class="feedback-actions">
                     <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">Visit the bot repo</a>
                     <a class="feedback-link" href="https://github.com/catalystxch/catalyst-bot/pulls" target="_blank" rel="noopener">Open a pull request</a>
@@ -2139,7 +2141,7 @@
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>Not available</div>
+                    <div class="download-detail-value" data-release-linux-sha256>b259d62cffc304738200f660dd59a793d7b645dd69cbb185a13aec9b93a04fd0</div>
                 </div>
             </div>
             <div class="download-security">
@@ -2275,6 +2277,7 @@
             <ul class="footer-links">
                 <li><a href="#features">Features</a></li>
                 <li><a href="beta-guide.html">Beta guide</a></li>
+                <li><a href="docs.html">FAQ &amp; screenshots</a></li>
                 <li><a href="#setup">Setup</a></li>
                 <li><a href="#download">Download</a></li>
                 <li><a href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">GitHub</a></li>

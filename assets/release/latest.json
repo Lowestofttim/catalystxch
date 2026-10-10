@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-10-10T01:41:35Z",
+  "generated_at": "2026-10-10T05:39:14Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
@@ -38,6 +38,24 @@
           "evidence_url": null,
           "evidence_sha256": null
         }
+      },
+      {
+        "name": "catalyst_v1.4.1_amd64.deb",
+        "platform": "linux",
+        "kind": "installer",
+        "size_bytes": 199968102,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.4.1/catalyst_v1.4.1_amd64.deb",
+        "sha256": "b259d62cffc304738200f660dd59a793d7b645dd69cbb185a13aec9b93a04fd0",
+        "download_enabled": true
+      },
+      {
+        "name": "Catalyst-linux-v1.4.1-x86_64.AppImage",
+        "platform": "linux",
+        "kind": "installer",
+        "size_bytes": 257402048,
+        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.4.1/Catalyst-linux-v1.4.1-x86_64.AppImage",
+        "sha256": "2382c28fa13fbad42035d844c01719aa7f886d27a309548c56beb591b52f084e",
+        "download_enabled": true
       }
     ]
   }

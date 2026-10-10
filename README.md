@@ -4,7 +4,7 @@ This is the public website repository for CATalyst:
 
 - Website: https://catalystxch.com
 - v1.4 beta guide (Dexie with optional Splash): https://catalystxch.com/beta-guide.html
-- Previous v1.3.21 docs: https://catalystxch.com/docs.html
+- Current FAQ and screenshots: https://catalystxch.com/docs.html
 - Downloads: https://catalystxch.com/#download
 
 This repository is intentionally separate from the main CATalyst bot source code. It gives testers a public place to read the website and download the current public installer while the app source, bug reports, and beta feedback live in the public bot repository.
@@ -33,6 +33,10 @@ https://catalystxch.com/#download
 Current public Windows installers are hosted through the official CATalyst public release channel:
 
 https://github.com/Lowestofttim/catalyst-releases/releases
+
+Linux AppImage, Debian and tarball packages are built from the matching protected source tag and hosted at:
+
+https://github.com/catalystxch/catalyst-bot/releases
 
 The website shows the current version, release notes, file size, and SHA-256 checksum next to the download buttons. Windows builds are shown as signature-verified or explicitly labelled unsigned betas; Linux downloads point at the official bot release assets. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
 
