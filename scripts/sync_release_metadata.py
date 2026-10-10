@@ -546,7 +546,13 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         status = "Linux download available"
     else:
         status = "Public links coming soon"
-    channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
+    channel = (
+        "Unsigned beta"
+        if unsigned_windows_beta
+        else "Prerelease"
+        if latest.get("channel") == "prerelease"
+        else "Stable"
+    )
     release_date = _format_date(latest.get("published_at", ""))
     meta = (
         f"{channel} - published {release_date} - {status.lower()}"

@@ -1,30 +1,29 @@
 {
   "schema_version": 2,
   "source_repo": "Lowestofttim/catalyst-releases",
-  "generated_at": "2026-09-07T09:15:27Z",
+  "generated_at": "2026-10-10T01:41:35Z",
   "downloads_enabled": true,
   "download_status": "available",
   "latest": {
-    "version": "v1.3.21",
-    "name": "CATalyst v1.3.21",
-    "published_at": "2026-09-07T09:10:14Z",
-    "channel": "stable",
+    "version": "v1.4.1",
+    "name": "CATalyst v1.4.1",
+    "published_at": "2026-10-10T01:40:58Z",
+    "channel": "prerelease",
     "release_notes": [
-      "Harden CATalyst lifecycle and Coin Prep stability",
-      "Harden packaged TLS trust store",
-      "Fix secondary-PC wallet and cancellation races",
-      "Bound exhausted fill verification retries",
-      "Fix stale cancel diagnostics and top-up authority race"
+      "This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.",
+      "The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.",
+      "The earlier v1.4.0 prerelease was withdrawn before website promotion because its signed notes lost the public issue-report link. This v1.4.1 prerelease corrects that release-metadata wording; the trading runtime is unchanged.",
+      "This is an opt-in Windows beta for testers. It is not a general public-readiness claim or an unattended-trading recommendation. Use a separate test wallet funded only with amounts you can afford to lose, and back up an existing CATalyst profile before upgrading."
     ],
     "verification_notes": [],
     "assets": [
       {
-        "name": "Catalyst-Setup-v1.3.21.exe",
+        "name": "Catalyst-Setup-v1.4.1.exe",
         "platform": "windows",
         "kind": "installer",
-        "size_bytes": 37788131,
-        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.21/Catalyst-Setup-v1.3.21.exe",
-        "sha256": "49ec98b5ff8fc19ce3490bed5a7a4d011551b7fa48e6423dbb1744d38cfabe58",
+        "size_bytes": 36859947,
+        "download_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.4.1/Catalyst-Setup-v1.4.1.exe",
+        "sha256": "70713d25cfc778f532c6f81c45ada850d0eb22df6eee6cdeb26b42c60d2f1434",
         "download_enabled": true,
         "distribution_status": "unsigned_beta",
         "verification": {
@@ -34,29 +33,11 @@
           "signer_thumbprint": null,
           "timestamp_status": "unavailable",
           "update_manifest_status": "valid",
-          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.21/latest.json",
-          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.3.21/latest.json.sig",
+          "update_manifest_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.4.1/latest.json",
+          "update_manifest_signature_url": "https://github.com/Lowestofttim/catalyst-releases/releases/download/v1.4.1/latest.json.sig",
           "evidence_url": null,
           "evidence_sha256": null
         }
-      },
-      {
-        "name": "catalyst_v1.3.21_amd64.deb",
-        "platform": "linux",
-        "kind": "installer",
-        "size_bytes": 199219966,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.21/catalyst_v1.3.21_amd64.deb",
-        "sha256": "55b5e00ab785d2f1c506c346ad84d6188294d36312729c0c9efb78ac46a66867",
-        "download_enabled": true
-      },
-      {
-        "name": "Catalyst-linux-v1.3.21-x86_64.AppImage",
-        "platform": "linux",
-        "kind": "installer",
-        "size_bytes": 256636096,
-        "download_url": "https://github.com/catalystxch/catalyst-bot/releases/download/v1.3.21/Catalyst-linux-v1.3.21-x86_64.AppImage",
-        "sha256": "49cd7719f89864788b024682adf2157244d3739e81118bedfbd17545bbcc4a19",
-        "download_enabled": true
       }
     ]
   }

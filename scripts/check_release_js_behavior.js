@@ -7,7 +7,18 @@ const vm = require("vm");
 const RELEASE_JS = "assets/release.js";
 const MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot";
 const metadata = JSON.parse(fs.readFileSync("assets/release/latest.json", "utf8"));
-const baseLatest = metadata.latest;
+const actualLatest = metadata.latest;
+// Keep the older Linux-package path under test even when the current beta is Windows-only.
+const legacyLinuxAsset = {
+  name: `Catalyst_${actualLatest.version.slice(1)}_amd64.deb`,
+  platform: "linux",
+  kind: "installer",
+  size_bytes: 1024,
+  download_url: `https://github.com/catalystxch/catalyst-bot/releases/download/${actualLatest.version}/Catalyst_${actualLatest.version.slice(1)}_amd64.deb`,
+  sha256: "d".repeat(64),
+  download_enabled: true
+};
+const baseLatest = { ...actualLatest, assets: [...actualLatest.assets, legacyLinuxAsset] };
 const windowsInstaller = baseLatest.assets.find((asset) => asset.platform === "windows" && asset.kind === "installer");
 const verifiedWindows = {
   ...windowsInstaller,
@@ -305,6 +316,20 @@ function assert(condition, message) {
 }
 
 async function main() {
+  const windowsOnly = await runRelease({ downloads_enabled: true, latest: actualLatest });
+  assert(windowsOnly.link.href === actualLatest.assets.find((asset) => asset.platform === "windows").download_url, "Windows-only beta should enable its verified Windows URL");
+  assert(windowsOnly.linuxLink.href === "", "Windows-only beta must not invent a Linux download");
+  assert(windowsOnly.linuxLink.attrs.get("aria-disabled") === "true", "Windows-only beta must disable the Linux card");
+  assert(windowsOnly.text("[data-release-linux-sha256]") === "Not available", "Windows-only beta should not show a Linux checksum");
+  assert(windowsOnly.text("[data-release-status]") === "Windows download available", "Windows-only beta should describe only the available platform");
+
+  const windowsOnlyFailure = await runRelease({
+    downloads_enabled: true,
+    latest: { ...actualLatest, assets: actualLatest.assets.map((asset) => ({ ...asset, verification: undefined })) }
+  });
+  assert(windowsOnlyFailure.linuxLink.href === "", "failed Windows-only release must keep Linux disabled");
+  assert(!windowsOnlyFailure.text("[data-windows-download-notice-body]").includes("Linux packages"), "failed Windows-only release must not claim a Linux package exists");
+
   const enabled = await runRelease({ downloads_enabled: true, latest: verifiedLatest });
   assert(enabled.link.href === PUBLIC_URL, "enabled release should set the Windows download href");
   assert(enabled.macosLink.href === MAC_SOURCE_URL, "enabled release should keep macOS on the source repo href");
@@ -331,6 +356,7 @@ async function main() {
   assert(unsigned.text("[data-release-sha256]") === unsignedWindows.sha256, "unsigned beta should show SHA-256");
   assert(unsigned.text("[data-release-windows-signature]") === "Unsigned beta - expect a Windows SmartScreen warning", "unsigned beta should be labelled honestly");
   assert(unsigned.text("[data-release-windows-tag]") === "Unsigned beta", "unsigned beta should be labelled on its platform card");
+  assert(unsigned.text("[data-release-meta]").startsWith("Unsigned beta -"), "unsigned beta must not be described as stable in the release summary");
   assert(unsigned.hidden("[data-windows-download-notice]") === false, "unsigned beta should keep its warning visible");
   assert(unsigned.text("[data-windows-download-notice-title]") === "Unsigned Windows beta", "unsigned beta should show a specific warning title");
   assert(unsigned.text("[data-windows-download-notice-body]").includes("Windows protected your PC"), "unsigned beta should explain the normal SmartScreen warning");

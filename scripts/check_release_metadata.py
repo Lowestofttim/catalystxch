@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
 HTML_FILES = [ROOT / "index.html", ROOT / "docs.html"]
+ARCHIVED_DOC_VERSION = "v1.3.21"
 VERSION_RE = re.compile(r"\bv\d+\.\d+\.\d+\b")
 HTML_VOID_ELEMENTS = {
     "area",
@@ -455,7 +456,13 @@ def validate_fallback_records(
         status = "Linux download available"
     else:
         status = "Public links coming soon"
-    channel = "Prerelease" if latest.get("channel") == "prerelease" else "Stable"
+    channel = (
+        "Unsigned beta"
+        if unsigned_windows_beta
+        else "Prerelease"
+        if latest.get("channel") == "prerelease"
+        else "Stable"
+    )
     meta = (
         f"{channel} - published {release_date} - {status.lower()}"
         if release_date
@@ -612,6 +619,17 @@ def validate_website_wiring(data: dict, version: str) -> None:
         stale_versions = find_stale_literal_versions(
             html, version, allowed_release_note_versions
         )
+        if html_path.name == "docs.html" and ARCHIVED_DOC_VERSION in stale_versions:
+            archive_is_explicit = all(
+                marker in html
+                for marker in (
+                    f"Archived CATalyst {ARCHIVED_DOC_VERSION} documentation",
+                    f"CATalyst {ARCHIVED_DOC_VERSION} guide",
+                    'href="beta-guide.html"',
+                )
+            )
+            if archive_is_explicit:
+                stale_versions.remove(ARCHIVED_DOC_VERSION)
         if stale_versions:
             fail(f"{rel} contains stale literal versions: {', '.join(stale_versions)}")
         validate_fallback_records(html_path, html, data, version)

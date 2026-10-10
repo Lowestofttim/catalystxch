@@ -3,7 +3,8 @@
 This is the public website repository for CATalyst:
 
 - Website: https://catalystxch.com
-- Docs: https://catalystxch.com/docs.html
+- v1.4 beta guide (Dexie with optional Splash): https://catalystxch.com/beta-guide.html
+- Previous v1.3.21 docs: https://catalystxch.com/docs.html
 - Downloads: https://catalystxch.com/#download
 
 This repository is intentionally separate from the main CATalyst bot source code. It gives testers a public place to read the website and download the current public installer while the app source, bug reports, and beta feedback live in the public bot repository.
@@ -33,7 +34,7 @@ Current public Windows installers are hosted through the official CATalyst publi
 
 https://github.com/Lowestofttim/catalyst-releases/releases
 
-The website shows the current version, release notes, file size, and SHA-256 checksum next to the download buttons. Windows uses the signed public installer channel, while macOS and Linux downloads point at the official bot release assets. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
+The website shows the current version, release notes, file size, and SHA-256 checksum next to the download buttons. Windows builds are shown as signature-verified or explicitly labelled unsigned betas; Linux downloads point at the official bot release assets. Avoid installer links sent only by chat, URL shorteners, mirrors, or files uploaded directly to this website repository.
 
 ## Report a bug
 
@@ -91,7 +92,7 @@ python scripts/check_sync_release_fallbacks.py
 python scripts/check_sync_workflow.py
 node scripts/check_release_js_behavior.js
 python scripts/check_release_dom_rendering.py
-npx --yes html-validate index.html docs.html
+npx --yes html-validate@11.4.0 index.html docs.html beta-guide.html
 ```
 
 The hourly and manually dispatchable `Sync release metadata` workflow reads the

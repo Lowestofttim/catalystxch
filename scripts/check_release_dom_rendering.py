@@ -245,6 +245,10 @@ def assert_release_panel(page, metadata: dict) -> None:
         if linux_available
         else "public links coming soon"
     )
+    if unsigned_beta:
+        expect(page.locator("#download [data-release-meta]")).to_contain_text(
+            "Unsigned beta"
+        )
     download_link = page.locator("[data-download-windows]")
     macos_link = page.locator("[data-download-macos]")
     linux_link = page.locator("[data-download-linux]")

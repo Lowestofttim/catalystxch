@@ -20,7 +20,7 @@ def main() -> None:
         "playwright==1.60.0": "a pinned browser-test dependency",
         "python -m playwright install --with-deps chromium": "the Chromium browser used by the DOM check",
         'node-version: "24"': "a runtime supported by html-validate 11.4.0",
-        "html-validate@11.4.0": "a pinned HTML validator",
+        "html-validate@11.4.0 index.html docs.html beta-guide.html": "a pinned HTML validator covering the beta guide",
         "gh auth setup-git": "post-validation Git authentication",
         "automation/sync-release-metadata": "dedicated automation branch",
         "gh pr create": "protected-branch pull request creation",
@@ -34,10 +34,13 @@ def main() -> None:
         "python scripts/check_windows_release_verification.py": "pure Windows release verifier regression checks",
         "windows-signature-": "the signed evidence companion asset",
         "--allow-unsigned-windows-beta": "the explicit unsigned Windows beta policy switch",
+        "--tag v1.4.1": "the pinned opt-in beta release tag",
     }
     for marker, purpose in required.items():
         if marker not in workflow:
             raise SystemExit(f"sync workflow is missing {purpose}: {marker}")
+    if "--include-platform-downloads" in workflow:
+        raise SystemExit("Windows-only beta sync must not require unpublished Linux assets")
     if re.search(r"(?m)^\s*git push\s*$", workflow):
         raise SystemExit("sync workflow must not push directly to protected main")
     if re.search(r"uses:\s*actions/[^@\s]+@v\d+", workflow):

@@ -51,9 +51,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: >-
           python scripts/sync_release_metadata.py
+          --tag v1.4.1
           --include-download-urls
           --allow-unsigned-windows-beta
-          --include-platform-downloads
           --update-html-fallbacks
 
       - name: Verify release metadata and website rendering
@@ -63,7 +63,7 @@ jobs:
           python scripts/check_sync_workflow.py
           node scripts/check_release_js_behavior.js
           python scripts/check_release_dom_rendering.py
-          npx --yes html-validate@11.4.0 index.html docs.html
+          npx --yes html-validate@11.4.0 index.html docs.html beta-guide.html
 
       - name: Commit a changed release to the automation branch
         id: release
