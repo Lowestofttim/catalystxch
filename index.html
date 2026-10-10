@@ -2050,12 +2050,12 @@
         <div class="download-wrap">
             <img src="assets/icon.png" alt="CATalyst" class="download-icon">
             <div class="download-title">Download CATalyst</div>
-            <p class="download-sub">Windows and Linux beta packages come from official GitHub Releases. The Windows installer has no publisher certificate; the release manifest is signed, and each package has a SHA-256 checksum. Mac users can run from source.</p>
+            <p class="download-sub">Windows and Linux beta packages come from official GitHub Releases. Windows may show a blue warning during installation; read the steps below before opening the installer. Each package has a SHA-256 checksum. Mac users can run from source.</p>
             <aside class="windows-download-notice" data-windows-download-notice role="status">
                 <span class="windows-download-notice-icon" aria-hidden="true">⚠</span>
                 <div>
-                    <strong class="windows-download-notice-title" data-windows-download-notice-title>Unsigned Windows beta</strong>
-                    <p data-windows-download-notice-body>Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -&gt; Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning.</p>
+                    <strong class="windows-download-notice-title" data-windows-download-notice-title>Windows may show a blue warning</strong>
+                    <p data-windows-download-notice-body>You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it.</p>
                 </div>
             </aside>
             <div class="platforms">
@@ -2063,7 +2063,7 @@
                     <div class="platform-row">
                         <span class="platform-icon">🪟</span>
                         <span class="platform-name">Windows</span>
-                        <span class="platform-tag tested" data-release-windows-tag>Unsigned beta</span>
+                        <span class="platform-tag tested" data-release-windows-tag>Beta</span>
                     </div>
                     <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>35.2 MB</span></div>
                 </a>
@@ -2090,7 +2090,7 @@
                     <div class="release-label">Latest packaged build</div>
                     <div class="release-name" data-release-name>CATalyst v1.4.1</div>
                     <div class="release-version" data-release-version>v1.4.1</div>
-                    <div class="release-meta" data-release-meta>Unsigned beta - published 10 Oct 2026 - windows/linux downloads available</div>
+                    <div class="release-meta" data-release-meta>Tester beta - published 10 Oct 2026 - windows/linux downloads available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
@@ -2133,7 +2133,7 @@
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows signature</div>
-                    <div class="download-detail-value" data-release-windows-signature>Unsigned beta - expect a Windows SmartScreen warning</div>
+                    <div class="download-detail-value" data-release-windows-signature>No verified Windows publisher certificate; blue warning possible</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">macOS package</div>

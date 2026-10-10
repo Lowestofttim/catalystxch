@@ -355,13 +355,13 @@ async function main() {
   assert(unsigned.link.href === unsignedWindows.download_url, "explicit unsigned beta should set the Windows download href");
   assert(!unsigned.link.attrs.has("aria-disabled"), "explicit unsigned beta should enable the Windows link");
   assert(unsigned.text("[data-release-sha256]") === unsignedWindows.sha256, "unsigned beta should show SHA-256");
-  assert(unsigned.text("[data-release-windows-signature]") === "Unsigned beta - expect a Windows SmartScreen warning", "unsigned beta should be labelled honestly");
-  assert(unsigned.text("[data-release-windows-tag]") === "Unsigned beta", "unsigned beta should be labelled on its platform card");
-  assert(unsigned.text("[data-release-meta]").startsWith("Unsigned beta -"), "unsigned beta must not be described as stable in the release summary");
+  assert(unsigned.text("[data-release-windows-signature]") === "No verified Windows publisher certificate; blue warning possible", "beta should describe the Windows warning clearly");
+  assert(unsigned.text("[data-release-windows-tag]") === "Beta", "beta should be labelled on its platform card");
+  assert(unsigned.text("[data-release-meta]").startsWith("Tester beta -"), "beta must not be described as stable in the release summary");
   assert(unsigned.hidden("[data-windows-download-notice]") === false, "unsigned beta should keep its warning visible");
-  assert(unsigned.text("[data-windows-download-notice-title]") === "Unsigned Windows beta", "unsigned beta should show a specific warning title");
+  assert(unsigned.text("[data-windows-download-notice-title]") === "Windows may show a blue warning", "beta should show a specific warning title");
   assert(unsigned.text("[data-windows-download-notice-body]").includes("Windows protected your PC"), "unsigned beta should explain the normal SmartScreen warning");
-  assert(unsigned.text("[data-windows-download-notice-body]").includes("Do not continue"), "unsigned beta should distinguish malware or PUA warnings");
+  assert(unsigned.text("[data-windows-download-notice-body]").includes("stop and report it"), "beta should distinguish malware or PUA warnings");
 
   const disabled = await runRelease(disabledMetadata, PUBLIC_URL);
   assert(disabled.link.href === "", "disabled release should remove stale Windows download href");

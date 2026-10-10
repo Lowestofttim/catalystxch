@@ -409,14 +409,14 @@ def main() -> None:
         }:
             raise SystemExit("explicit unsigned Windows beta metadata is incorrect")
         unsigned_html = render_release_fallbacks(source, unsigned_metadata)
-        if "Unsigned beta - published 25 Aug 2026" not in unsigned_html:
+        if "Tester beta - published 25 Aug 2026" not in unsigned_html:
             raise SystemExit("unsigned Windows fallback must not say Stable")
         for expected in (
-            "Unsigned beta - expect a Windows SmartScreen warning",
-            "Unsigned Windows beta",
-            ">Unsigned beta</span>",
+            "No verified Windows publisher certificate; blue warning possible",
+            "Windows may show a blue warning",
+            ">Beta</span>",
             "Windows protected your PC",
-            "Do not continue",
+            "stop and report it",
         ):
             if expected not in unsigned_html:
                 raise SystemExit(f"unsigned Windows fallback is missing: {expected}")

@@ -547,7 +547,7 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     else:
         status = "Public links coming soon"
     channel = (
-        "Unsigned beta"
+        "Tester beta"
         if unsigned_windows_beta
         else "Prerelease"
         if latest.get("channel") == "prerelease"
@@ -575,22 +575,22 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         else "",
         "data-release-sha256": windows["sha256"] if windows else "Not available",
         "data-release-windows-signature": (
-            "Unsigned beta - expect a Windows SmartScreen warning"
+            "No verified Windows publisher certificate; blue warning possible"
             if unsigned_windows_beta
             else "Verified publisher: SignPath Foundation"
             if windows
             else "Windows installer unavailable - signature verification required"
         ),
         "data-release-windows-tag": (
-            "Unsigned beta" if unsigned_windows_beta else "Verified" if windows else "Unavailable"
+            "Beta" if unsigned_windows_beta else "Verified" if windows else "Unavailable"
         ),
         "data-windows-download-notice-title": (
-            "Unsigned Windows beta"
+            "Windows may show a blue warning"
             if unsigned_windows_beta
             else "Windows download temporarily unavailable"
         ),
         "data-windows-download-notice-body": (
-            "Windows may show a blue 'Windows protected your PC' warning because this beta installer is not digitally signed. Download only from this page, verify the SHA-256 checksum shown below, then use More info -> Run anyway if you choose to proceed. Do not continue if Windows reports malware or potentially unwanted software rather than the blue unrecognized-app warning."
+            "You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it."
             if unsigned_windows_beta
             else "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. Linux packages and the source code remain available while a replacement is verified."
         ),
