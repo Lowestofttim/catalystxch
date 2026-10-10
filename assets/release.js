@@ -176,12 +176,15 @@
     });
   };
 
-  const disableWindowsDownload = () => {
+  const disableWindowsDownload = (linuxAvailable) => {
     setHidden("[data-windows-download-notice]", false);
     setText("[data-windows-download-notice-title]", "Windows download temporarily unavailable");
     setText(
       "[data-windows-download-notice-body]",
-      "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. Linux packages and the source code remain available while a replacement is verified."
+      "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. " +
+      (linuxAvailable
+        ? "Linux packages and the source code remain available while a replacement is verified."
+        : "The source code remains available while a replacement is verified.")
     );
     setText("[data-release-download-name]", "Not available");
     setText("[data-release-download-size]", "");
@@ -232,7 +235,7 @@
     else disableDownload("[data-download-linux]");
 
     if (!downloadsAvailable) {
-      disableWindowsDownload();
+      disableWindowsDownload(Boolean(linuxDownload));
       return;
     }
 

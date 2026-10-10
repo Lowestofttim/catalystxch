@@ -1659,7 +1659,7 @@
             <div class="hero-copy">
                 <span class="hero-eyebrow">
                     <span class="dot"></span>
-                    <span data-release-eyebrow>Windows/Linux downloads available - current release v1.3.21</span>
+                    <span data-release-eyebrow>Windows download available - current release v1.4.1</span>
                 </span>
                 <h1 class="hero-title">
                     Automated <span class="tag-accent">market making</span><br>
@@ -2064,7 +2064,7 @@
                         <span class="platform-name">Windows</span>
                         <span class="platform-tag tested" data-release-windows-tag>Unsigned beta</span>
                     </div>
-                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>36.0 MB</span></div>
+                    <div class="platform-note">Windows 10/11 · 64-bit installer · <span data-release-download-size>35.2 MB</span></div>
                 </a>
                 <a class="platform-card" data-download-macos href="https://github.com/catalystxch/catalyst-bot" target="_blank" rel="noopener">
                     <div class="platform-row">
@@ -2078,26 +2078,25 @@
                     <div class="platform-row">
                         <span class="platform-icon">🐧</span>
                         <span class="platform-name">Linux</span>
-                        <span class="platform-tag tested">Package</span>
+                        <span class="platform-tag tested">When published</span>
                     </div>
-                    <div class="platform-note">deb/AppImage · <span data-release-linux-size>190.0 MB</span> · opens without manual env setup</div>
+                    <div class="platform-note">Linux packages depend on the selected release · <span data-release-linux-size></span></div>
                 </a>
             </div>
             <div class="release-status">
                 <div class="release-card">
                     <div class="release-label">Latest packaged build</div>
-                    <div class="release-name" data-release-name>CATalyst v1.3.21</div>
-                    <div class="release-version" data-release-version>v1.3.21</div>
-                    <div class="release-meta" data-release-meta>Unsigned beta - published 7 Sep 2026 - windows/linux downloads available</div>
+                    <div class="release-name" data-release-name>CATalyst v1.4.1</div>
+                    <div class="release-version" data-release-version>v1.4.1</div>
+                    <div class="release-meta" data-release-meta>Unsigned beta - published 10 Oct 2026 - windows download available</div>
                 </div>
                 <div class="release-card">
                     <div class="release-label">What changed recently</div>
                     <ul class="release-list" data-release-notes>
-                        <li>Harden CATalyst lifecycle and Coin Prep stability</li>
-                        <li>Harden packaged TLS trust store</li>
-                        <li>Fix secondary-PC wallet and cancellation races</li>
-                        <li>Bound exhausted fill verification retries</li>
-                        <li>Fix stale cancel diagnostics and top-up authority race</li>
+                        <li>This update installs an intentionally unsigned Windows beta. Microsoft SmartScreen may show the normal blue warning. Verify the SHA-256 sidecar before choosing More info and Run anyway.</li>
+                        <li>The installer has no Authenticode publisher signature; only this update manifest is cryptographically signed.</li>
+                        <li>The earlier v1.4.0 prerelease was withdrawn before website promotion because its signed notes lost the public issue-report link. This v1.4.1 prerelease corrects that release-metadata wording; the trading runtime is unchanged.</li>
+                        <li>This is an opt-in Windows beta for testers. It is not a general public-readiness claim or an unattended-trading recommendation. Use a separate test wallet funded only with amounts you can afford to lose, and back up an existing CATalyst profile before upgrading.</li>
                     </ul>
                 </div>
             </div>
@@ -2124,11 +2123,11 @@
             <div class="download-details">
                 <div class="download-detail">
                     <div class="download-detail-label">Installer</div>
-                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.3.21.exe</span></div>
+                    <div class="download-detail-value"><span data-release-download-name>Catalyst-Setup-v1.4.1.exe</span></div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows SHA-256</div>
-                    <div class="download-detail-value" data-release-sha256>49ec98b5ff8fc19ce3490bed5a7a4d011551b7fa48e6423dbb1744d38cfabe58</div>
+                    <div class="download-detail-value" data-release-sha256>70713d25cfc778f532c6f81c45ada850d0eb22df6eee6cdeb26b42c60d2f1434</div>
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Windows signature</div>
@@ -2140,7 +2139,7 @@
                 </div>
                 <div class="download-detail">
                     <div class="download-detail-label">Linux SHA-256</div>
-                    <div class="download-detail-value" data-release-linux-sha256>55b5e00ab785d2f1c506c346ad84d6188294d36312729c0c9efb78ac46a66867</div>
+                    <div class="download-detail-value" data-release-linux-sha256>Not available</div>
                 </div>
             </div>
             <div class="download-security">
@@ -2293,7 +2292,7 @@
     </div>
 </footer>
 
-<script src="assets/release.js?v=v1.3.21" defer></script>
+<script src="assets/release.js?v=v1.4.1" defer></script>
 
 </body>
 </html>

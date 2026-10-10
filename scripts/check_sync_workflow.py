@@ -34,7 +34,7 @@ def main() -> None:
         "python scripts/check_windows_release_verification.py": "pure Windows release verifier regression checks",
         "windows-signature-": "the signed evidence companion asset",
         "--allow-unsigned-windows-beta": "the explicit unsigned Windows beta policy switch",
-        "--tag v1.4.0": "the pinned opt-in beta release tag",
+        "--tag v1.4.1": "the pinned opt-in beta release tag",
     }
     for marker, purpose in required.items():
         if marker not in workflow:
