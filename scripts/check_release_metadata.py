@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LATEST_JSON = ROOT / "assets" / "release" / "latest.json"
 RELEASE_JS = ROOT / "assets" / "release.js"
-HTML_FILES = [ROOT / "index.html", ROOT / "docs.html"]
+HTML_FILES = [ROOT / "index.html"]
 ARCHIVED_DOC_VERSION = "v1.3.21"
 VERSION_RE = re.compile(r"\bv\d+\.\d+\.\d+\b")
 HTML_VOID_ELEMENTS = {

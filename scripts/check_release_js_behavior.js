@@ -8,7 +8,8 @@ const RELEASE_JS = "assets/release.js";
 const MAC_SOURCE_URL = "https://github.com/catalystxch/catalyst-bot";
 const metadata = JSON.parse(fs.readFileSync("assets/release/latest.json", "utf8"));
 const actualLatest = metadata.latest;
-// Keep the older Linux-package path under test even when the current beta is Windows-only.
+// Keep an explicit Windows-only fixture even after the Linux beta is published.
+const windowsOnlyLatest = { ...actualLatest, assets: actualLatest.assets.filter((asset) => asset.platform !== "linux") };
 const legacyLinuxAsset = {
   name: `Catalyst_${actualLatest.version.slice(1)}_amd64.deb`,
   platform: "linux",
@@ -18,7 +19,7 @@ const legacyLinuxAsset = {
   sha256: "d".repeat(64),
   download_enabled: true
 };
-const baseLatest = { ...actualLatest, assets: [...actualLatest.assets, legacyLinuxAsset] };
+const baseLatest = { ...windowsOnlyLatest, assets: [...windowsOnlyLatest.assets, legacyLinuxAsset] };
 const windowsInstaller = baseLatest.assets.find((asset) => asset.platform === "windows" && asset.kind === "installer");
 const verifiedWindows = {
   ...windowsInstaller,
@@ -316,7 +317,7 @@ function assert(condition, message) {
 }
 
 async function main() {
-  const windowsOnly = await runRelease({ downloads_enabled: true, latest: actualLatest });
+  const windowsOnly = await runRelease({ downloads_enabled: true, latest: windowsOnlyLatest });
   assert(windowsOnly.link.href === actualLatest.assets.find((asset) => asset.platform === "windows").download_url, "Windows-only beta should enable its verified Windows URL");
   assert(windowsOnly.linuxLink.href === "", "Windows-only beta must not invent a Linux download");
   assert(windowsOnly.linuxLink.attrs.get("aria-disabled") === "true", "Windows-only beta must disable the Linux card");
@@ -325,7 +326,7 @@ async function main() {
 
   const windowsOnlyFailure = await runRelease({
     downloads_enabled: true,
-    latest: { ...actualLatest, assets: actualLatest.assets.map((asset) => ({ ...asset, verification: undefined })) }
+    latest: { ...windowsOnlyLatest, assets: windowsOnlyLatest.assets.map((asset) => ({ ...asset, verification: undefined })) }
   });
   assert(windowsOnlyFailure.linuxLink.href === "", "failed Windows-only release must keep Linux disabled");
   assert(!windowsOnlyFailure.text("[data-windows-download-notice-body]").includes("Linux packages"), "failed Windows-only release must not claim a Linux package exists");

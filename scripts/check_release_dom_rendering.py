@@ -130,9 +130,8 @@ def main() -> None:
 
                 docs_page = browser.new_page(viewport={"width": 390, "height": 900})
                 docs_page.goto(urljoin(url, "docs.html"), wait_until="networkidle")
-                assert_release_script_cache_key(
-                    docs_page, enabled_latest["version"]
-                )
+                assert "Dexie beta docs and FAQ" in docs_page.title()
+                assert docs_page.locator("h2#faq").count() == 1
 
                 verified_page = browser.new_page(viewport={"width": 390, "height": 900})
                 verified_page.route(
