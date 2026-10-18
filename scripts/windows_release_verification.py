@@ -530,22 +530,27 @@ def verify_windows_release(
         raise ReleaseVerificationError("Windows release verification failed") from exc
 
 
-def verify_unsigned_windows_release(
+def _verify_unsigned_windows_release(
     release: Mapping[str, object],
+    *,
+    expected_channel: str,
+    expected_prerelease: bool,
     temp_root: Path | None = None,
     urlopen=urllib.request.urlopen,
     runner=subprocess.run,
     system_name: str | None = None,
     manifest_public_key_b64: str = UPDATE_MANIFEST_PUBLIC_KEY_B64,
 ) -> dict[str, object]:
-    """Verify exact release bytes and prove no Authenticode signature is present."""
+    """Verify one explicit unsigned channel without weakening signed releases."""
 
     try:
         tag = str(release.get("tagName") or "")
         if not re.fullmatch(r"v\d+\.\d+\.\d+", tag):
             raise ReleaseVerificationError("release tag is not semantic")
-        if release.get("isPrerelease") is not True:
-            raise ReleaseVerificationError("unsigned beta release must be prerelease")
+        if release.get("isPrerelease") is not expected_prerelease:
+            raise ReleaseVerificationError("unsigned release state does not match channel")
+        if expected_channel == "stable" and release.get("isDraft") is not False:
+            raise ReleaseVerificationError("unsigned stable release must be public")
         installer_name = f"Catalyst-Setup-{tag}.exe"
         sidecar_name = f"{installer_name}.sha256"
         evidence_name = f"windows-signature-{tag}.json"
@@ -559,7 +564,8 @@ def verify_unsigned_windows_release(
         if not isinstance(assets, list):
             raise ReleaseVerificationError("release assets are missing")
         if any(
-            isinstance(asset, Mapping) and asset.get("name") == evidence_name
+            isinstance(asset, Mapping)
+            and re.fullmatch(r"windows-signature-.*\.json", str(asset.get("name") or ""))
             for asset in assets
         ):
             raise ReleaseVerificationError(
@@ -627,7 +633,7 @@ def verify_unsigned_windows_release(
                 installer_size=expected_size,
                 installer_sha256=installer_sha256,
                 expected_tag=tag,
-                expected_channel="beta",
+                expected_channel=expected_channel,
                 expected_source_commit=source_commit,
             )
             prove_no_authenticode_signature(
@@ -638,7 +644,7 @@ def verify_unsigned_windows_release(
 
         return {
             "download_enabled": True,
-            "distribution_status": "unsigned_beta",
+            "distribution_status": f"unsigned_{expected_channel}",
             "verification": {
                 "authenticode_status": "unsigned",
                 "publisher": None,
@@ -664,3 +670,47 @@ def verify_unsigned_windows_release(
         raise ReleaseVerificationError(
             "Unsigned Windows release verification failed"
         ) from exc
+
+
+def verify_unsigned_windows_release(
+    release: Mapping[str, object],
+    temp_root: Path | None = None,
+    urlopen=urllib.request.urlopen,
+    runner=subprocess.run,
+    system_name: str | None = None,
+    manifest_public_key_b64: str = UPDATE_MANIFEST_PUBLIC_KEY_B64,
+) -> dict[str, object]:
+    """Preserve the explicit unsigned beta release contract."""
+
+    return _verify_unsigned_windows_release(
+        release,
+        expected_channel="beta",
+        expected_prerelease=True,
+        temp_root=temp_root,
+        urlopen=urlopen,
+        runner=runner,
+        system_name=system_name,
+        manifest_public_key_b64=manifest_public_key_b64,
+    )
+
+
+def verify_unsigned_windows_stable_release(
+    release: Mapping[str, object],
+    temp_root: Path | None = None,
+    urlopen=urllib.request.urlopen,
+    runner=subprocess.run,
+    system_name: str | None = None,
+    manifest_public_key_b64: str = UPDATE_MANIFEST_PUBLIC_KEY_B64,
+) -> dict[str, object]:
+    """Verify an unsigned public stable installer and its signed stable manifest."""
+
+    return _verify_unsigned_windows_release(
+        release,
+        expected_channel="stable",
+        expected_prerelease=False,
+        temp_root=temp_root,
+        urlopen=urlopen,
+        runner=runner,
+        system_name=system_name,
+        manifest_public_key_b64=manifest_public_key_b64,
+    )
