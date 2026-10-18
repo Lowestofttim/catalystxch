@@ -545,6 +545,20 @@ def main() -> None:
         )
         if result["latest"]["assets"][0]["download_enabled"]:
             raise SystemExit("invalid signed evidence must disable stable download")
+        malformed_evidence = deepcopy(stable_release)
+        malformed_evidence["assets"].append({"name": "windows-signature-bogus.txt"})
+        result = build_metadata(
+            malformed_evidence,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_stable=True,
+            windows_verifier=fail_verification,
+            windows_unsigned_stable_verifier=lambda value: stable_result,
+        )
+        if result["latest"]["assets"][0]["download_enabled"]:
+            raise SystemExit("malformed signing evidence must disable stable download")
 
         before_replace_failure = output.read_bytes()
         with patch.object(Path, "replace", side_effect=OSError("replace failed")):

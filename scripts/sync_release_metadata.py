@@ -212,7 +212,7 @@ def _unavailable_windows_verification() -> dict[str, object]:
 def _has_windows_signing_evidence(release: dict, version: str) -> bool:
     return any(
         isinstance(asset, dict)
-        and re.fullmatch(r"windows-signature-.*\.json", str(asset.get("name") or ""))
+        and str(asset.get("name") or "").lower().startswith("windows-signature-")
         for asset in (release.get("assets") or [])
     )
 

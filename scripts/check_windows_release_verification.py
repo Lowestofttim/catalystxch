@@ -689,6 +689,9 @@ def check_unsigned_stable_verification() -> None:
     candidate = copy.deepcopy(release)
     candidate["assets"].append({"name": "windows-signature-v1.3.17.json"})
     reject(candidate)
+    candidate = copy.deepcopy(release)
+    candidate["assets"].append({"name": "windows-signature-bogus.txt"})
+    reject(candidate)
 
     for field, value in (
         ("size", 1),

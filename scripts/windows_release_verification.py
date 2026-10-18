@@ -553,7 +553,6 @@ def _verify_unsigned_windows_release(
             raise ReleaseVerificationError("unsigned stable release must be public")
         installer_name = f"Catalyst-Setup-{tag}.exe"
         sidecar_name = f"{installer_name}.sha256"
-        evidence_name = f"windows-signature-{tag}.json"
         manifest_name = "latest.json"
         manifest_signature_name = "latest.json.sig"
         release_prefix = (
@@ -565,7 +564,7 @@ def _verify_unsigned_windows_release(
             raise ReleaseVerificationError("release assets are missing")
         if any(
             isinstance(asset, Mapping)
-            and re.fullmatch(r"windows-signature-.*\.json", str(asset.get("name") or ""))
+            and str(asset.get("name") or "").lower().startswith("windows-signature-")
             for asset in assets
         ):
             raise ReleaseVerificationError(
