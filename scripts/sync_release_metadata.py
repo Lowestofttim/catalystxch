@@ -82,6 +82,22 @@ def select_release_at_beta_floor(
     return get_release(repo, beta_floor)
 
 
+def ensure_current_stable_release(
+    release: dict, repo: str, get_release=run_gh
+) -> None:
+    """Keep an explicitly selected older stable tag out of website latest."""
+
+    latest = get_release(repo, None)
+    if (
+        latest.get("tagName") != release.get("tagName")
+        or latest.get("isDraft") is not False
+        or latest.get("isPrerelease") is not False
+    ):
+        raise ReleaseVerificationError(
+            "stable release is not the current public latest"
+        )
+
+
 def normalize_heading(line: str) -> str | None:
     match = re.match(r"^\s{0,3}#{1,6}\s+(.+?)\s*$", line)
     if not match:
@@ -239,6 +255,7 @@ def build_metadata(
     *,
     allow_unsigned_windows_beta: bool = False,
     allow_unsigned_windows_stable: bool = False,
+    require_verified_stable_windows: bool = False,
     windows_verifier=verify_windows_release,
     windows_unsigned_verifier=verify_unsigned_windows_release,
     windows_unsigned_stable_verifier=verify_unsigned_windows_stable_release,
@@ -275,6 +292,7 @@ def build_metadata(
                 unsigned_windows_result = windows_unsigned_verifier(release)
             except ReleaseVerificationError:
                 unsigned_windows_result = None
+
         if (
             windows_result is None
             and no_signing_evidence
@@ -286,6 +304,16 @@ def build_metadata(
                 unsigned_windows_result = windows_unsigned_stable_verifier(release)
             except ReleaseVerificationError:
                 unsigned_windows_result = None
+        if (
+            require_verified_stable_windows
+            and release.get("isPrerelease") is False
+            and release.get("isDraft") is False
+            and windows_result is None
+            and unsigned_windows_result is None
+        ):
+            raise ReleaseVerificationError(
+                "public stable Windows installer verification failed"
+            )
 
     expected_windows_name = f"Catalyst-Setup-{version}.exe"
     assets = []
@@ -795,6 +823,8 @@ def main() -> None:
     )
     if release.get("isDraft"):
         raise SystemExit("refusing to publish metadata for a draft release")
+    if args.include_download_urls and release.get("isPrerelease") is False:
+        ensure_current_stable_release(release, args.repo)
 
     metadata = build_metadata(
         release,
@@ -804,6 +834,7 @@ def main() -> None:
         args.kind,
         allow_unsigned_windows_beta=args.allow_unsigned_windows_beta,
         allow_unsigned_windows_stable=args.allow_unsigned_windows_stable,
+        require_verified_stable_windows=args.include_download_urls,
     )
     if args.include_platform_downloads or args.include_experimental_archives:
         platform_release = run_gh(args.experimental_repo, metadata["latest"]["version"])

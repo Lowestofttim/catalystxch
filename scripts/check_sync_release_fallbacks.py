@@ -17,6 +17,7 @@ from check_release_metadata import (
 from sync_release_metadata import (
     append_platform_downloads,
     build_metadata,
+    ensure_current_stable_release,
     preserve_generated_at_if_unchanged,
     render_release_fallbacks,
     select_release_at_beta_floor,
@@ -40,6 +41,22 @@ def main() -> None:
     selected.clear()
     assert select_release_at_beta_floor("owner/repo", "v1.4.1", fake_release)["tagName"] == "v1.4.2"
     assert selected == [None], "newer stable must enter normal channel"
+
+    older_stable = {"tagName": "v1.3.21", "isDraft": False, "isPrerelease": False}
+    current_stable = {"tagName": "v1.4.2", "isDraft": False, "isPrerelease": False}
+    try:
+        ensure_current_stable_release(
+            older_stable, "Lowestofttim/catalyst-releases",
+            lambda _repo, _tag: current_stable,
+        )
+    except ReleaseVerificationError:
+        pass
+    else:
+        raise SystemExit("an older stable tag must not become website latest")
+    ensure_current_stable_release(
+        current_stable, "Lowestofttim/catalyst-releases",
+        lambda _repo, _tag: current_stable,
+    )
 
     metadata = {
         "schema_version": 2,
@@ -308,6 +325,12 @@ def main() -> None:
     )
     disabled["downloads_enabled"] = True
     disabled["download_status"] = "partial"
+    try:
+        validate_metadata(disabled)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit("protected-main check must reject an unverified stable Windows release")
     disabled_html = render_release_fallbacks(source, disabled)
     if "Linux download available" not in disabled_html:
         raise SystemExit("disabled Windows must not disable Linux")
@@ -339,6 +362,22 @@ def main() -> None:
         failed_windows = failed_metadata["latest"]["assets"][0]
         if failed_windows["download_enabled"] is not False:
             raise SystemExit("failed Windows verification must disable Windows")
+        try:
+            build_metadata(
+                {**release, "isDraft": False},
+                "Lowestofttim/catalyst-releases",
+                True,
+                "windows",
+                "installer",
+                require_verified_stable_windows=True,
+                windows_verifier=fail_verification,
+                allow_unsigned_windows_stable=True,
+                windows_unsigned_stable_verifier=fail_verification,
+            )
+        except ReleaseVerificationError:
+            pass
+        else:
+            raise SystemExit("public stable verification failure must fail release sync")
         if failed_windows["verification"] != {
             "authenticode_status": "unavailable",
             "publisher": None,

@@ -296,6 +296,11 @@ def validate_metadata(data: dict) -> str:
     ]
     if len(windows_assets) != 1:
         fail("website metadata must expose exactly one Windows installer record")
+    if (
+        latest.get("channel") == "stable"
+        and windows_assets[0].get("download_enabled") is not True
+    ):
+        fail("public stable Windows installer must pass verification")
 
     for asset in assets:
         if not isinstance(asset, dict):
