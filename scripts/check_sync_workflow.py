@@ -36,6 +36,7 @@ def main() -> None:
         "--allow-unsigned-windows-beta": "the explicit unsigned Windows beta policy switch",
         "--allow-unsigned-windows-stable": "the explicit unsigned Windows stable policy switch",
         "--beta-release-floor v1.4.1": "the current beta floor until a newer stable release is public",
+        "git add assets/release/latest.json index.html docs.html beta-guide.html": "all three release-copy pages in the protected sync commit",
     }
     for marker, purpose in required.items():
         if marker not in workflow:

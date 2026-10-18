@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPO = "Lowestofttim/catalyst-releases"
 DEFAULT_EXPERIMENTAL_REPO = "catalystxch/catalyst-bot"
 DEFAULT_OUTPUT = ROOT / "assets" / "release" / "latest.json"
-DEFAULT_HTML_FILES = (ROOT / "index.html", ROOT / "docs.html")
+DEFAULT_HTML_FILES = (ROOT / "index.html", ROOT / "docs.html", ROOT / "beta-guide.html")
 GH_FIELDS = "tagName,name,isDraft,isPrerelease,publishedAt,body,assets"
 
 
@@ -610,6 +610,16 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         and windows.get("distribution_status") == "unsigned_stable"
         and windows.get("verification", {}).get("authenticode_status") == "unsigned"
     )
+    signed_windows_stable = bool(
+        windows
+        and latest.get("channel") == "stable"
+        and windows.get("distribution_status") is None
+        and windows.get("verification", {}).get("authenticode_status") == "valid"
+        and windows.get("verification", {}).get("publisher") == "SignPath Foundation"
+        and windows.get("verification", {}).get("timestamp_status") == "valid"
+        and windows.get("verification", {}).get("update_manifest_status") == "valid"
+    )
+    public_stable_copy = unsigned_windows_stable or signed_windows_stable
     if windows and linux:
         status = "Windows/Linux downloads available"
     elif windows:
@@ -632,6 +642,23 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         else f"{channel} - {status.lower()}"
     )
     values = {
+        "data-release-phase-heading": (
+            "Unsigned Windows stable release"
+            if unsigned_windows_stable
+            else "CATalyst stable release"
+            if signed_windows_stable
+            else "New Dexie only beta testing"
+        ),
+        "data-release-setup-status": (
+            "This is the current stable release. The Windows package is available only when the download panel verifies its release evidence. Trading uses real wallet funds, so review the wallet, exact asset ID, campaign limits, and safety state before starting."
+            if public_stable_copy
+            else "This is an opt-in tester beta. Package smoke checks, automated tests, and an isolated Sage offer lifecycle passed. Real-wallet recovery, second-PC acceptance, and long-running stability checks are still in progress for this build; a successful install does not mean those checks have passed."
+        ),
+        "data-release-attendance-status": (
+            "A stable release does not guarantee unattended trading. Use limits you understand, inspect wallet and market state regularly, and stop when CATalyst reports an unresolved operation or safety block."
+            if public_stable_copy
+            else "No. It is an opt-in tester beta. Original-wallet recovery, independent second-PC acceptance, native UI review, Splash peer receipt, and final stability traces remain open. Use a separate test wallet, small amounts, and an attentive operator."
+        ),
         "data-release-version": latest["version"],
         "data-release-name": latest["name"],
         "data-release-status": status,
@@ -807,7 +834,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--update-html-fallbacks",
         action="store_true",
-        help="update index.html and docs.html static fallbacks to match the metadata",
+        help="update index.html, docs.html, and beta-guide.html static fallbacks to match the metadata",
     )
     return parser.parse_args()
 

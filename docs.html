@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Current CATalyst Dexie beta documentation, Linux and Windows setup, screenshots and frequently asked questions.">
+  <meta name="description" content="Current CATalyst Dexie documentation, Linux and Windows setup, screenshots and frequently asked questions.">
   <meta name="theme-color" content="#080C12">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'none'; frame-src 'none'; form-action 'none'; upgrade-insecure-requests">
-  <title>Dexie beta docs and FAQ | CATalyst</title>
+  <title>Dexie docs and FAQ | CATalyst</title>
   <link rel="icon" type="image/png" href="assets/icon.png">
   <style>
     :root { color-scheme: dark; font: 16px/1.65 system-ui, sans-serif; background: #080c12; color: #dbe6ef; }
@@ -44,30 +44,30 @@
       <a href="index.html#download">Downloads</a>
       <a href="https://github.com/catalystxch/catalyst-bot/issues" rel="noopener">Feedback and bugs</a>
     </nav>
-    <h1>Dexie beta docs and FAQ</h1>
-    <p class="eyebrow">New Dexie only beta testing · Windows and Linux</p>
-    <p class="lead">CATalyst connects to Sage Wallet locally, builds Chia CAT/XCH offers, and publishes them to Dexie. Optional Splash P2P can also broadcast offers. TibetSwap, AMM pricing, Arb Sniper, and Close the Gap are retired in this beta.</p>
+    <h1>Dexie docs and FAQ</h1>
+    <p class="eyebrow"><span data-release-phase-heading>New Dexie only beta testing</span> · Windows and Linux</p>
+    <p class="lead">CATalyst connects to Sage Wallet locally, builds Chia CAT/XCH offers, and publishes them to Dexie. Optional Splash P2P can also broadcast offers. TibetSwap, AMM pricing, Arb Sniper, and Close the Gap are retired.</p>
     <div class="notice"><strong>Real wallet actions:</strong> Offers, cancellations, and coin preparation can move or lock funds and incur network fees. Test with a separate wallet funded only with amounts you can afford to lose, and back up an existing CATalyst profile before upgrading. Review the selected wallet, exact CAT asset ID, campaign limits, and fee scope in the app before proceeding.</div>
   </header>
   <main>
     <section aria-labelledby="why-dexie">
       <h2 id="why-dexie">Why CATalyst changed</h2>
       <p>TibetSwap has shut down. Earlier CATalyst versions used its AMM data for pricing and arbitrage, so those TibetSwap-dependent features are retired. We redesigned CATalyst to manage CAT/XCH offers through Dexie without relying on TibetSwap. Read <a href="https://v2.tibetswap.io/" rel="noopener">TibetSwap's closure notice</a> for the venue's announcement.</p>
-      <p>Dexie is the offer marketplace for this beta. Splash remains an optional way to broadcast the same signed offers, starts off for new installs, and does not replace Dexie.</p>
+      <p>Dexie is CATalyst's offer marketplace. Splash remains an optional way to broadcast the same signed offers, starts off for new installs, and does not replace Dexie.</p>
     </section>
     <section aria-labelledby="tester-status">
       <h2 id="tester-status">Tester status</h2>
-      <p>This is a test build. The Windows installer, Linux AppImage and Debian package passed their package smoke checks; automated tests and an isolated Sage offer lifecycle passed. The current build is still undergoing real-wallet offer and recovery testing, independent second-PC live acceptance, and long-running stability checks. Please report unexpected behavior; a successful install does not mean those checks have passed.</p>
-      <p>Dexie is the primary offer publication path. Splash is optional and starts off for new installs; delivery to a separate Splash peer has not yet been confirmed for this build. Leave Splash off unless you specifically intend to test it, and verify offer visibility independently.</p>
+      <p data-release-setup-status>This is an opt-in tester beta. Package smoke checks, automated tests, and an isolated Sage offer lifecycle passed. Real-wallet recovery, second-PC acceptance, and long-running stability checks are still in progress for this build; a successful install does not mean those checks have passed.</p>
+      <p>Dexie is the primary offer publication path. Splash is optional and starts off for new installs. If you enable it, check peer status and verify exact offer visibility independently before relying on broadcast reach.</p>
     </section>
     <section>
       <h2>1. Download and verify</h2>
       <ol>
-        <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the v1.4 Dexie beta. Windows and Linux downloads point to official GitHub Releases.</li>
+        <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the release you intend to install. Windows and Linux downloads point to official GitHub Releases.</li>
         <li>Compare the downloaded package's SHA-256 with the value on the page and its release sidecar before running it.</li>
-        <li>On Windows, you may see a blue “Windows protected your PC” screen because the beta installer does not yet have a verified Windows publisher certificate. If the download came from this page and its SHA-256 matches, choose More info, check the app name, then Run anyway. Stop if Windows or your antivirus reports malware or potentially unwanted software.</li>
-        <li>On Linux x86-64, Ubuntu/Debian users can choose the <code>.deb</code>. The <a href="https://github.com/catalystxch/catalyst-bot/releases/tag/v1.4.1" rel="noopener">exact source release</a> also has an AppImage and tarball. The packages follow the PyInstaller, AppImage and Debian build path used for the earlier working Linux release.</li>
-        <li>In the download directory, verify the Debian package with <code>sha256sum -c catalyst_v1.4.1_amd64.deb.sha256</code>, then install it using <code>sudo apt install ./catalyst_v1.4.1_amd64.deb</code>. Or verify the matching AppImage sidecar, run <code>chmod +x Catalyst-linux-v1.4.1-x86_64.AppImage</code>, and launch the AppImage. Some distributions need FUSE 2 for AppImage; extract-and-run mode is available when FUSE is absent.</li>
+        <li>On Windows, an installer marked unsigned may show the ordinary blue “Windows protected your PC” warning. Verify the official download and SHA-256 first. If that ordinary warning offers More info, check the app name and choose Run anyway only if you trust it. Stop for malware or potentially unwanted software warnings; Smart App Control and organization policy may provide no continuation option.</li>
+        <li>On Linux x86-64, use the package listed for the same release in the download panel. The corresponding source release may offer a Debian package, AppImage, or tarball; check each asset and sidecar for the version you select.</li>
+        <li>Verify a Debian package with its matching <code>.sha256</code> sidecar, then install that exact file with <code>sudo apt install ./&lt;downloaded-package&gt;.deb</code>. For an AppImage, verify its matching sidecar, make that exact file executable, and launch it. Some distributions need FUSE 2 for AppImage; extract-and-run mode is available when FUSE is absent.</li>
       </ol>
     </section>
     <section>
@@ -105,13 +105,13 @@
       <p>Report bugs through the <a href="https://github.com/catalystxch/catalyst-bot/issues/new/choose" rel="noopener">public issue forms</a>. Never post seed phrases, private keys, wallet TLS keys, or unredacted personal wallet data.</p>
     </section>
     <section aria-labelledby="screens">
-      <h2 id="screens">Current v1.4.1 screens</h2>
-      <p>These screenshots come from an isolated preview of the exact v1.4.1 interface with no Sage wallet connected. Empty offers and zero performance are intentional; they are not live trading results.</p>
+      <h2 id="screens">Interface preview</h2>
+      <p>These screenshots come from an isolated v1.4.1 preview with no Sage wallet connected. They show the layout, not necessarily the latest release. Empty offers and zero performance are intentional; they are not live trading results.</p>
       <div class="gallery">
-        <figure><img src="assets/screenshots/v1.4.1-dashboard-setup.png" alt="Dexie beta dashboard quick start and offer-book market confidence" loading="lazy"><figcaption>Dashboard: pair setup, wallet readiness and offer-book confidence.</figcaption></figure>
-        <figure><img src="assets/screenshots/v1.4.1-offers-empty.png" alt="Dexie beta Offers view with no active offers" loading="lazy"><figcaption>Offers: separate buy and sell groups, empty until offers exist.</figcaption></figure>
-        <figure><img src="assets/screenshots/v1.4.1-pnl-empty.png" alt="Dexie beta P and L view before confirmed fills" loading="lazy"><figcaption>P&amp;L: confirmed fills are needed before economic totals appear.</figcaption></figure>
-        <figure><img src="assets/screenshots/v1.4.1-settings-setup.png" alt="Dexie beta Settings setup before connecting Sage" loading="lazy"><figcaption>Settings: wallet session, trading pair and market mode.</figcaption></figure>
+        <figure><img src="assets/screenshots/v1.4.1-dashboard-setup.png" alt="Dexie dashboard quick start and offer-book market confidence" loading="lazy"><figcaption>Dashboard: pair setup, wallet readiness and offer-book confidence.</figcaption></figure>
+        <figure><img src="assets/screenshots/v1.4.1-offers-empty.png" alt="Dexie Offers view with no active offers" loading="lazy"><figcaption>Offers: separate buy and sell groups, empty until offers exist.</figcaption></figure>
+        <figure><img src="assets/screenshots/v1.4.1-pnl-empty.png" alt="Dexie P and L view before confirmed fills" loading="lazy"><figcaption>P&amp;L: confirmed fills are needed before economic totals appear.</figcaption></figure>
+        <figure><img src="assets/screenshots/v1.4.1-settings-setup.png" alt="Dexie Settings setup before connecting Sage" loading="lazy"><figcaption>Settings: wallet session, trading pair and market mode.</figcaption></figure>
       </div>
     </section>
     <section aria-labelledby="faq">
@@ -120,7 +120,7 @@
       <p>An unsigned Windows installer may show the ordinary blue “Windows protected your PC” warning because it has no verified publisher certificate or established download reputation. Get the installer from this site and compare its SHA-256 with the value on the download page. On that ordinary warning, choose More info, check the app name, then Run anyway only if you trust the download. Smart App Control or an organization policy may provide no Run anyway option; follow that policy and do not try to bypass it. Stop and report a malware or potentially unwanted app warning.</p>
       <p>In the release notes, “unsigned installer” means only that the Windows installer lacks that publisher certificate. CATalyst separately signs its update information and publishes SHA-256 checksums; those checks do not remove the Windows warning. Linux packages also have checksum files but no distribution repository signature.</p>
       <h3>Does “Dexie only” mean Splash was removed?</h3>
-      <p>No. Dexie is the offer marketplace. Splash can optionally broadcast the same signed offers to peers and starts off. Separate-peer delivery has not been proven for this beta; check the exact offer's visibility before relying on Splash reach.</p>
+      <p>No. Dexie is the offer marketplace. Splash can optionally broadcast the same signed offers to peers and starts off. Check the exact offer's peer visibility before relying on Splash reach.</p>
       <h3>Where does the reference price come from?</h3>
       <p>Fresh Dexie offer-book evidence for the selected CAT/XCH pair. TibetSwap AMM pricing is retired. When attributable market depth is insufficient, CATalyst can hold or withdraw exposure instead of inventing a price.</p>
       <h3>Do I need Sage Wallet?</h3>
@@ -128,13 +128,13 @@
       <h3>What happens when I stop the bot?</h3>
       <p>Stopping prevents new trading work. Existing offers may remain live until you request cancellation and confirm terminal state in Sage. Cancel All is separate. After a restart, inspect the previous session and any unresolved operation before retrying.</p>
       <h3>Is this ready for unattended live trading?</h3>
-      <p>No. It is an opt-in tester beta. Exact-candidate original-wallet active-offer recovery, independent second-PC live acceptance, complete native UI review, independent Splash receipt and final 24-hour trace audits remain open. Use a separate test wallet, small amounts and an attentive operator.</p>
+      <p data-release-attendance-status>No. It is an opt-in tester beta. Original-wallet recovery, independent second-PC acceptance, native UI review, Splash peer receipt, and final stability traces remain open. Use a separate test wallet, small amounts, and an attentive operator.</p>
       <h3>How do I report an issue?</h3>
       <p>Use the <a href="https://github.com/catalystxch/catalyst-bot/issues/new/choose" rel="noopener">public issue forms</a> with the exact version and a redacted Debug Bundle from Logs if available. Do not post seed phrases, private keys, wallet TLS keys or unredacted wallet data.</p>
     </section>
   </main>
   <footer>
-    <p>This is the current v1.4 Dexie beta documentation. Read the <a href="beta-guide.html">step-by-step guide</a> before connecting a wallet.</p>
+    <p>Read the <a href="beta-guide.html">step-by-step guide</a> before connecting a wallet, and verify the current release in the download panel.</p>
   </footer>
 </body>
 </html>

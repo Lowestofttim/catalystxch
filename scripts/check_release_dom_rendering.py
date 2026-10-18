@@ -142,7 +142,7 @@ def main() -> None:
 
                 docs_page = browser.new_page(viewport={"width": 390, "height": 900})
                 docs_page.goto(urljoin(url, "docs.html"), wait_until="networkidle")
-                assert "Dexie beta docs and FAQ" in docs_page.title()
+                assert "Dexie docs and FAQ" in docs_page.title()
                 assert docs_page.locator("h2#faq").count() == 1
 
                 verified_page = browser.new_page(viewport={"width": 390, "height": 900})
@@ -168,6 +168,7 @@ def main() -> None:
                 )
                 unsigned_page.goto(url, wait_until="networkidle")
                 assert_release_panel(unsigned_page, unsigned_metadata)
+                assert unsigned_page.locator("[data-release-phase-heading]").text_content() == "New Dexie only beta testing"
 
                 stable_page = browser.new_page(viewport={"width": 390, "height": 900})
                 stable_page.route(
@@ -180,6 +181,7 @@ def main() -> None:
                 )
                 stable_page.goto(url, wait_until="networkidle")
                 assert_release_panel(stable_page, stable_metadata)
+                assert stable_page.locator("[data-release-phase-heading]").text_content() == "Unsigned Windows stable release"
 
             finally:
                 browser.close()

@@ -15,6 +15,7 @@ from check_release_metadata import (
     validate_metadata,
 )
 from sync_release_metadata import (
+    DEFAULT_HTML_FILES,
     append_platform_downloads,
     build_metadata,
     ensure_current_stable_release,
@@ -27,6 +28,10 @@ from windows_release_verification import ReleaseVerificationError
 
 
 def main() -> None:
+    if {path.name for path in DEFAULT_HTML_FILES} != {
+        "index.html", "docs.html", "beta-guide.html"
+    }:
+        raise SystemExit("release sync must update homepage, FAQ, and setup guide")
     selected = []
     fixtures = {
         None: {"tagName": "v1.3.21", "isDraft": False, "isPrerelease": False},
@@ -553,6 +558,27 @@ def main() -> None:
         if "<aside data-windows-download-notice hidden>" in stable_html:
             raise SystemExit("unsigned stable fallback must keep warning visible")
         validate_fallback_records(Path(__file__).resolve().parents[1] / "index.html", stable_html, stable_metadata, "v9.8.7")
+        site_root = Path(__file__).resolve().parents[1]
+        for page_name in ("index.html", "docs.html", "beta-guide.html"):
+            page_source = (site_root / page_name).read_text(encoding="utf-8")
+            stable_page = render_release_fallbacks(page_source, stable_metadata)
+            if "New Dexie only beta testing" in stable_page:
+                raise SystemExit(f"{page_name} still presents the stable release as beta")
+            if "Unsigned Windows stable release" not in stable_page:
+                raise SystemExit(f"{page_name} lacks stable release guidance")
+            beta_page = render_release_fallbacks(page_source, unsigned_metadata)
+            if "New Dexie only beta testing" not in beta_page:
+                raise SystemExit(f"{page_name} lost its live beta guidance")
+            signed_page = render_release_fallbacks(page_source, metadata)
+            if "New Dexie only beta testing" in signed_page:
+                raise SystemExit(f"{page_name} treats a verified signed stable release as beta")
+            if page_name != "index.html":
+                if "current stable release" not in stable_page:
+                    raise SystemExit(f"{page_name} still lacks stable setup status")
+                if "opt-in tester beta" in stable_page:
+                    raise SystemExit(f"{page_name} still claims stable is a tester beta")
+                if "opt-in tester beta" not in beta_page:
+                    raise SystemExit(f"{page_name} lost beta setup status")
         for change in ("isPrerelease", "isDraft"):
             invalid_release = deepcopy(stable_release)
             invalid_release[change] = True

@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Setup and safety guide for the CATalyst v1.4 beta with optional Splash offer broadcasting.">
+  <meta name="description" content="Setup and safety guide for CATalyst with Dexie offers and optional Splash offer broadcasting.">
   <meta name="theme-color" content="#080C12">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'none'; frame-src 'none'; form-action 'none'; upgrade-insecure-requests">
-  <title>v1.4 beta guide | CATalyst</title>
+  <title>Setup guide | CATalyst</title>
   <link rel="icon" type="image/png" href="assets/icon.png">
   <style>
     :root { color-scheme: dark; font: 16px/1.65 system-ui, sans-serif; background: #080c12; color: #dbe6ef; }
@@ -40,29 +40,29 @@
       <a href="index.html#download">Downloads</a>
       <a href="https://github.com/catalystxch/catalyst-bot/issues" rel="noopener">Feedback and bugs</a>
     </nav>
-    <h1>v1.4 beta guide</h1>
-    <p class="eyebrow">New Dexie only beta testing · Windows and Linux</p>
-    <p class="lead">CATalyst connects to Sage Wallet locally, builds Chia CAT/XCH offers, and publishes them to Dexie. Optional Splash P2P can also broadcast offers. TibetSwap, AMM pricing, Arb Sniper, and Close the Gap are retired in this beta.</p>
+    <h1>CATalyst setup guide</h1>
+    <p class="eyebrow"><span data-release-phase-heading>New Dexie only beta testing</span> · Windows and Linux</p>
+    <p class="lead">CATalyst connects to Sage Wallet locally, builds Chia CAT/XCH offers, and publishes them to Dexie. Optional Splash P2P can also broadcast offers. TibetSwap, AMM pricing, Arb Sniper, and Close the Gap are retired.</p>
     <div class="notice"><strong>Real wallet actions:</strong> Offers, cancellations, and coin preparation can move or lock funds and incur network fees. Test with a separate wallet funded only with amounts you can afford to lose, and back up an existing CATalyst profile before upgrading. Review the selected wallet, exact CAT asset ID, campaign limits, and fee scope in the app before proceeding.</div>
   </header>
   <main>
     <section aria-labelledby="why-dexie">
       <h2 id="why-dexie">Why CATalyst changed</h2>
       <p>TibetSwap has shut down. Earlier CATalyst versions used its AMM data for pricing and arbitrage, so those TibetSwap-dependent features are retired. We redesigned CATalyst to manage CAT/XCH offers through Dexie without relying on TibetSwap. Read <a href="https://v2.tibetswap.io/" rel="noopener">TibetSwap's closure notice</a> for the venue's announcement.</p>
-      <p>Dexie is the offer marketplace for this beta. Splash remains an optional way to broadcast the same signed offers, starts off for new installs, and does not replace Dexie.</p>
+      <p>Dexie is CATalyst's offer marketplace. Splash remains an optional way to broadcast the same signed offers, starts off for new installs, and does not replace Dexie.</p>
     </section>
     <section aria-labelledby="tester-status">
       <h2 id="tester-status">Tester status</h2>
-      <p>This is a test build. Windows and Linux package smoke checks, automated tests, and an isolated Sage offer lifecycle have passed. The current build is still undergoing real-wallet offer and recovery testing, independent second-PC live acceptance, and long-running stability checks. Please report unexpected behavior; a successful install does not mean those checks have passed.</p>
-      <p>Dexie is the primary offer publication path. Splash is optional and starts off for new installs; delivery to a separate Splash peer has not yet been confirmed for this build. Leave Splash off unless you specifically intend to test it, and verify offer visibility independently.</p>
+      <p data-release-setup-status>This is an opt-in tester beta. Package smoke checks, automated tests, and an isolated Sage offer lifecycle passed. Real-wallet recovery, second-PC acceptance, and long-running stability checks are still in progress for this build; a successful install does not mean those checks have passed.</p>
+      <p>Dexie is the primary offer publication path. Splash is optional and starts off for new installs. If you enable it, check peer status and verify exact offer visibility independently before relying on broadcast reach.</p>
     </section>
     <section>
       <h2>1. Download and verify</h2>
       <ol>
-        <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the v1.4 Dexie beta. It links to official Windows and Linux releases.</li>
+        <li>Use the <a href="index.html#download">CATalyst download panel</a> only when it explicitly lists the release you intend to install. It links to official Windows and Linux releases.</li>
         <li>Compare your downloaded package's SHA-256 with the value shown on the page and in its release sidecar before running it.</li>
-        <li>Windows: a blue “Windows protected your PC” screen may appear because this beta installer does not yet have a verified publisher certificate. After checking the SHA-256, choose More info, check the app name, then Run anyway if you want to install. Stop if Windows or your antivirus reports malware or a potentially unwanted app.</li>
-        <li>Linux x86-64: the download panel offers the Debian package. The <a href="https://github.com/catalystxch/catalyst-bot/releases/tag/v1.4.1" rel="noopener">exact release</a> also offers an AppImage and tarball, following the packaging path used for earlier working Linux releases.</li>
+        <li>Windows: an installer marked unsigned may show the ordinary blue “Windows protected your PC” warning. Verify the official source and SHA-256 first. If that ordinary warning offers More info, check the app name and choose Run anyway only if you trust it. Stop for malware or potentially unwanted app warnings; Smart App Control and organization policy may provide no continuation option.</li>
+        <li>Linux x86-64: use the package listed for the same release in the download panel. Check the exact asset and matching checksum sidecar before running it.</li>
       </ol>
     </section>
     <section>
@@ -101,7 +101,7 @@
     </section>
   </main>
   <footer>
-    <p>This guide is for the v1.4 Dexie beta. See the <a href="docs.html">current FAQ and screenshots</a> for Linux setup and package verification.</p>
+    <p>See the <a href="docs.html">current FAQ and screenshots</a> for Linux setup and package verification, and verify the release shown in the download panel.</p>
   </footer>
 </body>
 </html>

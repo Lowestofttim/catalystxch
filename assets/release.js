@@ -222,6 +222,12 @@
       ? `${channel} - published ${releaseDate} - ${status.toLowerCase()}`
       : `${channel} - ${status.toLowerCase()}`;
 
+    setText("[data-release-phase-heading]", unsignedWindowsStable
+      ? "Unsigned Windows stable release"
+      : (latest.channel === "stable" && isVerifiedWindowsInstaller(windowsInstaller))
+        ? "CATalyst stable release"
+      : "New Dexie only beta testing");
+
     setText("[data-release-version]", version);
     setText("[data-release-name]", latest.name || version);
     setText("[data-release-status]", status);
