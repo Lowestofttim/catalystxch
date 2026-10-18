@@ -212,6 +212,7 @@ function buildDocument(link, macosLink, linuxLink) {
     ["[data-release-meta]", [makeTextNode()]],
     ["[data-release-eyebrow]", [makeTextNode()]],
     ["[data-release-phase-heading]", [makeTextNode("New Dexie only beta testing")]],
+    ["[data-release-risk-label]", [makeTextNode("beta software")]],
     ["[data-release-date]", [makeTextNode()]],
     ["[data-release-download-name]", [makeTextNode(DOWNLOAD_NAME)]],
     ["[data-release-download-size]", [makeTextNode(DOWNLOAD_SIZE)]],
@@ -367,6 +368,7 @@ async function main() {
   assert(unsigned.text("[data-release-windows-tag]") === "Beta", "beta should be labelled on its platform card");
   assert(unsigned.text("[data-release-meta]").startsWith("Tester beta -"), "beta must not be described as stable in the release summary");
   assert(unsigned.text("[data-release-phase-heading]") === "New Dexie only beta testing", "beta homepage must retain beta heading");
+  assert(unsigned.text("[data-release-risk-label]") === "beta software", "beta homepage must retain beta risk label");
   assert(unsigned.hidden("[data-windows-download-notice]") === false, "unsigned beta should keep its warning visible");
   assert(unsigned.text("[data-windows-download-notice-title]") === "Windows may show a blue warning", "beta should show a specific warning title");
   assert(unsigned.text("[data-windows-download-notice-body]").includes("Windows protected your PC"), "unsigned beta should explain the normal SmartScreen warning");
@@ -377,6 +379,7 @@ async function main() {
   assert(stable.text("[data-release-sha256]") === unsignedStableWindows.sha256, "unsigned stable should show exact digest");
   assert(stable.text("[data-release-meta]").startsWith("Stable -"), "unsigned stable must say Stable");
   assert(stable.text("[data-release-phase-heading]") === "Unsigned Windows stable release", "stable homepage must not retain beta heading");
+  assert(stable.text("[data-release-risk-label]") === "automated trading software", "stable homepage must update risk label");
   assert(stable.text("[data-release-windows-tag]") === "Unsigned", "unsigned stable card must say Unsigned");
   assert(stable.text("[data-release-windows-signature]") === "Unsigned Windows release; no verified publisher certificate", "unsigned stable must not claim a publisher");
   assert(stable.hidden("[data-windows-download-notice]") === false, "unsigned stable must show warning");

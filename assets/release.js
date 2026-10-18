@@ -227,6 +227,9 @@
       : (latest.channel === "stable" && isVerifiedWindowsInstaller(windowsInstaller))
         ? "CATalyst stable release"
       : "New Dexie only beta testing");
+    setText("[data-release-risk-label]", (
+      unsignedWindowsStable || (latest.channel === "stable" && isVerifiedWindowsInstaller(windowsInstaller))
+    ) ? "automated trading software" : "beta software");
 
     setText("[data-release-version]", version);
     setText("[data-release-name]", latest.name || version);

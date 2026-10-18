@@ -573,12 +573,21 @@ def main() -> None:
             if "New Dexie only beta testing" in signed_page:
                 raise SystemExit(f"{page_name} treats a verified signed stable release as beta")
             if page_name != "index.html":
+                if '<h2 id="tester-status" data-release-status-heading>Release status</h2>' not in stable_page:
+                    raise SystemExit(f"{page_name} retains tester heading for stable release")
+                if '<h2 id="tester-status" data-release-status-heading>Tester status</h2>' not in beta_page:
+                    raise SystemExit(f"{page_name} lost tester heading for current beta")
                 if "current stable release" not in stable_page:
                     raise SystemExit(f"{page_name} still lacks stable setup status")
                 if "opt-in tester beta" in stable_page:
                     raise SystemExit(f"{page_name} still claims stable is a tester beta")
                 if "opt-in tester beta" not in beta_page:
                     raise SystemExit(f"{page_name} lost beta setup status")
+            else:
+                if "<strong data-release-risk-label>automated trading software</strong>" not in stable_page:
+                    raise SystemExit("stable homepage risk label is wrong")
+                if "<strong data-release-risk-label>beta software</strong>" not in beta_page:
+                    raise SystemExit("current beta homepage lost its beta risk label")
         for change in ("isPrerelease", "isDraft"):
             invalid_release = deepcopy(stable_release)
             invalid_release[change] = True

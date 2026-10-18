@@ -642,6 +642,12 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         else f"{channel} - {status.lower()}"
     )
     values = {
+        "data-release-risk-label": (
+            "automated trading software" if public_stable_copy else "beta software"
+        ),
+        "data-release-status-heading": (
+            "Release status" if public_stable_copy else "Tester status"
+        ),
         "data-release-phase-heading": (
             "Unsigned Windows stable release"
             if unsigned_windows_stable
