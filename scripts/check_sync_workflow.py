@@ -35,6 +35,7 @@ def main() -> None:
         "Signed, unsigned beta, and unsigned stable": "separate Windows release proof rules",
         "--allow-unsigned-windows-beta": "the explicit unsigned Windows beta policy switch",
         "--allow-unsigned-windows-stable": "the explicit unsigned Windows stable policy switch",
+        "--beta-release-floor v1.4.1": "the current beta floor until a newer stable release is public",
     }
     for marker, purpose in required.items():
         if marker not in workflow:

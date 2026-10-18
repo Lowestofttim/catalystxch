@@ -59,6 +59,29 @@ def run_gh(repo: str, tag: str | None) -> dict:
         raise SystemExit(f"gh returned invalid JSON: {exc}")
 
 
+def select_release_at_beta_floor(
+    repo: str, beta_floor: str, get_release=run_gh
+) -> dict:
+    """Keep the current beta until a newer public stable tag is available."""
+
+    match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)", beta_floor)
+    if not match:
+        raise SystemExit("beta release floor must be a semantic tag")
+    floor_version = tuple(map(int, match.groups()))
+    latest = get_release(repo, None)
+    latest_match = re.fullmatch(
+        r"v(\d+)\.(\d+)\.(\d+)", str(latest.get("tagName") or "")
+    )
+    if (
+        latest_match
+        and tuple(map(int, latest_match.groups())) > floor_version
+        and latest.get("isDraft") is False
+        and latest.get("isPrerelease") is False
+    ):
+        return latest
+    return get_release(repo, beta_floor)
+
+
 def normalize_heading(line: str) -> str | None:
     match = re.match(r"^\s{0,3}#{1,6}\s+(.+?)\s*$", line)
     if not match:
@@ -709,6 +732,11 @@ def parse_args() -> argparse.Namespace:
         "--tag", default=None, help="specific release tag; omitted means latest release"
     )
     parser.add_argument(
+        "--beta-release-floor",
+        default=None,
+        help="keep this beta listed until GitHub latest is a newer public stable tag",
+    )
+    parser.add_argument(
         "--output", type=Path, default=DEFAULT_OUTPUT, help="metadata JSON output path"
     )
     parser.add_argument(
@@ -758,7 +786,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    release = run_gh(args.repo, args.tag)
+    if args.tag and args.beta_release_floor:
+        raise SystemExit("--tag and --beta-release-floor are mutually exclusive")
+    release = (
+        select_release_at_beta_floor(args.repo, args.beta_release_floor)
+        if args.beta_release_floor
+        else run_gh(args.repo, args.tag)
+    )
     if release.get("isDraft"):
         raise SystemExit("refusing to publish metadata for a draft release")
 

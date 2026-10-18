@@ -51,6 +51,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: >-
           python scripts/sync_release_metadata.py
+          --beta-release-floor v1.4.1
           --include-download-urls
           --allow-unsigned-windows-beta
           --allow-unsigned-windows-stable

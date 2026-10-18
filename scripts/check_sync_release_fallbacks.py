@@ -19,12 +19,28 @@ from sync_release_metadata import (
     build_metadata,
     preserve_generated_at_if_unchanged,
     render_release_fallbacks,
+    select_release_at_beta_floor,
     write_metadata_atomic,
 )
 from windows_release_verification import ReleaseVerificationError
 
 
 def main() -> None:
+    selected = []
+    fixtures = {
+        None: {"tagName": "v1.3.21", "isDraft": False, "isPrerelease": False},
+        "v1.4.1": {"tagName": "v1.4.1", "isDraft": False, "isPrerelease": True},
+    }
+    def fake_release(_repo, tag):
+        selected.append(tag)
+        return fixtures[tag]
+    assert select_release_at_beta_floor("owner/repo", "v1.4.1", fake_release)["tagName"] == "v1.4.1"
+    assert selected == [None, "v1.4.1"], "older stable must keep current beta"
+    fixtures[None] = {"tagName": "v1.4.2", "isDraft": False, "isPrerelease": False}
+    selected.clear()
+    assert select_release_at_beta_floor("owner/repo", "v1.4.1", fake_release)["tagName"] == "v1.4.2"
+    assert selected == [None], "newer stable must enter normal channel"
+
     metadata = {
         "schema_version": 2,
         "downloads_enabled": True,
