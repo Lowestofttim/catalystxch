@@ -554,6 +554,11 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         and windows.get("distribution_status") == "unsigned_beta"
         and windows.get("verification", {}).get("authenticode_status") == "unsigned"
     )
+    unsigned_windows_stable = bool(
+        windows
+        and windows.get("distribution_status") == "unsigned_stable"
+        and windows.get("verification", {}).get("authenticode_status") == "unsigned"
+    )
     if windows and linux:
         status = "Windows/Linux downloads available"
     elif windows:
@@ -593,21 +598,31 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         "data-release-windows-signature": (
             "No verified Windows publisher certificate; blue warning possible"
             if unsigned_windows_beta
+            else "Unsigned Windows release; no verified publisher certificate"
+            if unsigned_windows_stable
             else "Verified publisher: SignPath Foundation"
             if windows
             else "Windows installer unavailable - signature verification required"
         ),
         "data-release-windows-tag": (
-            "Beta" if unsigned_windows_beta else "Verified" if windows else "Unavailable"
+            "Beta"
+            if unsigned_windows_beta
+            else "Unsigned"
+            if unsigned_windows_stable
+            else "Verified"
+            if windows
+            else "Unavailable"
         ),
         "data-windows-download-notice-title": (
             "Windows may show a blue warning"
-            if unsigned_windows_beta
+            if unsigned_windows_beta or unsigned_windows_stable
             else "Windows download temporarily unavailable"
         ),
         "data-windows-download-notice-body": (
             "You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it."
             if unsigned_windows_beta
+            else "This is an unsigned Windows release with no verified publisher certificate. Download from this page and compare the file’s SHA-256 with the value below. If the ordinary blue “Windows protected your PC” warning appears, choose More info, check the app name, then Run anyway only if you trust the download. Smart App Control or an organization policy may provide no Run anyway option; follow that policy and do not try to bypass it. Stop and report any malware or potentially unwanted app warning."
+            if unsigned_windows_stable
             else "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. Linux packages and the source code remain available while a replacement is verified."
         ),
         "data-release-macos-size": "GitHub source",
@@ -623,7 +638,7 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     return _set_release_hook_hidden(
         rendered,
         "data-windows-download-notice",
-        hidden=windows is not None and not unsigned_windows_beta,
+        hidden=windows is not None and not unsigned_windows_beta and not unsigned_windows_stable,
     )
 
 

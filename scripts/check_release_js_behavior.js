@@ -67,6 +67,12 @@ const unsignedLatest = {
   ...baseLatest,
   assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? unsignedWindows : asset)
 };
+const unsignedStableWindows = { ...unsignedWindows, distribution_status: "unsigned_stable" };
+const unsignedStableLatest = {
+  ...baseLatest,
+  channel: "stable",
+  assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? unsignedStableWindows : asset)
+};
 const disabledWindows = {
   ...windowsInstaller,
   download_url: null,
@@ -363,6 +369,18 @@ async function main() {
   assert(unsigned.text("[data-windows-download-notice-body]").includes("Windows protected your PC"), "unsigned beta should explain the normal SmartScreen warning");
   assert(unsigned.text("[data-windows-download-notice-body]").includes("stop and report it"), "beta should distinguish malware or PUA warnings");
 
+  const stable = await runRelease({ downloads_enabled: true, latest: unsignedStableLatest });
+  assert(stable.link.href === unsignedStableWindows.download_url, "unsigned stable should set exact Windows href");
+  assert(stable.text("[data-release-sha256]") === unsignedStableWindows.sha256, "unsigned stable should show exact digest");
+  assert(stable.text("[data-release-meta]").startsWith("Stable -"), "unsigned stable must say Stable");
+  assert(stable.text("[data-release-windows-tag]") === "Unsigned", "unsigned stable card must say Unsigned");
+  assert(stable.text("[data-release-windows-signature]") === "Unsigned Windows release; no verified publisher certificate", "unsigned stable must not claim a publisher");
+  assert(stable.hidden("[data-windows-download-notice]") === false, "unsigned stable must show warning");
+  const stableNotice = stable.text("[data-windows-download-notice-body]");
+  for (const phrase of ["Windows protected your PC", "More info", "Run anyway", "Smart App Control", "organization policy", "malware", "potentially unwanted"]) {
+    assert(stableNotice.includes(phrase), `unsigned stable warning missing ${phrase}`);
+  }
+
   const disabled = await runRelease(disabledMetadata, PUBLIC_URL);
   assert(disabled.link.href === "", "disabled release should remove stale Windows download href");
   assert(disabled.macosLink.href === MAC_SOURCE_URL, "disabled release should preserve macOS source href");
@@ -418,6 +436,10 @@ async function main() {
     {
       name: "unsigned beta claiming a publisher",
       asset: { ...unsignedWindows, verification: { ...unsignedWindows.verification, publisher: "Unknown" } }
+    },
+    {
+      name: "unsigned stable claiming a publisher",
+      asset: { ...unsignedStableWindows, verification: { ...unsignedStableWindows.verification, publisher: "Unknown" } }
     }
   ];
   for (const testCase of guardedCases) {
@@ -430,6 +452,18 @@ async function main() {
     assert(guardFailure.link.attrs.get("aria-disabled") === "true", `${testCase.name} should mark Windows disabled`);
     assert(guardFailure.linuxLink.href === LINUX_URL, `${testCase.name} should preserve Linux`);
     assert(guardFailure.hidden("[data-windows-download-notice]") === false, `${testCase.name} should show the temporary pause notice`);
+  }
+  for (const badStable of [
+    { ...unsignedStableWindows, distribution_status: "unsigned_beta" },
+    { ...unsignedStableWindows, sha256: null },
+    { ...unsignedStableWindows, verification: { ...unsignedStableWindows.verification, evidence_url: "https://example.com/evidence" } }
+  ]) {
+    const latest = {
+      ...unsignedStableLatest,
+      assets: unsignedStableLatest.assets.map((asset) => asset === unsignedStableWindows ? badStable : asset)
+    };
+    const rejected = await runRelease({ downloads_enabled: true, latest });
+    assert(rejected.link.href === "", "invalid unsigned stable evidence must disable Windows link");
   }
 
   const staleLatest = {

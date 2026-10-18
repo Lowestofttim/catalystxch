@@ -67,7 +67,7 @@
     return (
       asset.download_url === `${releaseBase}${asset.name}` &&
       /^[a-f0-9]{64}$/.test(asset.sha256 || "") &&
-      asset.distribution_status !== "unsigned_beta" &&
+      asset.distribution_status == null &&
       asset.verification.authenticode_status === "valid" &&
       asset.verification.publisher === "SignPath Foundation" &&
       asset.verification.timestamp_status === "valid" &&
@@ -80,13 +80,13 @@
     );
   };
 
-  const isUnsignedWindowsBeta = (asset) => {
+  const isUnsignedWindowsChannel = (asset, channel) => {
     if (!asset || asset.download_enabled !== true || !asset.verification) return false;
     const nameMatch = /^Catalyst-Setup-(v\d+\.\d+\.\d+)\.exe$/.exec(asset.name || "");
     if (!nameMatch) return false;
     const releaseBase = `https://github.com/Lowestofttim/catalyst-releases/releases/download/${nameMatch[1]}/`;
     return (
-      asset.distribution_status === "unsigned_beta" &&
+      asset.distribution_status === `unsigned_${channel}` &&
       asset.download_url === `${releaseBase}${asset.name}` &&
       /^[a-f0-9]{64}$/.test(asset.sha256 || "") &&
       asset.verification.authenticode_status === "unsigned" &&
@@ -101,6 +101,8 @@
       asset.verification.evidence_sha256 === null
     );
   };
+  const isUnsignedWindowsBeta = (asset) => isUnsignedWindowsChannel(asset, "beta");
+  const isUnsignedWindowsStable = (asset) => isUnsignedWindowsChannel(asset, "stable");
 
   const findAsset = (latest, platform, kind) => {
     if (!Array.isArray(latest.assets)) return null;
@@ -121,7 +123,11 @@
 
   const findWindowsInstaller = (latest) => {
     const asset = findAsset(latest, "windows", "installer");
-    return (isVerifiedWindowsInstaller(asset) || isUnsignedWindowsBeta(asset)) ? asset : null;
+    return (
+      isVerifiedWindowsInstaller(asset) ||
+      (latest.channel === "prerelease" && isUnsignedWindowsBeta(asset)) ||
+      (latest.channel === "stable" && isUnsignedWindowsStable(asset))
+    ) ? asset : null;
   };
   const findPlatformDownload = (latest, platform) => (
     findAsset(latest, platform, "installer") ||
@@ -205,6 +211,7 @@
     const releaseDate = formatDate(latest.published_at);
     const windowsInstaller = findWindowsInstaller(latest);
     const unsignedWindowsBeta = isUnsignedWindowsBeta(windowsInstaller);
+    const unsignedWindowsStable = isUnsignedWindowsStable(windowsInstaller);
     const linuxDownload = findPlatformDownload(latest, "linux");
     const downloadsAvailable = Boolean(windowsInstaller);
     const status = downloadsAvailable
@@ -247,20 +254,24 @@
       "[data-release-windows-signature]",
       unsignedWindowsBeta
         ? "No verified Windows publisher certificate; blue warning possible"
+        : unsignedWindowsStable
+        ? "Unsigned Windows release; no verified publisher certificate"
         : "Verified publisher: SignPath Foundation"
     );
     setText(
       "[data-release-windows-tag]",
-      unsignedWindowsBeta ? "Beta" : "Verified"
+      unsignedWindowsBeta ? "Beta" : unsignedWindowsStable ? "Unsigned" : "Verified"
     );
-    if (unsignedWindowsBeta) {
+    if (unsignedWindowsBeta || unsignedWindowsStable) {
       setText("[data-windows-download-notice-title]", "Windows may show a blue warning");
       setText(
         "[data-windows-download-notice-body]",
-        "You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it."
+        unsignedWindowsStable
+          ? "This is an unsigned Windows release with no verified publisher certificate. Download from this page and compare the file’s SHA-256 with the value below. If the ordinary blue “Windows protected your PC” warning appears, choose More info, check the app name, then Run anyway only if you trust the download. Smart App Control or an organization policy may provide no Run anyway option; follow that policy and do not try to bypass it. Stop and report any malware or potentially unwanted app warning."
+          : "You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it."
       );
     }
-    setHidden("[data-windows-download-notice]", !unsignedWindowsBeta);
+    setHidden("[data-windows-download-notice]", !unsignedWindowsBeta && !unsignedWindowsStable);
     enableDownload("[data-download-windows]", windowsInstaller);
   };
 

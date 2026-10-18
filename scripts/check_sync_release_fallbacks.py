@@ -9,7 +9,11 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
 
-from check_release_metadata import find_stale_literal_versions, validate_metadata
+from check_release_metadata import (
+    find_stale_literal_versions,
+    validate_fallback_records,
+    validate_metadata,
+)
 from sync_release_metadata import (
     append_platform_downloads,
     build_metadata,
@@ -480,6 +484,20 @@ def main() -> None:
             raise SystemExit("verified stable release must enable exact installer")
         if validate_metadata(stable_metadata) != "v9.8.7":
             raise SystemExit("stable metadata validator rejected verified release")
+        stable_html = render_release_fallbacks(source, stable_metadata)
+        for expected in (
+            "Unsigned Windows release; no verified publisher certificate",
+            "Unsigned</span>",
+            "Windows protected your PC",
+            "Smart App Control",
+            "organization policy",
+            "potentially unwanted",
+        ):
+            if expected not in stable_html:
+                raise SystemExit(f"unsigned stable fallback is missing: {expected}")
+        if "<aside data-windows-download-notice hidden>" in stable_html:
+            raise SystemExit("unsigned stable fallback must keep warning visible")
+        validate_fallback_records(Path(__file__).resolve().parents[1] / "index.html", stable_html, stable_metadata, "v9.8.7")
         for change in ("isPrerelease", "isDraft"):
             invalid_release = deepcopy(stable_release)
             invalid_release[change] = True
