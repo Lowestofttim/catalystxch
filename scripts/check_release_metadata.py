@@ -220,10 +220,10 @@ def load_metadata() -> dict:
     return data
 
 
-def is_unsigned_windows_beta(asset: dict) -> bool:
+def is_unsigned_windows_channel(asset: dict, channel: str) -> bool:
     verification = asset.get("verification")
     return bool(
-        asset.get("distribution_status") == "unsigned_beta"
+        asset.get("distribution_status") == f"unsigned_{channel}"
         and isinstance(verification, dict)
         and verification.get("authenticode_status") == "unsigned"
         and verification.get("publisher") is None
@@ -236,6 +236,14 @@ def is_unsigned_windows_beta(asset: dict) -> bool:
         and verification.get("evidence_url") is None
         and verification.get("evidence_sha256") is None
     )
+
+
+def is_unsigned_windows_beta(asset: dict) -> bool:
+    return is_unsigned_windows_channel(asset, "beta")
+
+
+def is_unsigned_windows_stable(asset: dict) -> bool:
+    return is_unsigned_windows_channel(asset, "stable")
 
 
 def validate_metadata(data: dict) -> str:
@@ -339,7 +347,13 @@ def validate_metadata(data: dict) -> str:
                     fail("enabled Windows installer name is invalid")
                 if asset["download_url"] != f"{release_prefix}{expected_name}":
                     fail("enabled Windows installer URL is invalid")
-                if not is_unsigned_windows_beta(asset):
+                unsigned_beta = is_unsigned_windows_beta(asset)
+                unsigned_stable = is_unsigned_windows_stable(asset)
+                if unsigned_beta and latest.get("channel") != "prerelease":
+                    fail("unsigned beta requires prerelease channel")
+                if unsigned_stable and latest.get("channel") != "stable":
+                    fail("unsigned stable requires stable channel")
+                if not unsigned_beta and not unsigned_stable:
                     if asset.get("distribution_status") is not None:
                         fail("verified Windows download has an invalid distribution status")
                     expected_verification = {

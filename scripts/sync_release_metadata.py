@@ -21,6 +21,7 @@ from pathlib import Path
 from windows_release_verification import (
     ReleaseVerificationError,
     verify_unsigned_windows_release,
+    verify_unsigned_windows_stable_release,
     verify_windows_release,
 )
 
@@ -186,9 +187,9 @@ def _unavailable_windows_verification() -> dict[str, object]:
 
 
 def _has_windows_signing_evidence(release: dict, version: str) -> bool:
-    expected_name = f"windows-signature-{version}.json"
     return any(
-        isinstance(asset, dict) and asset.get("name") == expected_name
+        isinstance(asset, dict)
+        and re.fullmatch(r"windows-signature-.*\.json", str(asset.get("name") or ""))
         for asset in (release.get("assets") or [])
     )
 
@@ -214,8 +215,10 @@ def build_metadata(
     kind: str,
     *,
     allow_unsigned_windows_beta: bool = False,
+    allow_unsigned_windows_stable: bool = False,
     windows_verifier=verify_windows_release,
     windows_unsigned_verifier=verify_unsigned_windows_release,
+    windows_unsigned_stable_verifier=verify_unsigned_windows_stable_release,
 ) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
@@ -238,13 +241,26 @@ def build_metadata(
             windows_result = windows_verifier(release)
         except ReleaseVerificationError:
             windows_result = None
+        no_signing_evidence = not _has_windows_signing_evidence(release, version)
         if (
             windows_result is None
+            and no_signing_evidence
             and allow_unsigned_windows_beta
-            and not _has_windows_signing_evidence(release, version)
+            and release.get("isPrerelease") is True
         ):
             try:
                 unsigned_windows_result = windows_unsigned_verifier(release)
+            except ReleaseVerificationError:
+                unsigned_windows_result = None
+        if (
+            windows_result is None
+            and no_signing_evidence
+            and allow_unsigned_windows_stable
+            and release.get("isPrerelease") is False
+            and release.get("isDraft") is False
+        ):
+            try:
+                unsigned_windows_result = windows_unsigned_stable_verifier(release)
             except ReleaseVerificationError:
                 unsigned_windows_result = None
 
@@ -703,6 +719,11 @@ def parse_args() -> argparse.Namespace:
         help="publish an explicitly labelled unsigned Windows beta when signature verification is unavailable",
     )
     parser.add_argument(
+        "--allow-unsigned-windows-stable",
+        action="store_true",
+        help="publish an explicitly labelled unsigned Windows stable release after exact verification",
+    )
+    parser.add_argument(
         "--include-experimental-archives",
         action="store_true",
         help="legacy alias for --include-platform-downloads",
@@ -733,6 +754,7 @@ def main() -> None:
         args.platform,
         args.kind,
         allow_unsigned_windows_beta=args.allow_unsigned_windows_beta,
+        allow_unsigned_windows_stable=args.allow_unsigned_windows_stable,
     )
     if args.include_platform_downloads or args.include_experimental_archives:
         platform_release = run_gh(args.experimental_repo, metadata["latest"]["version"])

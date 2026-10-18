@@ -32,15 +32,17 @@ def main() -> None:
         "sudo apt-get install -y osslsigncode": "the independent Authenticode verifier",
         "cryptography==50.0.1": "the pinned CATalyst manifest signature verifier",
         "python scripts/check_windows_release_verification.py": "pure Windows release verifier regression checks",
-        "windows-signature-": "the signed evidence companion asset",
+        "Signed, unsigned beta, and unsigned stable": "separate Windows release proof rules",
         "--allow-unsigned-windows-beta": "the explicit unsigned Windows beta policy switch",
-        "--tag v1.4.1": "the pinned opt-in beta release tag",
+        "--allow-unsigned-windows-stable": "the explicit unsigned Windows stable policy switch",
     }
     for marker, purpose in required.items():
         if marker not in workflow:
             raise SystemExit(f"sync workflow is missing {purpose}: {marker}")
     if "--include-platform-downloads" not in workflow:
         raise SystemExit("Windows/Linux beta sync must include the published Linux assets")
+    if "--tag v1.4.1" in workflow:
+        raise SystemExit("stable releases must be found through latest public release")
     if re.search(r"(?m)^\s*git push\s*$", workflow):
         raise SystemExit("sync workflow must not push directly to protected main")
     if re.search(r"uses:\s*actions/[^@\s]+@v\d+", workflow):

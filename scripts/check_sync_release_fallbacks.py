@@ -9,7 +9,7 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
 
-from check_release_metadata import find_stale_literal_versions
+from check_release_metadata import find_stale_literal_versions, validate_metadata
 from sync_release_metadata import (
     append_platform_downloads,
     build_metadata,
@@ -347,8 +347,10 @@ def main() -> None:
         ):
             raise SystemExit("failed Windows verification removed the Linux release")
 
+        beta_release = deepcopy(release)
+        beta_release["isPrerelease"] = True
         unsigned_metadata = build_metadata(
-            release,
+            beta_release,
             "Lowestofttim/catalyst-releases",
             True,
             "windows",
@@ -423,7 +425,7 @@ def main() -> None:
         if "<aside data-windows-download-notice hidden>" in unsigned_html:
             raise SystemExit("unsigned Windows fallback must keep its warning visible")
 
-        invalid_signed_release = deepcopy(release)
+        invalid_signed_release = deepcopy(beta_release)
         invalid_signed_release["assets"].append(
             {
                 "name": "windows-signature-v9.8.7.json",
@@ -452,6 +454,63 @@ def main() -> None:
             raise SystemExit(
                 "a release with invalid signing evidence must fail closed instead of falling back to unsigned beta"
             )
+
+        stable_release = deepcopy(release)
+        stable_release["isDraft"] = False
+        stable_verification = deepcopy(unsigned_windows["verification"])
+        stable_result = {
+            "download_enabled": True,
+            "distribution_status": "unsigned_stable",
+            "verification": stable_verification,
+        }
+        stable_metadata = build_metadata(
+            stable_release,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_stable=True,
+            windows_verifier=fail_verification,
+            windows_unsigned_stable_verifier=lambda value: stable_result,
+        )
+        stable_asset = stable_metadata["latest"]["assets"][0]
+        if stable_asset.get("distribution_status") != "unsigned_stable":
+            raise SystemExit("verified stable release must keep unsigned_stable status")
+        if stable_asset.get("download_enabled") is not True:
+            raise SystemExit("verified stable release must enable exact installer")
+        if validate_metadata(stable_metadata) != "v9.8.7":
+            raise SystemExit("stable metadata validator rejected verified release")
+        for change in ("isPrerelease", "isDraft"):
+            invalid_release = deepcopy(stable_release)
+            invalid_release[change] = True
+            result = build_metadata(
+                invalid_release,
+                "Lowestofttim/catalyst-releases",
+                True,
+                "windows",
+                "installer",
+                allow_unsigned_windows_stable=True,
+                windows_verifier=fail_verification,
+                windows_unsigned_stable_verifier=lambda value: stable_result,
+            )
+            if result["latest"]["assets"][0]["download_enabled"]:
+                raise SystemExit(f"{change} must disable unsigned stable download")
+        signed_stable = deepcopy(stable_release)
+        signed_stable["assets"].append(invalid_signed_release["assets"][-1])
+        result = build_metadata(
+            signed_stable,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_stable=True,
+            windows_verifier=fail_verification,
+            windows_unsigned_stable_verifier=lambda value: (_ for _ in ()).throw(
+                AssertionError("unsigned stable verifier must not run with signing evidence")
+            ),
+        )
+        if result["latest"]["assets"][0]["download_enabled"]:
+            raise SystemExit("invalid signed evidence must disable stable download")
 
         before_replace_failure = output.read_bytes()
         with patch.object(Path, "replace", side_effect=OSError("replace failed")):
