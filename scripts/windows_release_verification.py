@@ -228,7 +228,7 @@ def validate_signed_update_manifest(
     for field, (actual, wanted) in expected.items():
         if actual != wanted:
             raise ReleaseVerificationError(f"signed manifest {field} does not match")
-    if expected_channel == "beta":
+    if expected_channel == "beta" or expected_source_commit is not None:
         if not re.fullmatch(r"[a-f0-9]{40}", str(expected_source_commit or "")):
             raise ReleaseVerificationError("source tag commit is unavailable")
         if manifest.get("source_commit") != expected_source_commit:

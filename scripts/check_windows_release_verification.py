@@ -669,6 +669,11 @@ def check_unsigned_stable_verification() -> None:
     assert result["verification"]["publisher"] is None
     assert result["verification"]["update_manifest_status"] == "valid"
 
+    wrong_source_payloads = dict(payloads)
+    wrong_source_payloads[
+        "https://api.github.com/repos/catalystxch/catalyst-bot/commits/v1.3.17"
+    ] = json.dumps({"sha": "b" * 40}).encode()
+
     def reject(candidate, data=payloads, signer=unsigned_runner):
         expect_failure(
             lambda: verify_stable(
@@ -680,6 +685,8 @@ def check_unsigned_stable_verification() -> None:
             ),
             "Unsigned Windows release verification failed",
         )
+
+    reject(release, wrong_source_payloads)
 
     for field, value in (("isPrerelease", True), ("isDraft", True)):
         candidate = copy.deepcopy(release)
