@@ -11,12 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main() -> int:
     metadata = json.loads((ROOT / "assets/release/latest.json").read_text(encoding="utf-8"))
-    homepage = render_release_fallbacks(
-        (ROOT / "index.html").read_text(encoding="utf-8"), metadata
-    ).lower()
-    guide = render_release_fallbacks(
-        (ROOT / "beta-guide.html").read_text(encoding="utf-8"), metadata
-    ).lower()
+    pages = {}
+    for page_name in ("index.html", "docs.html", "beta-guide.html"):
+        source = (ROOT / page_name).read_text(encoding="utf-8")
+        if render_release_fallbacks(source, metadata) != source:
+            raise SystemExit(f"{page_name} static fallback is out of sync with release metadata")
+        pages[page_name] = source.lower()
+    homepage = pages["index.html"]
+    guide = pages["beta-guide.html"]
     if metadata["latest"]["channel"] == "prerelease":
         if "new dexie only beta testing" not in homepage or "new dexie only beta testing" not in guide:
             raise SystemExit("Both current beta pages must identify the tester beta")
