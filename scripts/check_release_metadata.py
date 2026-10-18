@@ -220,10 +220,10 @@ def load_metadata() -> dict:
     return data
 
 
-def is_unsigned_windows_beta(asset: dict) -> bool:
+def is_unsigned_windows_channel(asset: dict, channel: str) -> bool:
     verification = asset.get("verification")
     return bool(
-        asset.get("distribution_status") == "unsigned_beta"
+        asset.get("distribution_status") == f"unsigned_{channel}"
         and isinstance(verification, dict)
         and verification.get("authenticode_status") == "unsigned"
         and verification.get("publisher") is None
@@ -236,6 +236,14 @@ def is_unsigned_windows_beta(asset: dict) -> bool:
         and verification.get("evidence_url") is None
         and verification.get("evidence_sha256") is None
     )
+
+
+def is_unsigned_windows_beta(asset: dict) -> bool:
+    return is_unsigned_windows_channel(asset, "beta")
+
+
+def is_unsigned_windows_stable(asset: dict) -> bool:
+    return is_unsigned_windows_channel(asset, "stable")
 
 
 def validate_metadata(data: dict) -> str:
@@ -288,6 +296,11 @@ def validate_metadata(data: dict) -> str:
     ]
     if len(windows_assets) != 1:
         fail("website metadata must expose exactly one Windows installer record")
+    if (
+        latest.get("channel") == "stable"
+        and windows_assets[0].get("download_enabled") is not True
+    ):
+        fail("public stable Windows installer must pass verification")
 
     for asset in assets:
         if not isinstance(asset, dict):
@@ -339,7 +352,13 @@ def validate_metadata(data: dict) -> str:
                     fail("enabled Windows installer name is invalid")
                 if asset["download_url"] != f"{release_prefix}{expected_name}":
                     fail("enabled Windows installer URL is invalid")
-                if not is_unsigned_windows_beta(asset):
+                unsigned_beta = is_unsigned_windows_beta(asset)
+                unsigned_stable = is_unsigned_windows_stable(asset)
+                if unsigned_beta and latest.get("channel") != "prerelease":
+                    fail("unsigned beta requires prerelease channel")
+                if unsigned_stable and latest.get("channel") != "stable":
+                    fail("unsigned stable requires stable channel")
+                if not unsigned_beta and not unsigned_stable:
                     if asset.get("distribution_status") is not None:
                         fail("verified Windows download has an invalid distribution status")
                     expected_verification = {
@@ -447,6 +466,7 @@ def validate_fallback_records(
     asset = find_asset(data, "windows", "installer")
     linux_asset = find_platform_download(data, "linux")
     unsigned_windows_beta = bool(asset and is_unsigned_windows_beta(asset))
+    unsigned_windows_stable = bool(asset and is_unsigned_windows_stable(asset))
     release_date = format_date(latest.get("published_at", ""))
     if asset and linux_asset:
         status = "Windows/Linux downloads available"
@@ -486,6 +506,8 @@ def validate_fallback_records(
         "data-release-windows-signature": (
             "No verified Windows publisher certificate; blue warning possible"
             if unsigned_windows_beta
+            else "Unsigned Windows release; no verified publisher certificate"
+            if unsigned_windows_stable
             else "Verified publisher: SignPath Foundation"
             if asset
             else "Windows installer unavailable - signature verification required"
@@ -493,18 +515,22 @@ def validate_fallback_records(
         "data-release-windows-tag": (
             "Beta"
             if unsigned_windows_beta
+            else "Unsigned"
+            if unsigned_windows_stable
             else "Verified"
             if asset
             else "Unavailable"
         ),
         "data-windows-download-notice-title": (
             "Windows may show a blue warning"
-            if unsigned_windows_beta
+            if unsigned_windows_beta or unsigned_windows_stable
             else "Windows download temporarily unavailable"
         ),
         "data-windows-download-notice-body": (
             "You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it."
             if unsigned_windows_beta
+            else "This is an unsigned Windows release with no verified publisher certificate. Download from this page and compare the file’s SHA-256 with the value below. If the ordinary blue “Windows protected your PC” warning appears, choose More info, check the app name, then Run anyway only if you trust the download. Smart App Control or an organization policy may provide no Run anyway option; follow that policy and do not try to bypass it. Stop and report any malware or potentially unwanted app warning."
+            if unsigned_windows_stable
             else "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. Linux packages and the source code remain available while a replacement is verified."
         ),
         "data-release-macos-size": "GitHub source",
@@ -568,7 +594,8 @@ def validate_website_wiring(data: dict, version: str) -> None:
         "update_manifest_url",
         "update_manifest_signature_url",
         "evidence_sha256",
-        "unsigned_beta",
+        "isUnsignedWindowsBeta",
+        "isUnsignedWindowsStable",
     ):
         if marker not in release_js:
             fail(f"assets/release.js is missing Windows verification marker {marker}")
