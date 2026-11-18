@@ -241,9 +241,14 @@ def resolve_source_tag_commit(tag: str, *, urlopen) -> str:
     if not re.fullmatch(r"v\d+\.\d+\.\d+", tag):
         raise ReleaseVerificationError("source tag is invalid")
     url = f"https://api.github.com/repos/catalystxch/catalyst-bot/commits/{tag}"
-    request = urllib.request.Request(
-        url, headers={"User-Agent": "CATalyst-website-release-verifier/1"}
-    )
+    headers = {"User-Agent": "CATalyst-website-release-verifier/1"}
+    # Anonymous API calls from shared GitHub runners hit the 60-per-hour
+    # limit and fail with HTTP 403, which silently disabled the Windows
+    # download. Use the workflow token when one is available.
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
     with urlopen(request, timeout=60) as response:
         if response.geturl() != url:
             raise ReleaseVerificationError("source tag API redirect is not canonical")
