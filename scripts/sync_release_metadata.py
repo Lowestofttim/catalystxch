@@ -21,6 +21,7 @@ from pathlib import Path
 from windows_release_verification import (
     ReleaseVerificationError,
     verify_unsigned_windows_release,
+    verify_unsigned_windows_stable_release,
     verify_windows_release,
 )
 
@@ -28,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPO = "Lowestofttim/catalyst-releases"
 DEFAULT_EXPERIMENTAL_REPO = "catalystxch/catalyst-bot"
 DEFAULT_OUTPUT = ROOT / "assets" / "release" / "latest.json"
-DEFAULT_HTML_FILES = (ROOT / "index.html", ROOT / "docs.html")
+DEFAULT_HTML_FILES = (ROOT / "index.html", ROOT / "docs.html", ROOT / "beta-guide.html")
 GH_FIELDS = "tagName,name,isDraft,isPrerelease,publishedAt,body,assets"
 
 
@@ -56,6 +57,45 @@ def run_gh(repo: str, tag: str | None) -> dict:
         return json.loads(completed.stdout)
     except json.JSONDecodeError as exc:
         raise SystemExit(f"gh returned invalid JSON: {exc}")
+
+
+def select_release_at_beta_floor(
+    repo: str, beta_floor: str, get_release=run_gh
+) -> dict:
+    """Keep the current beta until a newer public stable tag is available."""
+
+    match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)", beta_floor)
+    if not match:
+        raise SystemExit("beta release floor must be a semantic tag")
+    floor_version = tuple(map(int, match.groups()))
+    latest = get_release(repo, None)
+    latest_match = re.fullmatch(
+        r"v(\d+)\.(\d+)\.(\d+)", str(latest.get("tagName") or "")
+    )
+    if (
+        latest_match
+        and tuple(map(int, latest_match.groups())) > floor_version
+        and latest.get("isDraft") is False
+        and latest.get("isPrerelease") is False
+    ):
+        return latest
+    return get_release(repo, beta_floor)
+
+
+def ensure_current_stable_release(
+    release: dict, repo: str, get_release=run_gh
+) -> None:
+    """Keep an explicitly selected older stable tag out of website latest."""
+
+    latest = get_release(repo, None)
+    if (
+        latest.get("tagName") != release.get("tagName")
+        or latest.get("isDraft") is not False
+        or latest.get("isPrerelease") is not False
+    ):
+        raise ReleaseVerificationError(
+            "stable release is not the current public latest"
+        )
 
 
 def normalize_heading(line: str) -> str | None:
@@ -186,9 +226,9 @@ def _unavailable_windows_verification() -> dict[str, object]:
 
 
 def _has_windows_signing_evidence(release: dict, version: str) -> bool:
-    expected_name = f"windows-signature-{version}.json"
     return any(
-        isinstance(asset, dict) and asset.get("name") == expected_name
+        isinstance(asset, dict)
+        and str(asset.get("name") or "").lower().startswith("windows-signature-")
         for asset in (release.get("assets") or [])
     )
 
@@ -214,8 +254,11 @@ def build_metadata(
     kind: str,
     *,
     allow_unsigned_windows_beta: bool = False,
+    allow_unsigned_windows_stable: bool = False,
+    require_verified_stable_windows: bool = False,
     windows_verifier=verify_windows_release,
     windows_unsigned_verifier=verify_unsigned_windows_release,
+    windows_unsigned_stable_verifier=verify_unsigned_windows_stable_release,
 ) -> dict:
     version = release.get("tagName") or release.get("name")
     if not version:
@@ -238,15 +281,39 @@ def build_metadata(
             windows_result = windows_verifier(release)
         except ReleaseVerificationError:
             windows_result = None
+        no_signing_evidence = not _has_windows_signing_evidence(release, version)
         if (
             windows_result is None
+            and no_signing_evidence
             and allow_unsigned_windows_beta
-            and not _has_windows_signing_evidence(release, version)
+            and release.get("isPrerelease") is True
         ):
             try:
                 unsigned_windows_result = windows_unsigned_verifier(release)
             except ReleaseVerificationError:
                 unsigned_windows_result = None
+
+        if (
+            windows_result is None
+            and no_signing_evidence
+            and allow_unsigned_windows_stable
+            and release.get("isPrerelease") is False
+            and release.get("isDraft") is False
+        ):
+            try:
+                unsigned_windows_result = windows_unsigned_stable_verifier(release)
+            except ReleaseVerificationError:
+                unsigned_windows_result = None
+        if (
+            require_verified_stable_windows
+            and release.get("isPrerelease") is False
+            and release.get("isDraft") is False
+            and windows_result is None
+            and unsigned_windows_result is None
+        ):
+            raise ReleaseVerificationError(
+                "public stable Windows installer verification failed"
+            )
 
     expected_windows_name = f"Catalyst-Setup-{version}.exe"
     assets = []
@@ -538,6 +605,21 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         and windows.get("distribution_status") == "unsigned_beta"
         and windows.get("verification", {}).get("authenticode_status") == "unsigned"
     )
+    unsigned_windows_stable = bool(
+        windows
+        and windows.get("distribution_status") == "unsigned_stable"
+        and windows.get("verification", {}).get("authenticode_status") == "unsigned"
+    )
+    signed_windows_stable = bool(
+        windows
+        and latest.get("channel") == "stable"
+        and windows.get("distribution_status") is None
+        and windows.get("verification", {}).get("authenticode_status") == "valid"
+        and windows.get("verification", {}).get("publisher") == "SignPath Foundation"
+        and windows.get("verification", {}).get("timestamp_status") == "valid"
+        and windows.get("verification", {}).get("update_manifest_status") == "valid"
+    )
+    public_stable_copy = unsigned_windows_stable or signed_windows_stable
     if windows and linux:
         status = "Windows/Linux downloads available"
     elif windows:
@@ -560,6 +642,29 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         else f"{channel} - {status.lower()}"
     )
     values = {
+        "data-release-risk-label": (
+            "automated trading software" if public_stable_copy else "beta software"
+        ),
+        "data-release-status-heading": (
+            "Release status" if public_stable_copy else "Tester status"
+        ),
+        "data-release-phase-heading": (
+            "Unsigned Windows stable release"
+            if unsigned_windows_stable
+            else "CATalyst stable release"
+            if signed_windows_stable
+            else "New Dexie only beta testing"
+        ),
+        "data-release-setup-status": (
+            "This is the current stable release. The Windows package is available only when the download panel verifies its release evidence. Trading uses real wallet funds, so review the wallet, exact asset ID, campaign limits, and safety state before starting."
+            if public_stable_copy
+            else "This is an opt-in tester beta. Package smoke checks, automated tests, and an isolated Sage offer lifecycle passed. Real-wallet recovery, second-PC acceptance, and long-running stability checks are still in progress for this build; a successful install does not mean those checks have passed."
+        ),
+        "data-release-attendance-status": (
+            "A stable release does not guarantee unattended trading. Use limits you understand, inspect wallet and market state regularly, and stop when CATalyst reports an unresolved operation or safety block."
+            if public_stable_copy
+            else "No. It is an opt-in tester beta. Original-wallet recovery, independent second-PC acceptance, native UI review, Splash peer receipt, and final stability traces remain open. Use a separate test wallet, small amounts, and an attentive operator."
+        ),
         "data-release-version": latest["version"],
         "data-release-name": latest["name"],
         "data-release-status": status,
@@ -577,21 +682,31 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
         "data-release-windows-signature": (
             "No verified Windows publisher certificate; blue warning possible"
             if unsigned_windows_beta
+            else "Unsigned Windows release; no verified publisher certificate"
+            if unsigned_windows_stable
             else "Verified publisher: SignPath Foundation"
             if windows
             else "Windows installer unavailable - signature verification required"
         ),
         "data-release-windows-tag": (
-            "Beta" if unsigned_windows_beta else "Verified" if windows else "Unavailable"
+            "Beta"
+            if unsigned_windows_beta
+            else "Unsigned"
+            if unsigned_windows_stable
+            else "Verified"
+            if windows
+            else "Unavailable"
         ),
         "data-windows-download-notice-title": (
             "Windows may show a blue warning"
-            if unsigned_windows_beta
+            if unsigned_windows_beta or unsigned_windows_stable
             else "Windows download temporarily unavailable"
         ),
         "data-windows-download-notice-body": (
             "You may see “Windows protected your PC” because Windows does not yet recognize this beta installer or a verified publisher. This warning alone does not report malware. Download from this page and check that the file’s SHA-256 matches the value below. On that blue screen, choose More info, check the app name, then Run anyway to install. If Windows or your antivirus reports malware or a potentially unwanted app, stop and report it."
             if unsigned_windows_beta
+            else "This is an unsigned Windows release with no verified publisher certificate. Download from this page and compare the file’s SHA-256 with the value below. If the ordinary blue “Windows protected your PC” warning appears, choose More info, check the app name, then Run anyway only if you trust the download. Smart App Control or an organization policy may provide no Run anyway option; follow that policy and do not try to bypass it. Stop and report any malware or potentially unwanted app warning."
+            if unsigned_windows_stable
             else "The current Windows installer failed CATalyst's public-download Microsoft Defender check and is temporarily withheld. Do not bypass malware or potentially unwanted software alerts. Linux packages and the source code remain available while a replacement is verified."
         ),
         "data-release-macos-size": "GitHub source",
@@ -607,7 +722,7 @@ def render_release_fallbacks(html_text: str, metadata: dict) -> str:
     return _set_release_hook_hidden(
         rendered,
         "data-windows-download-notice",
-        hidden=windows is not None and not unsigned_windows_beta,
+        hidden=windows is not None and not unsigned_windows_beta and not unsigned_windows_stable,
     )
 
 
@@ -678,6 +793,11 @@ def parse_args() -> argparse.Namespace:
         "--tag", default=None, help="specific release tag; omitted means latest release"
     )
     parser.add_argument(
+        "--beta-release-floor",
+        default=None,
+        help="keep this beta listed until GitHub latest is a newer public stable tag",
+    )
+    parser.add_argument(
         "--output", type=Path, default=DEFAULT_OUTPUT, help="metadata JSON output path"
     )
     parser.add_argument(
@@ -703,6 +823,11 @@ def parse_args() -> argparse.Namespace:
         help="publish an explicitly labelled unsigned Windows beta when signature verification is unavailable",
     )
     parser.add_argument(
+        "--allow-unsigned-windows-stable",
+        action="store_true",
+        help="publish an explicitly labelled unsigned Windows stable release after exact verification",
+    )
+    parser.add_argument(
         "--include-experimental-archives",
         action="store_true",
         help="legacy alias for --include-platform-downloads",
@@ -715,16 +840,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--update-html-fallbacks",
         action="store_true",
-        help="update index.html and docs.html static fallbacks to match the metadata",
+        help="update index.html, docs.html, and beta-guide.html static fallbacks to match the metadata",
     )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    release = run_gh(args.repo, args.tag)
+    if args.tag and args.beta_release_floor:
+        raise SystemExit("--tag and --beta-release-floor are mutually exclusive")
+    release = (
+        select_release_at_beta_floor(args.repo, args.beta_release_floor)
+        if args.beta_release_floor
+        else run_gh(args.repo, args.tag)
+    )
     if release.get("isDraft"):
         raise SystemExit("refusing to publish metadata for a draft release")
+    if args.include_download_urls and release.get("isPrerelease") is False:
+        ensure_current_stable_release(release, args.repo)
 
     metadata = build_metadata(
         release,
@@ -733,6 +866,8 @@ def main() -> None:
         args.platform,
         args.kind,
         allow_unsigned_windows_beta=args.allow_unsigned_windows_beta,
+        allow_unsigned_windows_stable=args.allow_unsigned_windows_stable,
+        require_verified_stable_windows=args.include_download_urls,
     )
     if args.include_platform_downloads or args.include_experimental_archives:
         platform_release = run_gh(args.experimental_repo, metadata["latest"]["version"])

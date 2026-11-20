@@ -113,6 +113,18 @@ def main() -> None:
             ],
         },
     }
+    stable_installer = {**unsigned_installer, "distribution_status": "unsigned_stable"}
+    stable_metadata = {
+        **unsigned_metadata,
+        "latest": {
+            **enabled_latest,
+            "channel": "stable",
+            "assets": [
+                stable_installer if asset is enabled_installer else asset
+                for asset in enabled_latest["assets"]
+            ],
+        },
+    }
 
     server = None
     url = os.environ.get("CATALYST_SITE_URL")
@@ -130,7 +142,7 @@ def main() -> None:
 
                 docs_page = browser.new_page(viewport={"width": 390, "height": 900})
                 docs_page.goto(urljoin(url, "docs.html"), wait_until="networkidle")
-                assert "Dexie beta docs and FAQ" in docs_page.title()
+                assert "Dexie docs and FAQ" in docs_page.title()
                 assert docs_page.locator("h2#faq").count() == 1
 
                 verified_page = browser.new_page(viewport={"width": 390, "height": 900})
@@ -156,6 +168,20 @@ def main() -> None:
                 )
                 unsigned_page.goto(url, wait_until="networkidle")
                 assert_release_panel(unsigned_page, unsigned_metadata)
+                assert unsigned_page.locator("[data-release-phase-heading]").text_content() == "New Dexie only beta testing"
+
+                stable_page = browser.new_page(viewport={"width": 390, "height": 900})
+                stable_page.route(
+                    "**/assets/release/latest.json",
+                    lambda route: route.fulfill(
+                        status=200,
+                        content_type="application/json",
+                        body=json.dumps(stable_metadata),
+                    ),
+                )
+                stable_page.goto(url, wait_until="networkidle")
+                assert_release_panel(stable_page, stable_metadata)
+                assert stable_page.locator("[data-release-phase-heading]").text_content() == "Unsigned Windows stable release"
 
             finally:
                 browser.close()
@@ -188,7 +214,7 @@ def find_windows_installer(latest: dict) -> dict | None:
                     and asset.get("verification", {}).get("update_manifest_status") == "valid"
                 )
                 or (
-                    asset.get("distribution_status") == "unsigned_beta"
+                    asset.get("distribution_status") in {"unsigned_beta", "unsigned_stable"}
                     and asset.get("verification", {}).get("authenticode_status") == "unsigned"
                     and asset.get("verification", {}).get("publisher") is None
                 )
@@ -228,6 +254,9 @@ def assert_release_panel(page, metadata: dict) -> None:
     unsigned_beta = bool(
         installer and installer.get("distribution_status") == "unsigned_beta"
     )
+    unsigned_stable = bool(
+        installer and installer.get("distribution_status") == "unsigned_stable"
+    )
     linux_available = bool(linux and linux["download_url"])
 
     expect(page.locator("[data-release-eyebrow]")).to_contain_text(latest["version"])
@@ -254,7 +283,7 @@ def assert_release_panel(page, metadata: dict) -> None:
     windows_notice = page.locator("[data-windows-download-notice]")
     expect(windows_notice).to_have_count(1)
     if downloads_available:
-        if unsigned_beta:
+        if unsigned_beta or unsigned_stable:
             expect(windows_notice).to_be_visible()
             expect(page.locator("[data-windows-download-notice-title]")).to_have_text(
                 "Windows may show a blue warning"
@@ -263,7 +292,7 @@ def assert_release_panel(page, metadata: dict) -> None:
                 "Windows protected your PC"
             )
             expect(page.locator("[data-windows-download-notice-body]")).to_contain_text(
-                "stop and report it"
+                "stop and report it" if unsigned_beta else "Smart App Control"
             )
         else:
             expect(windows_notice).to_be_hidden()
@@ -304,6 +333,8 @@ def assert_release_panel(page, metadata: dict) -> None:
     expect(page.locator("[data-release-windows-signature]")).to_have_text(
         "No verified Windows publisher certificate; blue warning possible"
         if unsigned_beta
+        else "Unsigned Windows release; no verified publisher certificate"
+        if unsigned_stable
         else "Verified publisher: SignPath Foundation"
         if downloads_available
         else "Windows installer unavailable - signature verification required"

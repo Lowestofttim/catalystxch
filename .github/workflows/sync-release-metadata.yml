@@ -43,7 +43,7 @@ jobs:
 
       - name: Check Windows release verifier
         run: |
-          # Every enabled Windows release requires windows-signature-vX.Y.Z.json.
+          # Signed, unsigned beta, and unsigned stable have separate proof rules.
           python scripts/check_windows_release_verification.py
 
       - name: Sync the latest public release
@@ -51,9 +51,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: >-
           python scripts/sync_release_metadata.py
-          --tag v1.4.1
+          --beta-release-floor v1.4.1
           --include-download-urls
           --allow-unsigned-windows-beta
+          --allow-unsigned-windows-stable
           --include-platform-downloads
           --update-html-fallbacks
 
@@ -74,7 +75,7 @@ jobs:
           gh auth setup-git
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/release/latest.json index.html docs.html
+          git add assets/release/latest.json index.html docs.html beta-guide.html
           if git diff --cached --quiet; then
             echo "Website already matches the latest public release."
             echo "changed=false" >> "$GITHUB_OUTPUT"

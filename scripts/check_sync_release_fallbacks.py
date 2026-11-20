@@ -9,18 +9,60 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
 
-from check_release_metadata import find_stale_literal_versions
+from check_release_metadata import (
+    find_stale_literal_versions,
+    validate_fallback_records,
+    validate_metadata,
+)
 from sync_release_metadata import (
+    DEFAULT_HTML_FILES,
     append_platform_downloads,
     build_metadata,
+    ensure_current_stable_release,
     preserve_generated_at_if_unchanged,
     render_release_fallbacks,
+    select_release_at_beta_floor,
     write_metadata_atomic,
 )
 from windows_release_verification import ReleaseVerificationError
 
 
 def main() -> None:
+    if {path.name for path in DEFAULT_HTML_FILES} != {
+        "index.html", "docs.html", "beta-guide.html"
+    }:
+        raise SystemExit("release sync must update homepage, FAQ, and setup guide")
+    selected = []
+    fixtures = {
+        None: {"tagName": "v1.3.21", "isDraft": False, "isPrerelease": False},
+        "v1.4.1": {"tagName": "v1.4.1", "isDraft": False, "isPrerelease": True},
+    }
+    def fake_release(_repo, tag):
+        selected.append(tag)
+        return fixtures[tag]
+    assert select_release_at_beta_floor("owner/repo", "v1.4.1", fake_release)["tagName"] == "v1.4.1"
+    assert selected == [None, "v1.4.1"], "older stable must keep current beta"
+    fixtures[None] = {"tagName": "v1.4.2", "isDraft": False, "isPrerelease": False}
+    selected.clear()
+    assert select_release_at_beta_floor("owner/repo", "v1.4.1", fake_release)["tagName"] == "v1.4.2"
+    assert selected == [None], "newer stable must enter normal channel"
+
+    older_stable = {"tagName": "v1.3.21", "isDraft": False, "isPrerelease": False}
+    current_stable = {"tagName": "v1.4.2", "isDraft": False, "isPrerelease": False}
+    try:
+        ensure_current_stable_release(
+            older_stable, "Lowestofttim/catalyst-releases",
+            lambda _repo, _tag: current_stable,
+        )
+    except ReleaseVerificationError:
+        pass
+    else:
+        raise SystemExit("an older stable tag must not become website latest")
+    ensure_current_stable_release(
+        current_stable, "Lowestofttim/catalyst-releases",
+        lambda _repo, _tag: current_stable,
+    )
+
     metadata = {
         "schema_version": 2,
         "downloads_enabled": True,
@@ -288,6 +330,12 @@ def main() -> None:
     )
     disabled["downloads_enabled"] = True
     disabled["download_status"] = "partial"
+    try:
+        validate_metadata(disabled)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit("protected-main check must reject an unverified stable Windows release")
     disabled_html = render_release_fallbacks(source, disabled)
     if "Linux download available" not in disabled_html:
         raise SystemExit("disabled Windows must not disable Linux")
@@ -319,6 +367,22 @@ def main() -> None:
         failed_windows = failed_metadata["latest"]["assets"][0]
         if failed_windows["download_enabled"] is not False:
             raise SystemExit("failed Windows verification must disable Windows")
+        try:
+            build_metadata(
+                {**release, "isDraft": False},
+                "Lowestofttim/catalyst-releases",
+                True,
+                "windows",
+                "installer",
+                require_verified_stable_windows=True,
+                windows_verifier=fail_verification,
+                allow_unsigned_windows_stable=True,
+                windows_unsigned_stable_verifier=fail_verification,
+            )
+        except ReleaseVerificationError:
+            pass
+        else:
+            raise SystemExit("public stable verification failure must fail release sync")
         if failed_windows["verification"] != {
             "authenticode_status": "unavailable",
             "publisher": None,
@@ -347,8 +411,10 @@ def main() -> None:
         ):
             raise SystemExit("failed Windows verification removed the Linux release")
 
+        beta_release = deepcopy(release)
+        beta_release["isPrerelease"] = True
         unsigned_metadata = build_metadata(
-            release,
+            beta_release,
             "Lowestofttim/catalyst-releases",
             True,
             "windows",
@@ -423,7 +489,7 @@ def main() -> None:
         if "<aside data-windows-download-notice hidden>" in unsigned_html:
             raise SystemExit("unsigned Windows fallback must keep its warning visible")
 
-        invalid_signed_release = deepcopy(release)
+        invalid_signed_release = deepcopy(beta_release)
         invalid_signed_release["assets"].append(
             {
                 "name": "windows-signature-v9.8.7.json",
@@ -452,6 +518,121 @@ def main() -> None:
             raise SystemExit(
                 "a release with invalid signing evidence must fail closed instead of falling back to unsigned beta"
             )
+
+        stable_release = deepcopy(release)
+        stable_release["isDraft"] = False
+        stable_verification = deepcopy(unsigned_windows["verification"])
+        stable_result = {
+            "download_enabled": True,
+            "distribution_status": "unsigned_stable",
+            "verification": stable_verification,
+        }
+        stable_metadata = build_metadata(
+            stable_release,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_stable=True,
+            windows_verifier=fail_verification,
+            windows_unsigned_stable_verifier=lambda value: stable_result,
+        )
+        stable_asset = stable_metadata["latest"]["assets"][0]
+        if stable_asset.get("distribution_status") != "unsigned_stable":
+            raise SystemExit("verified stable release must keep unsigned_stable status")
+        if stable_asset.get("download_enabled") is not True:
+            raise SystemExit("verified stable release must enable exact installer")
+        if validate_metadata(stable_metadata) != "v9.8.7":
+            raise SystemExit("stable metadata validator rejected verified release")
+        stable_html = render_release_fallbacks(source, stable_metadata)
+        for expected in (
+            "Unsigned Windows release; no verified publisher certificate",
+            "Unsigned</span>",
+            "Windows protected your PC",
+            "Smart App Control",
+            "organization policy",
+            "potentially unwanted",
+        ):
+            if expected not in stable_html:
+                raise SystemExit(f"unsigned stable fallback is missing: {expected}")
+        if "<aside data-windows-download-notice hidden>" in stable_html:
+            raise SystemExit("unsigned stable fallback must keep warning visible")
+        validate_fallback_records(Path(__file__).resolve().parents[1] / "index.html", stable_html, stable_metadata, "v9.8.7")
+        site_root = Path(__file__).resolve().parents[1]
+        for page_name in ("index.html", "docs.html", "beta-guide.html"):
+            page_source = (site_root / page_name).read_text(encoding="utf-8")
+            stable_page = render_release_fallbacks(page_source, stable_metadata)
+            if "New Dexie only beta testing" in stable_page:
+                raise SystemExit(f"{page_name} still presents the stable release as beta")
+            if "Unsigned Windows stable release" not in stable_page:
+                raise SystemExit(f"{page_name} lacks stable release guidance")
+            beta_page = render_release_fallbacks(page_source, unsigned_metadata)
+            if "New Dexie only beta testing" not in beta_page:
+                raise SystemExit(f"{page_name} lost its live beta guidance")
+            signed_page = render_release_fallbacks(page_source, metadata)
+            if "New Dexie only beta testing" in signed_page:
+                raise SystemExit(f"{page_name} treats a verified signed stable release as beta")
+            if page_name != "index.html":
+                if '<h2 id="tester-status" data-release-status-heading>Release status</h2>' not in stable_page:
+                    raise SystemExit(f"{page_name} retains tester heading for stable release")
+                if '<h2 id="tester-status" data-release-status-heading>Tester status</h2>' not in beta_page:
+                    raise SystemExit(f"{page_name} lost tester heading for current beta")
+                if "current stable release" not in stable_page:
+                    raise SystemExit(f"{page_name} still lacks stable setup status")
+                if "opt-in tester beta" in stable_page:
+                    raise SystemExit(f"{page_name} still claims stable is a tester beta")
+                if "opt-in tester beta" not in beta_page:
+                    raise SystemExit(f"{page_name} lost beta setup status")
+            else:
+                if "<strong data-release-risk-label>automated trading software</strong>" not in stable_page:
+                    raise SystemExit("stable homepage risk label is wrong")
+                if "<strong data-release-risk-label>beta software</strong>" not in beta_page:
+                    raise SystemExit("current beta homepage lost its beta risk label")
+        for change in ("isPrerelease", "isDraft"):
+            invalid_release = deepcopy(stable_release)
+            invalid_release[change] = True
+            result = build_metadata(
+                invalid_release,
+                "Lowestofttim/catalyst-releases",
+                True,
+                "windows",
+                "installer",
+                allow_unsigned_windows_stable=True,
+                windows_verifier=fail_verification,
+                windows_unsigned_stable_verifier=lambda value: stable_result,
+            )
+            if result["latest"]["assets"][0]["download_enabled"]:
+                raise SystemExit(f"{change} must disable unsigned stable download")
+        signed_stable = deepcopy(stable_release)
+        signed_stable["assets"].append(invalid_signed_release["assets"][-1])
+        result = build_metadata(
+            signed_stable,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_stable=True,
+            windows_verifier=fail_verification,
+            windows_unsigned_stable_verifier=lambda value: (_ for _ in ()).throw(
+                AssertionError("unsigned stable verifier must not run with signing evidence")
+            ),
+        )
+        if result["latest"]["assets"][0]["download_enabled"]:
+            raise SystemExit("invalid signed evidence must disable stable download")
+        malformed_evidence = deepcopy(stable_release)
+        malformed_evidence["assets"].append({"name": "windows-signature-bogus.txt"})
+        result = build_metadata(
+            malformed_evidence,
+            "Lowestofttim/catalyst-releases",
+            True,
+            "windows",
+            "installer",
+            allow_unsigned_windows_stable=True,
+            windows_verifier=fail_verification,
+            windows_unsigned_stable_verifier=lambda value: stable_result,
+        )
+        if result["latest"]["assets"][0]["download_enabled"]:
+            raise SystemExit("malformed signing evidence must disable stable download")
 
         before_replace_failure = output.read_bytes()
         with patch.object(Path, "replace", side_effect=OSError("replace failed")):

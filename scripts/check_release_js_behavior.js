@@ -44,6 +44,7 @@ const verifiedLatest = {
   ...baseLatest,
   assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? verifiedWindows : asset)
 };
+const signedStableLatest = { ...verifiedLatest, channel: "stable" };
 const unsignedWindows = {
   ...windowsInstaller,
   download_url: `https://github.com/Lowestofttim/catalyst-releases/releases/download/${baseLatest.version}/${windowsInstaller.name}`,
@@ -66,6 +67,12 @@ const unsignedWindows = {
 const unsignedLatest = {
   ...baseLatest,
   assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? unsignedWindows : asset)
+};
+const unsignedStableWindows = { ...unsignedWindows, distribution_status: "unsigned_stable" };
+const unsignedStableLatest = {
+  ...baseLatest,
+  channel: "stable",
+  assets: baseLatest.assets.map((asset) => asset === windowsInstaller ? unsignedStableWindows : asset)
 };
 const disabledWindows = {
   ...windowsInstaller,
@@ -204,6 +211,8 @@ function buildDocument(link, macosLink, linuxLink) {
     ["[data-release-status]", [makeTextNode()]],
     ["[data-release-meta]", [makeTextNode()]],
     ["[data-release-eyebrow]", [makeTextNode()]],
+    ["[data-release-phase-heading]", [makeTextNode("New Dexie only beta testing")]],
+    ["[data-release-risk-label]", [makeTextNode("beta software")]],
     ["[data-release-date]", [makeTextNode()]],
     ["[data-release-download-name]", [makeTextNode(DOWNLOAD_NAME)]],
     ["[data-release-download-size]", [makeTextNode(DOWNLOAD_SIZE)]],
@@ -358,10 +367,28 @@ async function main() {
   assert(unsigned.text("[data-release-windows-signature]") === "No verified Windows publisher certificate; blue warning possible", "beta should describe the Windows warning clearly");
   assert(unsigned.text("[data-release-windows-tag]") === "Beta", "beta should be labelled on its platform card");
   assert(unsigned.text("[data-release-meta]").startsWith("Tester beta -"), "beta must not be described as stable in the release summary");
+  assert(unsigned.text("[data-release-phase-heading]") === "New Dexie only beta testing", "beta homepage must retain beta heading");
+  assert(unsigned.text("[data-release-risk-label]") === "beta software", "beta homepage must retain beta risk label");
   assert(unsigned.hidden("[data-windows-download-notice]") === false, "unsigned beta should keep its warning visible");
   assert(unsigned.text("[data-windows-download-notice-title]") === "Windows may show a blue warning", "beta should show a specific warning title");
   assert(unsigned.text("[data-windows-download-notice-body]").includes("Windows protected your PC"), "unsigned beta should explain the normal SmartScreen warning");
   assert(unsigned.text("[data-windows-download-notice-body]").includes("stop and report it"), "beta should distinguish malware or PUA warnings");
+
+  const stable = await runRelease({ downloads_enabled: true, latest: unsignedStableLatest });
+  assert(stable.link.href === unsignedStableWindows.download_url, "unsigned stable should set exact Windows href");
+  assert(stable.text("[data-release-sha256]") === unsignedStableWindows.sha256, "unsigned stable should show exact digest");
+  assert(stable.text("[data-release-meta]").startsWith("Stable -"), "unsigned stable must say Stable");
+  assert(stable.text("[data-release-phase-heading]") === "Unsigned Windows stable release", "stable homepage must not retain beta heading");
+  assert(stable.text("[data-release-risk-label]") === "automated trading software", "stable homepage must update risk label");
+  assert(stable.text("[data-release-windows-tag]") === "Unsigned", "unsigned stable card must say Unsigned");
+  assert(stable.text("[data-release-windows-signature]") === "Unsigned Windows release; no verified publisher certificate", "unsigned stable must not claim a publisher");
+  assert(stable.hidden("[data-windows-download-notice]") === false, "unsigned stable must show warning");
+  const stableNotice = stable.text("[data-windows-download-notice-body]");
+  for (const phrase of ["Windows protected your PC", "More info", "Run anyway", "Smart App Control", "organization policy", "malware", "potentially unwanted"]) {
+    assert(stableNotice.includes(phrase), `unsigned stable warning missing ${phrase}`);
+  }
+  const signedStable = await runRelease({ downloads_enabled: true, latest: signedStableLatest });
+  assert(signedStable.text("[data-release-phase-heading]") === "CATalyst stable release", "signed stable must not retain beta or unsigned heading");
 
   const disabled = await runRelease(disabledMetadata, PUBLIC_URL);
   assert(disabled.link.href === "", "disabled release should remove stale Windows download href");
@@ -418,6 +445,10 @@ async function main() {
     {
       name: "unsigned beta claiming a publisher",
       asset: { ...unsignedWindows, verification: { ...unsignedWindows.verification, publisher: "Unknown" } }
+    },
+    {
+      name: "unsigned stable claiming a publisher",
+      asset: { ...unsignedStableWindows, verification: { ...unsignedStableWindows.verification, publisher: "Unknown" } }
     }
   ];
   for (const testCase of guardedCases) {
@@ -430,6 +461,18 @@ async function main() {
     assert(guardFailure.link.attrs.get("aria-disabled") === "true", `${testCase.name} should mark Windows disabled`);
     assert(guardFailure.linuxLink.href === LINUX_URL, `${testCase.name} should preserve Linux`);
     assert(guardFailure.hidden("[data-windows-download-notice]") === false, `${testCase.name} should show the temporary pause notice`);
+  }
+  for (const badStable of [
+    { ...unsignedStableWindows, distribution_status: "unsigned_beta" },
+    { ...unsignedStableWindows, sha256: null },
+    { ...unsignedStableWindows, verification: { ...unsignedStableWindows.verification, evidence_url: "https://example.com/evidence" } }
+  ]) {
+    const latest = {
+      ...unsignedStableLatest,
+      assets: unsignedStableLatest.assets.map((asset) => asset === unsignedStableWindows ? badStable : asset)
+    };
+    const rejected = await runRelease({ downloads_enabled: true, latest });
+    assert(rejected.link.href === "", "invalid unsigned stable evidence must disable Windows link");
   }
 
   const staleLatest = {

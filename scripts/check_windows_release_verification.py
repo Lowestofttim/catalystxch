@@ -13,6 +13,7 @@ import tempfile
 import urllib.error
 from pathlib import Path
 
+import windows_release_verification as verification
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from windows_release_verification import (
@@ -238,7 +239,7 @@ def build_release_fixture(channel="stable"):
             }
         },
     }
-    if channel == "beta":
+    if channel in {"beta", "stable"}:
         manifest["source_commit"] = "a" * 40
     manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
     signing_key = Ed25519PrivateKey.from_private_bytes(bytes(range(32)))
@@ -262,6 +263,7 @@ def build_release_fixture(channel="stable"):
     release = {
         "tagName": "v1.3.17",
         "isPrerelease": channel == "beta",
+        "isDraft": False,
         "assets": [
             {
                 "name": INSTALLER_NAME,
@@ -633,9 +635,108 @@ The signature is timestamped: Aug 28 2026
     )
 
 
+def check_unsigned_stable_verification() -> None:
+    verify_stable = getattr(verification, "verify_unsigned_windows_stable_release", None)
+    assert callable(verify_stable), "unsigned stable verifier is missing"
+
+    release, payloads, _, _, public_key_b64 = build_release_fixture(channel="stable")
+    release["assets"] = [
+        asset for asset in release["assets"]
+        if asset["name"] != "windows-signature-v1.3.17.json"
+    ]
+
+    def opener_for(source):
+        def opener(request, timeout):
+            url = request.full_url
+            return FakeResponse(source[url], url)
+        return opener
+
+    def unsigned_runner(command, **options):
+        return subprocess.CompletedProcess(
+            command, 1, "PE checksum : 0005CC67\nNo signature found\n\nFailed\n", ""
+        )
+
+    result = verify_stable(
+        release,
+        urlopen=opener_for(payloads),
+        runner=unsigned_runner,
+        system_name="Linux",
+        manifest_public_key_b64=public_key_b64,
+    )
+    assert result["download_enabled"] is True
+    assert result["distribution_status"] == "unsigned_stable"
+    assert result["verification"]["authenticode_status"] == "unsigned"
+    assert result["verification"]["publisher"] is None
+    assert result["verification"]["update_manifest_status"] == "valid"
+
+    wrong_source_payloads = dict(payloads)
+    wrong_source_payloads[
+        "https://api.github.com/repos/catalystxch/catalyst-bot/commits/v1.3.17"
+    ] = json.dumps({"sha": "b" * 40}).encode()
+
+    def reject(candidate, data=payloads, signer=unsigned_runner):
+        expect_failure(
+            lambda: verify_stable(
+                candidate,
+                urlopen=opener_for(data),
+                runner=signer,
+                system_name="Linux",
+                manifest_public_key_b64=public_key_b64,
+            ),
+            "Unsigned Windows release verification failed",
+        )
+
+    reject(release, wrong_source_payloads)
+
+    for field, value in (("isPrerelease", True), ("isDraft", True)):
+        candidate = copy.deepcopy(release)
+        candidate[field] = value
+        reject(candidate)
+
+    candidate = copy.deepcopy(release)
+    candidate["assets"].append({"name": "windows-signature-v1.3.17.json"})
+    reject(candidate)
+    candidate = copy.deepcopy(release)
+    candidate["assets"].append({"name": "windows-signature-bogus.txt"})
+    reject(candidate)
+
+    for field, value in (
+        ("size", 1),
+        ("digest", "sha256:" + "0" * 64),
+        ("url", "https://example.com/wrong.exe"),
+    ):
+        candidate = copy.deepcopy(release)
+        candidate["assets"][0][field] = value
+        reject(candidate)
+
+    for suffix, data in (
+        ("latest.json.sig", b"bad-signature"),
+        (f"{INSTALLER_NAME}.sha256", b"0" * 64),
+    ):
+        tampered = dict(payloads)
+        url = next(url for url in tampered if url.endswith("/" + suffix))
+        tampered[url] = data
+        reject(release, tampered)
+
+    beta_release, beta_payloads, _, _, _ = build_release_fixture(channel="beta")
+    beta_release["isPrerelease"] = False
+    beta_release["assets"] = [
+        asset for asset in beta_release["assets"]
+        if asset["name"] != "windows-signature-v1.3.17.json"
+    ]
+    reject(beta_release, beta_payloads)
+    reject(
+        release,
+        signer=lambda command, **options: subprocess.CompletedProcess(
+            command, 0, "Succeeded\nThe signature is timestamped\n", ""
+        ),
+    )
+
+
 def main() -> None:
     check_pure_validation()
     check_end_to_end_verification()
+    check_unsigned_stable_verification()
     print("Windows release evidence validation checks passed")
 
 
